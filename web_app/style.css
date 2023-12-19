@@ -1,0 +1,230 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+.header{
+    min-height: 100vh;
+    width: 100%;
+    background-image: linear-gradient(rgba(12, 27, 90, 0.7), rgba(11, 29, 102, 0.7));
+    background-position: center;
+    background-size: cover;
+    position: relative;
+}
+nav{
+    display: flex;
+    padding: 2% 6%;
+    justify-content: space-between;
+    align-items: center;
+}
+nav img{
+    width: 150px;
+}
+.nav-links{
+    flex: 1;
+    text-align: right;
+}
+.nav-links ul li{
+    list-style: none;
+    display: inline-block;
+    padding: 8px 12px;
+    position: relative;
+}
+.nav-links ul li a{
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+}
+.nav-links ul li::after{
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #6f88f7;
+    display: block;
+    margin: auto;
+    transition: 0.5s;
+}
+.nav-links ul li:hover::after{
+    width: 100%;
+}
+.text-box{
+    width: 90%;
+    color: #fff;
+    position: absolute;
+    /* top: 50%; */
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    text-align: left;
+}
+.text-box h1{
+    font-size: 62px;
+}
+.text-box p{
+    margin: 10px 0 40px;
+    font-size: 14px;
+    color:#fff
+}
+.hero-btn{
+    display: inline-block;
+    text-decoration: none;
+    color: rgba(11, 29, 102, 0.7);
+    border: 1px solid rgba(11, 29, 102, 0.7);
+    padding: 12px 34px;
+    font-size: 13px;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+}
+.hero-btn:hover{
+    border: 1px solid #6f88f7;
+    background: #6f88f7;
+    color:#fff;
+    transition: 0.5s;
+}
+nav .fa{
+    display: none;
+}
+
+@media(max-width: 700px){
+    .text-box h1{
+        font-size: 20px;
+    }
+    .nav-links ul li{
+        display: block;
+
+    }
+    .nav-links{
+        position: absolute;
+        background: #6f88f7;
+        height: 100vh;
+        width: 200px;
+        top: 0;
+        right: -200px;
+        text-align: left;
+        z-index: 2;
+        transition: 1s;
+    }
+    nav .fa{
+        display: block;
+        color:#fff;
+        margin: 10px;
+        font-size: 22px;
+        cursor:pointer;
+    }
+    .nav-links ul{
+        padding: 30px;
+
+    }
+    .row, .row-form{
+        flex-direction: column;
+    }
+}
+
+.row{
+    margin-top: 5%;
+    display: flex;
+    justify-content: space-between;
+}
+.row-form{
+    /* margin-top: 5%; */
+    display: flex;
+    justify-content: space-between;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+}
+.row-form-2{
+    display: flex;
+    justify-content:left;
+}
+
+.travel-col{
+    flex-basis: 25%;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 5%;
+    padding: 20px 12px;
+    box-sizing: border-box;
+    margin-left: 2%;
+}
+
+.footer{
+    width: 100;
+    text-align: center;
+    padding: 30px 0;
+}
+
+.footer h4{
+    margin-bottom:25px;
+    margin-top: 20px;
+    font-weight: 600;
+}
+.icons .fa{
+    color:#6f88f7;
+    margin: 0 13px;
+    cursor: pointer;
+    padding: 18px 0;
+}
+
+/* About us page*/
+.sub-header{
+    height: 50vh;
+    width: 100;
+    background-image: linear-gradient(rgba(12, 27, 90, 0.7), rgba(11, 29, 102, 0.7));
+    background-position: center;
+    background-size: cover;
+    text-align: left;
+    color:#fff;
+}
+.sub-header h1{
+    margin-top: 100px;
+    font-size: 50px;
+    margin-left: 30px;
+}
+.about-us{
+    width: 80%;
+    margin: auto;
+    padding-top: 80px;
+    padding-bottom: 50px;
+}
+.about-col{
+    flex-basis: 48%;
+    padding: 30px 2px;
+}
+.about-col img{
+    width: 100%;
+}
+.about-col h1{
+    padding-top: 0;
+}
+.about-col p{
+    padding: 15px 0 25px;
+}
+.comment-form{
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    outline: none;
+    background-color: #f0f0f0;
+}
+
+input, select{
+    width: 100%;
+    box-sizing: border-box;
+}
+.col-form{
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wrapper-class input[type="radio"] {
+    width: 15px;
+}
+  
+.wrapper-class label {
+    display: inline;
+    margin-left: 5px;
+}
