@@ -59,6 +59,10 @@ nav img{
 .text-box h1{
     font-size: 62px;
 }
+.text-box h2{
+    text-align: center;
+    font-size: 40px;
+}
 .text-box p{
     margin: 10px 0 40px;
     font-size: 14px;
@@ -86,7 +90,7 @@ nav .fa{
 }
 
 @media(max-width: 700px){
-    .text-box h1{
+    .text-box h1, .text-box h2{
         font-size: 20px;
     }
     .nav-links ul li{
@@ -115,7 +119,7 @@ nav .fa{
         padding: 30px;
 
     }
-    .row, .row-form{
+    .row, .row-form, .row-login{
         flex-direction: column;
     }
 }
@@ -128,7 +132,7 @@ nav .fa{
 .row-form{
     /* margin-top: 5%; */
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     border: 2px solid #ccc;
     border-radius: 10px;
     padding: 5px;
@@ -136,6 +140,16 @@ nav .fa{
 .row-form-2{
     display: flex;
     justify-content:left;
+}
+
+.row-login{
+    margin-top: 5%;
+    display: flex;
+    justify-content: center;
+}
+
+.row-login a{
+    font-size: 10px;
 }
 
 .travel-col{
@@ -146,6 +160,17 @@ nav .fa{
     padding: 20px 12px;
     box-sizing: border-box;
     margin-left: 2%;
+}
+
+.login-col{
+    flex-basis: 25%;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 5%;
+    padding: 20px 12px;
+    box-sizing: border-box;
+    margin-left: 2%;
+    align-self: auto;
 }
 
 .footer{
@@ -170,7 +195,7 @@ nav .fa{
 .sub-header{
     height: 50vh;
     width: 100;
-    background-image: linear-gradient(rgba(12, 27, 90, 0.7), rgba(11, 29, 102, 0.7));
+    background-image: linear-gradient(rgba(4, 9, 30, 0.5), rgba(4, 9, 30, 0.5)), url('images/team-work.jpg');
     background-position: center;
     background-size: cover;
     text-align: left;
@@ -181,23 +206,23 @@ nav .fa{
     font-size: 50px;
     margin-left: 30px;
 }
-.about-us{
+.work-with-us{
     width: 80%;
     margin: auto;
     padding-top: 80px;
     padding-bottom: 50px;
 }
-.about-col{
+.wwu-col{
     flex-basis: 48%;
     padding: 30px 2px;
 }
-.about-col img{
+.wwu-col img{
     width: 100%;
 }
-.about-col h1{
+.wwu-col h1{
     padding-top: 0;
 }
-.about-col p{
+.wwu-col p{
     padding: 15px 0 25px;
 }
 .comment-form{
@@ -218,6 +243,7 @@ input, select{
 .col-form{
     width: 100%;
     box-sizing: border-box;
+    margin: 1%;
 }
 
 .wrapper-class input[type="radio"] {
