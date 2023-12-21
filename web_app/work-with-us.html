@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="with=device-with, initial-scale=1.0">
+    <title>Itineris</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+<body>
+    <section class="sub-header">
+        <nav>
+            <a href="index.html"> <img src="images/logo.png"> </a>
+            <div class="nav-links" id="navLinks">
+                <i class="fa fa-times" onclick="hideMenu()"></i>
+                <ul>
+                    <li><a href="index.html">INICIO</a></li>
+                    <li><a href="">EMPRESAS</a></li>
+                    <li><a href="">TRABAJA CON NOSOTROS </a></li>
+                    <li><a href="login.html">INICIO DE SESION</a></li>
+                    <li><a href="sign-in.html">REGISTRARSE</a></li>
+                </ul>
+            </div>
+            <i class="fa fa-bars" onclick="showMenu()"></i>
+        </nav>
+        <h1>Trabaja con nosotros</h1>
+    </section>
+
+    <section class="work-with-us">
+        <div class="row">
+            <div class="wwu-col">
+                <h1>Lorem ipsus</h1>
+                <p>Lorem ipsusLorem ipsusLorem ipsusLorem ipsusLorem ipsus</p>
+                <a href="" class="hero-btn">Contactanos</a>
+            </div>
+            <div class="wwu-col">
+                <img src="images/working-people.jpg">
+            </div>
+        </div>
+    </section>
+
+    <section class="footer">
+        <h4>Sobre nosotros</h4>
+        <p>lorem ipsus</p>
+        <div class="icons">
+            <i class="fa fa-facebook"></i>
+            <i class="fa fa-twitter"></i>
+            <i class="fa fa-instagram"></i>
+        </div>
+    </section>
+
+    <!---------------- JavaScript to toggle the menu ----------------------->
+    <script>
+        var navLinks = document.getElementById("navLinks")
+
+        function showMenu(){
+            navLinks.style.right = "0";
+        }
+
+        function hideMenu(){
+            navLinks.style.right = "-200px";
+        }
+
+
+    </script>
+</body>
+</html >
