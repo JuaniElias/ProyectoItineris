@@ -146,6 +146,7 @@ nav .fa{
     margin-top: 5%;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .row-login a{
@@ -153,12 +154,12 @@ nav .fa{
 }
 
 .travel-col{
-    flex-basis: 25%;
+    flex-basis: 500px;
     background: #fff;
     border-radius: 10px;
     margin-bottom: 5%;
     padding: 20px 12px;
-    box-sizing: border-box;
+    box-sizing: content-box;
     margin-left: 2%;
 }
 
@@ -235,7 +236,9 @@ nav .fa{
     outline: none;
     background-color: #f0f0f0;
 }
-
+.comment-form p{
+    margin-top: 4px;
+}
 input, select{
     width: 100%;
     box-sizing: border-box;
@@ -253,4 +256,15 @@ input, select{
 .wrapper-class label {
     display: inline;
     margin-left: 5px;
+}
+
+.inline-block{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.fa-info-circle{
+    font-size: 8px;
+    display: inline-block;
+    margin-left: 3px;
 }

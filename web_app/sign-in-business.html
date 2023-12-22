@@ -19,7 +19,7 @@
                 <ul>
                     <li><a href="index.html">INICIO</a></li>
                     <li><a href="">EMPRESAS</a></li>
-                    <li><a href="work-with-us.html">TRABAJA CON NOSOTROS </a></li>
+                    <li><a href="">TRABAJA CON NOSOTROS </a></li>
                 </ul>
             </div>
             <i class="fa fa-bars" onclick="showMenu()"></i>
@@ -31,21 +31,26 @@
         <div class="row-login">
             <div class="travel-col">
                 <form class="comment-form">
-                    <p>DNI</p>
-                    <input type="text" placeholder="DNI">
-                    <div class="row">
+                    <p>Nombre de la empresa</p>
+                    <input type="text" placeholder="Nombre empresa">
+                    
+                    <p>Información de contacto</p>
+                    <div class="row-form">
                         <div class="col-form">
-                            <p>Nombre</p>
-                            <input type="text" placeholder="Nombre">
+                            <p>Email</p>
+                            <input type="email" placeholder="email">
                         </div>
-                        
                         <div class="col-form">
-                            <p>Apellido</p>
-                            <input type="text" placeholder="Apellido">
+                            <p>Teléfono</p>
+                            <input type="text" placeholder="Teléfono">
                         </div>
                     </div>
-                    <p>Email</p>
-                    <input type="email" placeholder="email">
+                    
+                    <p>Dirección</p>
+                    <input type="text" placeholder="Dirección">
+                    
+                    <p class="inline-block">Licencia</p><i class="fa fa-info-circle" title="Archivo PDF emitido por el CNRT que avale su empresa"></i>
+                    <input type="file" id="license" name="license">
                     <br>
                     <br>
                     <center>
