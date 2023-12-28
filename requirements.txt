@@ -1,0 +1,5 @@
+Django~=5.0
+googlemaps~=4.10.0
+numpy~=1.26.2
+pandas~=2.2.0rc0
+jupyter~=1.0.0
