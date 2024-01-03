@@ -122,6 +122,10 @@ nav .fa{
     .row, .row-form, .row-login{
         flex-direction: column;
     }
+    .bus-details{
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 .row{
@@ -151,6 +155,31 @@ nav .fa{
 
 .row-login a{
     font-size: 10px;
+}
+
+.row-bus{
+    margin-top: 5%;
+    margin-right: 3%;
+    justify-content: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.bus-col {
+    position:sticky;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 5%;
+    padding: 20px 12px;
+    margin-left: 3%;
+  }
+
+.bus-details {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
 }
 
 .travel-col{
