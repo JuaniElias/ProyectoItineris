@@ -75,6 +75,7 @@ nav img{
     border: 1px solid rgba(11, 29, 102, 0.7);
     padding: 12px 34px;
     font-size: 13px;
+    font-weight: 600;
     background: transparent;
     position: relative;
     cursor: pointer;
@@ -125,6 +126,13 @@ nav .fa{
     .bus-details{
         flex-direction: column;
         align-items: center;
+    }
+    .bus-time{
+        font-size: 12px;
+    }
+    
+    .bus-travel-time, .bus-info{
+        font-size: 10px;
     }
 }
 
@@ -180,6 +188,31 @@ nav .fa{
     display: flex;
     justify-content: space-around;
     margin-top: 20px;
+}
+
+.bus-info{
+    font-size: 16px;
+}
+
+.bus-time{
+    font-size: 35px;
+    font-weight: 800;
+    margin: 0%;
+}
+
+.bus-travel-time{
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.line{
+    display: inline-block; /* Para colocar la línea en línea con el texto */
+    width: 10%; /* Ancho de la línea */
+    vertical-align: middle; /* Alinea verticalmente la línea */
+    border-top: 1px solid #000; /* Estilo de la línea */
+}
+.larger-div {
+    width: 200px; /* Ajusta el ancho del contenedor */
 }
 
 .travel-col{
