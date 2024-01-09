@@ -12,63 +12,64 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
-    <section class="your-businness">
-        <nav class="sidebar">
+    <nav class="sidebar close">
             
-                <div class="sd-header">
-                    <div class="image-text">
-                        <span class="image">
-                            <img src="images/logo_reducido.png" alt="logo">
-                        </span>
+        <div class="sd-header">
+            <div class="image-text">
+                <span class="image">
+                    <img src="images/logo_reducido.png" alt="logo">
+                </span>
+
+                <div class="text header-text">
+                    <span class="businness">"Empresa"</span>
+                </div>
+                <div>
+                    <i class='bx bx-chevron-right toggle'></i>
+                </div>  
+            </div>
+        </div>
+
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="sb-nav-link">
+                        <a href="">
+                            <i class='bx bx-bus icon'></i>
+                            <span class="text sb-nav-text">Mis Viajes</span>
+                        </a>
+                    </li>
+                    <li class="sb-nav-link ">
+                        <a href="">
+                            <i class='bx bx-book-add icon'></i>
+                            <span class="text sb-nav-text">Crear un viaje</span>
+                        </a>
+                    </li>
+                    <li class="sb-nav-link">
+                        <a href=""> 
+                            <i class='bx bx-wallet-alt icon'></i>
+                            <span class="text sb-nav-text">Pagos</span>
+                        </a>
+                    </li>
+                    <li class="sb-nav-link">
+                        <a href=""> 
+                            <i class='bx bx-user icon'></i>
+                            <span class="text sb-nav-text">Mi empresa</span>
+                        </a>
+                    </li>
+                    <li class="sb-nav-link">
+                        <a href=""> 
+                            <i class='bx bx-log-out icon'></i>
+                            <span class="text sb-nav-text">Salir</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     
-                        <div class="text header-text">
-                            <span class="businness">"Empresa"</span>
-                        </div>
-                        <div>
-                            <i class='bx bx-chevron-right toggle'></i>
-                        </div>  
-                    </div>
-                </div>
 
-                <div class="menu-bar">
-                    <div class="menu">
-                        <ul class="menu-links">
-                            <li class="sb-nav-link">
-                                <a href="">
-                                    <i class='bx bx-bus icon'></i>
-                                    <span class="text sb-nav-text">Mis Viajes</span>
-                                </a>
-                            </li>
-                            <li class="sb-nav-link ">
-                                <a href="">
-                                    <i class='bx bx-book-add icon'></i>
-                                    <span class="text sb-nav-text">Crear un viaje</span>
-                                </a>
-                            </li>
-                            <li class="sb-nav-link">
-                                <a href=""> 
-                                    <i class='bx bx-wallet-alt icon'></i>
-                                    <span class="text sb-nav-text">Pagos</span>
-                                </a>
-                            </li>
-                            <li class="sb-nav-link">
-                                <a href=""> 
-                                    <i class='bx bx-user icon'></i>
-                                    <span class="text sb-nav-text">Mi empresa</span>
-                                </a>
-                            </li>
-                            <li class="sb-nav-link">
-                                <a href=""> 
-                                    <i class='bx bx-log-out icon'></i>
-                                    <span class="text sb-nav-text">Salir</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            
-
-        </nav>
+</nav>
+    <section class="your-businness">
+        
     </section>
     
     <section class="footer">
@@ -80,7 +81,16 @@
             <i class="fa fa-instagram"></i>
         </div>
     </section>
+    <!---------------- JavaScript to toggle the menu ----------------------->
+    <script>
+        const   body = document.querySelector("body"),
+                sidebar = body.querySelector(".sidebar"),
+                toggle = sidebar.querySelector(".toggle");
 
+                toggle.addEventListener("click", () =>{
+                    sidebar.classList.toggle("close");
+                })
+    </script>
     
 </body>
 </html>
