@@ -120,7 +120,7 @@ nav .fa{
         padding: 30px;
 
     }
-    .row, .row-form, .row-login{
+    .row, .row-form, .row-login, .row-filter{
         flex-direction: column;
     }
     .bus-details{
@@ -296,7 +296,7 @@ nav .fa{
     border: none;
     outline: none;
     outline: none;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
 }
 .comment-form p{
     margin-top: 4px;
@@ -382,7 +382,8 @@ input, select{
 }
 
 .sidebar.close .text{
-    opacity: 0; 
+    opacity: 0;
+    pointer-events: none;
 }
 
 .sidebar .sd-header{
@@ -509,7 +510,8 @@ input, select{
 .table-container{
     display: flex;
     padding: 15px;
-    width: 800px;
+    min-width: 600px;
+    max-width: 800px;
 }
 
 .sidebar.close ~ .table-container{
@@ -519,16 +521,14 @@ input, select{
     background: #fff;
     border-radius: 10px;
     width: 100%;
+    padding: 15px;
 }
 .content-table{
     border-collapse: collapse;
-    margin: 15px 0;
-    margin-left: 15px;
     font-weight: 500;
     overflow: hidden;
-}
-.content-table{
     text-align: left;
+    width: 100%;
 }
 
 .content-table th, .content-table td{
@@ -554,7 +554,45 @@ input, select{
     align-content: center;
 }
 
-
 .table-icon{
     cursor: pointer;
+}
+
+.checkbox-travel{
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"]{
+    width: 20px;
+}
+
+input[type="number"]{
+    width: 33%;
+}
+
+.row-filter{
+    display: flex;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+
+}
+
+.col-filter{
+    width: 70px;
+    box-sizing: border-box;
+    margin: 1%;
+    font-size: 10px;
+    font-weight: 400;
+}
+
+.col-filter input, .col-filter select{
+    height: 20px;
+    width: 70px;
+}
+
+.col-filter input::-moz-placeholder{
+    font-size: 10px;
 }

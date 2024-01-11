@@ -70,7 +70,7 @@
 </nav>
     <section class="your-businness">
         <div>
-            <h1 class="text">Mis viajes</h1>
+            <h1 class="text">Pagos</h1>
             
             <div class="table-container">
                 <div class="row-travel">
@@ -105,23 +105,18 @@
                     <table class="content-table">
                         <thead>
                             <tr>
-                                <th class="date"        >Fecha salida</th>
-                                <th class="origin"      >Origen</th>
-                                <th class="destination" >Destino</th>
-                                <th class="passanger"   >Pasajeros</th>
-                                <th class="more-info"   ></th>
-                                <th class="cancel"      ></th>
+                                <th class="date">Fecha</th>
+                                <th>ID Viaje</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="date"       >1</td>
-                                <td class="origin"     >2</td>
-                                <td class="destination">3</td>
-                                <td class="passanger"  >4</td>
-                                <td class="more-info"  ><i class="fa fa-info-circle fa-lg table-icon" id="more-info-button"></i></i></td>
-                                <td class="cancel"     ><i class="fa fa-times-circle fa-lg table-icon"></i></td>
-                                
+                                <td class="date">1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
                             </tr>
                         </tbody>
                     </table>
@@ -129,10 +124,6 @@
             </div>
             
         </div>
-        <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
-        <dialog id="travel-modal">
-            <h2>Hi, I´m a modal</h2>
-        </dialog>
         
     </section>
 
@@ -140,19 +131,11 @@
     <script>
         const   body = document.querySelector("body"),
                 sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle"),
-                btn_more_info = document.querySelector("#more-info-button"),
-                btn_close = document.querySelector("#close"),
-                modal = document.querySelector("#travel-modal");
-
-                btn_more_info.addEventListener("click", () =>{
-                    modal.show();
-                })
+                toggle = sidebar.querySelector(".toggle");
 
                 toggle.addEventListener("click", () =>{
                     sidebar.classList.toggle("close");
                 })
-
     </script>
     
 </body>
