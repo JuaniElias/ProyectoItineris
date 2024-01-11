@@ -424,6 +424,7 @@ input, select{
     padding-left: 2px;
     padding-top: 2px;
     transition: var(--tran-03);
+    cursor: pointer;
 }
 
 .sidebar.close .sd-header .toggle{
@@ -486,20 +487,74 @@ input, select{
 .your-businness{
     position: relative;
     height: 100vh;
-    left: 250px;
+    left: 278px;
     width: calc(100% - 88px);
     background-color: #545F8D;
     transition: var(--tran-05);
 }
 
 .your-businness .text{
-    font-size: 30px;
-    font-weight: 500;
-    color: var(--text-color);
-    padding: 8px 40px;
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--primary-color-light);
+    padding-left: 3%;
+    padding-top: 3%;
 }
 
 .sidebar.close ~ .your-businness{
     left: 88px;
     width: calc(100% - 88px);
+}
+
+.table-container{
+    display: flex;
+    padding: 15px;
+    width: 800px;
+}
+
+.sidebar.close ~ .table-container{
+    padding: 3%;
+}
+.row-travel{
+    background: #fff;
+    border-radius: 10px;
+    width: 100%;
+}
+.content-table{
+    border-collapse: collapse;
+    margin: 15px 0;
+    margin-left: 15px;
+    font-weight: 500;
+    overflow: hidden;
+}
+.content-table{
+    text-align: left;
+}
+
+.content-table th, .content-table td{
+    padding: 10px 12px;
+}
+
+.content-table tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.date{
+    width: 15%;
+}
+.origin, .destination {
+    width: 17%;
+}
+.passanger{
+    width: 10%;
+}
+.more-info, .cancel{
+    text-align: center;
+    width: 10%;
+    align-content: center;
+}
+
+
+.table-icon{
+    cursor: pointer;
 }
