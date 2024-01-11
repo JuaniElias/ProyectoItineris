@@ -70,9 +70,63 @@
 </nav>
     <section class="your-businness">
         <div>
-            <h1 class="text">Mi Empresa</h1>
+            <h1 class="text">Mis viajes</h1>
             
-            
+            <div class="table-container">
+                <div class="row-travel">
+                    <div class="row-filter">
+                        <div class="col-filter">
+                            <p>Fecha desde</p>
+                            <input type="date">
+                        </div>
+                        <div class="col-filter">
+                            <p>Fecha hasta</p>
+                            <input type="date">
+                        </div>
+                        <div class="col-filter">
+                            <p>Estado</p>
+                            <select class="form-control" tabindex="4">
+                                <option value="Todos">Todos</option>
+                                <option value="Completado">Completado</option>
+                                <option value="Cancelado">Cancelado</option>
+                                <option value="En proceso">En proceso</option>
+                            </select>
+                        </div>
+                        <div class="col-filter">
+                            <p>Ordernar por:</p>
+                            <select class="form-control" tabindex="3">
+                                <option value="1">Fecha</option>
+                                <option value="3">Monto</option>
+                                <option value="4">Estado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th class="date"        >Fecha salida</th>
+                                <th class="origin"      >Origen</th>
+                                <th class="destination" >Destino</th>
+                                <th class="passanger"   >Pasajeros</th>
+                                <th class="more-info"   ></th>
+                                <th class="cancel"      ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="date"       >1</td>
+                                <td class="origin"     >2</td>
+                                <td class="destination">3</td>
+                                <td class="passanger"  >4</td>
+                                <td class="more-info"  ><i class="fa fa-info-circle fa-lg table-icon" id="more-info-button"></i></i></td>
+                                <td class="cancel"     ><i class="fa fa-times-circle fa-lg table-icon"></i></td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             
         </div>
         <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->

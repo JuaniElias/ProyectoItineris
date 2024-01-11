@@ -70,15 +70,60 @@
 </nav>
     <section class="your-businness">
         <div>
-            <h1 class="text">Mi Empresa</h1>
+            <h1 class="text">Pagos</h1>
             
-            
+            <div class="table-container">
+                <div class="row-travel">
+                    <div class="row-filter">
+                        <div class="col-filter">
+                            <p>Fecha desde</p>
+                            <input type="date">
+                        </div>
+                        <div class="col-filter">
+                            <p>Fecha hasta</p>
+                            <input type="date">
+                        </div>
+                        <div class="col-filter">
+                            <p>Estado</p>
+                            <select class="form-control" tabindex="4">
+                                <option value="Todos">Todos</option>
+                                <option value="Completado">Completado</option>
+                                <option value="Cancelado">Cancelado</option>
+                                <option value="En proceso">En proceso</option>
+                            </select>
+                        </div>
+                        <div class="col-filter">
+                            <p>Ordernar por:</p>
+                            <select class="form-control" tabindex="3">
+                                <option value="1">Fecha</option>
+                                <option value="3">Monto</option>
+                                <option value="4">Estado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th class="date">Fecha</th>
+                                <th>ID Viaje</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="date">1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             
         </div>
-        <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
-        <dialog id="travel-modal">
-            <h2>Hi, I´m a modal</h2>
-        </dialog>
         
     </section>
 
@@ -86,19 +131,11 @@
     <script>
         const   body = document.querySelector("body"),
                 sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle"),
-                btn_more_info = document.querySelector("#more-info-button"),
-                btn_close = document.querySelector("#close"),
-                modal = document.querySelector("#travel-modal");
-
-                btn_more_info.addEventListener("click", () =>{
-                    modal.show();
-                })
+                toggle = sidebar.querySelector(".toggle");
 
                 toggle.addEventListener("click", () =>{
                     sidebar.classList.toggle("close");
                 })
-
     </script>
     
 </body>

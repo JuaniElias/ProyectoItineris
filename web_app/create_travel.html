@@ -70,15 +70,44 @@
 </nav>
     <section class="your-businness">
         <div>
-            <h1 class="text">Mi Empresa</h1>
-            
+            <h1 class="text">Crear Viaje</h1>
+            <div class="row">
+                <div class="travel-col">
+                    <form class="comment-form">
+                        <p>Origen</p>
+                        <input type="text" placeholder="Ciudad de origen">
+                        <p>Destino</p>
+                        <input type="text" placeholder="Ciudad de arribo">
+                        <br>
+    
+                        <p>Fechas</p>
+                        <div class="row-form">
+                            <div class="col-form">
+                                <p>Salida</p>
+                                <input type="date">
+                            </div>
+                            <div class="col-form">
+                                <p>Horas de viaje estimadas</p>
+                                <input type="text" placeholder="Ej: 8h 30m">
+                            </div>
+                        </div>
+                        <p>Pasajeros</p>
+                        <input type="number" placeholder="Cantidad pasajeros">
+                        <br>
+                        <br>
+                        <label class="checkbox-travel" for="pets">
+                            <input type="checkbox" id="pets" value="1">
+                            <span>Mascotas permitidas</span> 
+                        </label>
+                        <br>
+                        <button type="submit" class="hero-btn">CREAR</button>
+                        
+                    </form>
+                </div>
+            </div>
             
             
         </div>
-        <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
-        <dialog id="travel-modal">
-            <h2>Hi, I´m a modal</h2>
-        </dialog>
         
     </section>
 
@@ -86,19 +115,11 @@
     <script>
         const   body = document.querySelector("body"),
                 sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle"),
-                btn_more_info = document.querySelector("#more-info-button"),
-                btn_close = document.querySelector("#close"),
-                modal = document.querySelector("#travel-modal");
-
-                btn_more_info.addEventListener("click", () =>{
-                    modal.show();
-                })
+                toggle = sidebar.querySelector(".toggle");
 
                 toggle.addEventListener("click", () =>{
                     sidebar.classList.toggle("close");
                 })
-
     </script>
     
 </body>
