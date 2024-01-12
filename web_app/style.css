@@ -577,7 +577,6 @@ input[type="number"]{
     border: 2px solid #ccc;
     border-radius: 10px;
     padding: 5px;
-
 }
 
 .col-filter{
@@ -595,4 +594,51 @@ input[type="number"]{
 
 .col-filter input::-moz-placeholder{
     font-size: 10px;
+}
+
+/*          MODAL           */
+.travel-modal{
+    background-color: #f2ebe2;
+    border-radius: 10px;
+    padding: 15px;
+    max-width: 700px;
+    border: none;
+    top: 15%;
+    left: 10%;
+}
+
+.modal-btn{
+    background-color: black;
+    padding: 5px 15px;
+    border-radius: 5px;
+    color: white;
+    margin: 5px;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+dialog::backdrop{
+    background-color: rgba(4, 9, 30, 0.5);
+}
+ /* SCROLLABLE TABLE */
+
+.scroll-table th {
+    position: sticky;
+    top: 0px;
+}
+
+.scroll-table{
+    max-height: 400px;
+    overflow-y: scroll;
+    margin: 20px;
+}
+
+.row-modal{
+    margin-top: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
