@@ -75,11 +75,7 @@
             
             
         </div>
-        <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
-        <dialog id="travel-modal">
-            <h2>Hi, I´m a modal</h2>
-        </dialog>
-        
+
     </section>
 
     <!---------------- JavaScript to toggle the menu ----------------------->
@@ -90,10 +86,6 @@
                 btn_more_info = document.querySelector("#more-info-button"),
                 btn_close = document.querySelector("#close"),
                 modal = document.querySelector("#travel-modal");
-
-                btn_more_info.addEventListener("click", () =>{
-                    modal.show();
-                })
 
                 toggle.addEventListener("click", () =>{
                     sidebar.classList.toggle("close");

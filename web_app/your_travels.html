@@ -119,20 +119,61 @@
                                 <td class="origin"     >2</td>
                                 <td class="destination">3</td>
                                 <td class="passanger"  >4</td>
-                                <td class="more-info"  ><i class="fa fa-info-circle fa-lg table-icon" id="more-info-button"></i></i></td>
-                                <td class="cancel"     ><i class="fa fa-times-circle fa-lg table-icon"></i></td>
+                                <td class="more-info"  ><i class="fa fa-info-circle fa-lg table-icon" id="btn-more-info"></i></i></td>
+                                <td class="cancel"     ><i class="fa fa-times-circle fa-lg table-icon" id="btn-cancel-travel"></i></td>
                                 
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <dialog class="travel-modal" id="info-modal">
+                    <h3>Detalle del viaje</h3>
+                    <p>Fecha Salida:</p>
+                    <p>Salida:</p>
+                    <p>Destino:</p>
+                    <p>Pasajeros:</p>
+                    <div class="scroll-table">
+                        <table class="content-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Teléfono</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row-modal">
+                        <button type="submit" class="modal-btn" id="btn-close-more-info">CERRAR</button>
+                        <button type="submit" class="modal-btn" id="btn-export"><i class='bx bxs-file-export'></i>EXPORTAR</button>
+                    </div>
+                </dialog>
+                <dialog class="travel-modal" id="cancel-modal">
+                    <h3>Detalle del viaje</h3>
+                    <p>Fecha Salida:</p>
+                    <p>Salida:</p>
+                    <p>Destino:</p>
+                    <p>Pasajeros:</p>
+                    <h3>¿Está seguro que quiere cancelar este viaje?</h3>
+                    <div class="row-modal">
+                        <button type="submit" class="modal-btn" id="btn-close-cancel">SALIR</button>
+                        <button type="submit" class="modal-btn" id="btn-delete-travel">SI, CANCELAR</button>
+                    </div>
+                </dialog>
             </div>
             
         </div>
         <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
-        <dialog id="travel-modal">
-            <h2>Hi, I´m a modal</h2>
-        </dialog>
+        
         
     </section>
 
@@ -141,14 +182,34 @@
         const   body = document.querySelector("body"),
                 sidebar = body.querySelector(".sidebar"),
                 toggle = sidebar.querySelector(".toggle"),
-                btn_more_info = document.querySelector("#more-info-button"),
-                btn_close = document.querySelector("#close"),
-                modal = document.querySelector("#travel-modal");
 
+                btn_more_info = document.querySelector("#btn-more-info"),
+                btn_close_info = document.querySelector("#btn-close-more-info"),
+                info_modal = document.querySelector("#info-modal"),
+                
+                btn_cancel_travel = document.querySelector("#btn-cancel-travel"),
+                btn_close_cancel = document.querySelector("#btn-close-cancel"),
+                cancel_modal = document.querySelector("#cancel-modal");
+
+                /* MODAL MORE-INFO */
                 btn_more_info.addEventListener("click", () =>{
-                    modal.show();
+                    info_modal.showModal();
                 })
+                btn_close_info.addEventListener("click", () =>{
+                    info_modal.close()
+                }
+                )
+                
+                /* MODAL MORE-INFO */
+                btn_cancel_travel.addEventListener("click", () =>{
+                    cancel_modal.showModal();
+                })
+                btn_close_cancel.addEventListener("click", () =>{
+                    cancel_modal.close()
+                }
+                )
 
+                /* SIDE NAVBAR */
                 toggle.addEventListener("click", () =>{
                     sidebar.classList.toggle("close");
                 })
