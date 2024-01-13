@@ -150,6 +150,7 @@ nav .fa{
     padding: 5px;
 }
 .row-form-2{
+    margin: 0;
     display: flex;
     justify-content:left;
 }
@@ -308,7 +309,12 @@ input, select{
 .col-form{
     width: 100%;
     box-sizing: border-box;
-    margin: 1%;
+    margin-left: 1%;
+}
+
+.col-form-2{
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .wrapper-class input[type="radio"] {
@@ -641,4 +647,12 @@ dialog::backdrop{
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.mini-row{
+    margin-top: 15px;
+}
+
+.row-modal .hero-btn{
+    margin-left: 3%;
 }
