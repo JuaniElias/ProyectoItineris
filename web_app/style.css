@@ -656,3 +656,15 @@ dialog::backdrop{
 .row-modal .hero-btn{
     margin-left: 3%;
 }
+
+.center{
+    width: 100%;
+    text-align: right;
+    padding-top: 10px;
+    padding-right: 5px;
+}
+
+.center .fa{
+    color: #707070;
+    cursor:pointer;
+}
