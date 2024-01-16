@@ -20,7 +20,7 @@ class Driver(models.Model):
     driver_id = models.AutoField(primary_key=True)
     company_id = models.ForeignKey("Company", on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
-    license_number = models.IntegerField()
+    license_number = models.CharField(max_length=20)
     email = models.EmailField()
     phone_number = models.IntegerField()
 
@@ -37,12 +37,8 @@ class Vehicle(models.Model):
 
 class City(models.Model):
     city_id = models.AutoField(primary_key=True)
-    country = models.CharField(max_length=20)
-    province = models.CharField(max_length=20)
-    department = models.CharField(max_length=20)
-    city_name = models.CharField(max_length=20)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    city_name = models.CharField(max_length=50)
+    province = models.ForeignKey("Province", on_delete=models.CASCADE)
 
 
 # Esta es una relación, cómo se haría?
@@ -55,7 +51,7 @@ class Traveler(models.Model):
 
 
 class User(models.Model):
-    user_id = models.IntegerField()
+    user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=15)
     password = models.CharField(max_length=20)
     email = models.EmailField()
@@ -67,4 +63,9 @@ class User(models.Model):
 
 class Company(models.Model):
     company_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+
+class Province(models.Model):
+    province_id = models.AutoField(primary_key=True),
     name = models.CharField(max_length=20)
