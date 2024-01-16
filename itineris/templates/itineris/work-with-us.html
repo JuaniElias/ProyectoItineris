@@ -2,9 +2,8 @@
 <html>
 <head>
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Itineris</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../static/itineris/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
@@ -12,52 +11,45 @@
 
 </head>
 <body>
-    <section class="header">
+    <section class="sub-header">
         <nav>
-            <a href="index.html"> <img src="images/logo.png"> </a>
+            <a href="index.html"> <img src="../../static/itineris/images/logo.png"> </a>
             <div class="nav-links" id="navLinks">
                 <i class="fa fa-times" onclick="hideMenu()"></i>
                 <ul>
                     <li><a href="index.html">INICIO</a></li>
                     <li><a href="">EMPRESAS</a></li>
                     <li><a href="work-with-us.html">TRABAJA CON NOSOTROS </a></li>
+                    <li><a href="login.html">INICIO DE SESION</a></li>
+                    <li><a href="sign-in.html">REGISTRARSE</a></li>
                 </ul>
             </div>
             <i class="fa fa-bars" onclick="showMenu()"></i>
         </nav>
+        <h1>Trabaja con nosotros</h1>
+    </section>
 
-        <div class="text-box">
-            <h2>Crear una cuenta</h2>
-        </div>
-        <div class="row-login">
-            <div class="travel-col">
-                <form class="comment-form">
-                    <p>DNI</p>
-                    <input type="text" placeholder="DNI">
-                    <div class="row">
-                        <div class="col-form">
-                            <p>Nombre</p>
-                            <input type="text" placeholder="Nombre">
-                        </div>
-                        
-                        <div class="col-form">
-                            <p>Apellido</p>
-                            <input type="text" placeholder="Apellido">
-                        </div>
-                    </div>
-                    <p>Email</p>
-                    <input type="email" placeholder="email">
-                    <br>
-                    <br>
-                    <center>
-                        <button type="submit" class="hero-btn">Crear cuenta</button>
-                    </center>
-                    
-                </form>
+    <section class="work-with-us">
+        <div class="row">
+            <div class="wwu-col">
+                <h1>Lorem ipsus</h1>
+                <p>Información general de como nos manejamos, que ofremos bla bla bla, abajo hay un botón que brinda información de contacto para trabajar con nosotros.
+                    También hay que poner tipo un link directo a crear una cuenta de "empresa" donde tienen que cargar toda la información pertinente.
+                </p>
+                <a href="" class="hero-btn">Contactanos</a>
+            </div>
+            <div class="wwu-col">
+                <img src="../../static/itineris/images/working-people.jpg">
             </div>
         </div>
-
+        <div class="wwu-col">
+            <p>¿Tienes decidido que quieres trabajar con nosotros?
+                <a href="sign-in-business.html">Registrate aquí.</a>
+            </p>
+            
+        </div>
     </section>
+
     <section class="footer">
         <h4>Sobre nosotros</h4>
         <p>lorem ipsus</p>

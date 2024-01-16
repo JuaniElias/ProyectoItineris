@@ -4,7 +4,7 @@
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Itineris</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../static/itineris/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
@@ -14,13 +14,13 @@
 <body>
     <section class="header">
         <nav>
-            <a href="index.html"> <img src="images/logo.png"> </a>
+            <a href="index.html"> <img src="../../static/itineris/images/logo.png"> </a>
             <div class="nav-links" id="navLinks">
                 <i class="fa fa-times" onclick="hideMenu()"></i>
                 <ul>
                     <li><a href="index.html">INICIO</a></li>
                     <li><a href="">EMPRESAS</a></li>
-                    <li><a href="">TRABAJA CON NOSOTROS </a></li>
+                    <li><a href="work-with-us.html">TRABAJA CON NOSOTROS </a></li>
                 </ul>
             </div>
             <i class="fa fa-bars" onclick="showMenu()"></i>
@@ -32,26 +32,21 @@
         <div class="row-login">
             <div class="travel-col">
                 <form class="comment-form">
-                    <p>Nombre de la empresa</p>
-                    <input type="text" placeholder="Nombre empresa">
-                    
-                    <p>Información de contacto</p>
-                    <div class="row-form">
+                    <p>DNI</p>
+                    <input type="text" placeholder="DNI">
+                    <div class="row">
                         <div class="col-form">
-                            <p>Email</p>
-                            <input type="email" placeholder="email">
+                            <p>Nombre</p>
+                            <input type="text" placeholder="Nombre">
                         </div>
+                        
                         <div class="col-form">
-                            <p>Teléfono</p>
-                            <input type="text" placeholder="Teléfono">
+                            <p>Apellido</p>
+                            <input type="text" placeholder="Apellido">
                         </div>
                     </div>
-                    
-                    <p>Dirección</p>
-                    <input type="text" placeholder="Dirección">
-                    
-                    <p class="inline-block">Licencia</p><i class="fa fa-info-circle" title="Archivo PDF emitido por el CNRT que avale su empresa"></i>
-                    <input type="file" id="license" name="license">
+                    <p>Email</p>
+                    <input type="email" placeholder="email">
                     <br>
                     <br>
                     <center>

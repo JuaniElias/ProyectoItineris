@@ -40,6 +40,12 @@ class City(models.Model):
     city_name = models.CharField(max_length=50)
     province = models.ForeignKey("Province", on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name_plural = "cities"
+
+    def __str__(self):
+        return self.city_name
+
 
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
@@ -69,3 +75,6 @@ class Company(models.Model):
 class Province(models.Model):
     province_id = models.AutoField(primary_key=True),
     name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name

@@ -4,7 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0498913-6b7b-42c0-9a01-f1943fa64f58" name="Changes" comment="Initial Django setup" />
+    <list default="true" id="f0498913-6b7b-42c0-9a01-f1943fa64f58" name="Changes" comment="Initial Django setup">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/itineris/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/itinerisDB" beforeDir="false" afterPath="$PROJECT_DIR$/itinerisDB" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/about_us.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/about_us.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/create_travel.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/create_travel.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/images/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/images/logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/images/logo_reducido.png" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/images/logo_reducido.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/images/team-work.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/images/team-work.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/images/working-people.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/images/working-people.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/pre-checkout.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/pre-checkout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/sign-in-business.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/sign-in-business.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/sign-in.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/sign-in.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/travel_result.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/travel_result.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/work-with-us.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/work-with-us.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/your_drivers.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/your_drivers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/your_payments.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/your_payments.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/your_travels.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/your_travels.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/your_vehicles.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/your_vehicles.html" afterDir="false" />
+    </list>
+    <list id="c23bd735-1446-4937-9d88-57c1eab98cfe" name="Changes by juani" comment="">
+      <change beforePath="$PROJECT_DIR$/ProyectoItineris/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProyectoItineris/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/itineris/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/itineris/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/itineris/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/index.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,12 +45,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "JuaniElias"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;JuaniElias&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
@@ -30,9 +59,25 @@
       </UrlAndAccount>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/itineris/templates/itineris/index.html">
+      <ranges>
+        <range start1="0" end1="0" start2="0" end2="1" changelist="c23bd735-1446-4937-9d88-57c1eab98cfe" />
+        <range start1="6" end1="7" start2="7" end2="8" changelist="c23bd735-1446-4937-9d88-57c1eab98cfe" />
+        <range start1="16" end1="17" start2="17" end2="18" changelist="f0498913-6b7b-42c0-9a01-f1943fa64f58" />
+        <range start1="83" end1="84" start2="84" end2="85" changelist="f0498913-6b7b-42c0-9a01-f1943fa64f58" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/itineris/models.py">
+      <ranges>
+        <range start1="41" end1="41" start2="41" end2="47" changelist="c23bd735-1446-4937-9d88-57c1eab98cfe" />
+        <range start1="71" end1="71" start2="77" end2="80" changelist="f0498913-6b7b-42c0-9a01-f1943fa64f58" />
+      </ranges>
+    </file>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2YdKCp66QJU908KnvUNHmt5Nqlz" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -41,6 +86,8 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JavaScript Debug.index.html (1).executor": "Run",
+    "JavaScript Debug.index.html.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -53,9 +100,23 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\scara\Documents\ProyectoItineris\itineris\templates\itineris\css" />
+      <recent name="D:\scara\Documents\ProyectoItineris\itineris\templates\itineris" />
+      <recent name="D:\scara\Documents\ProyectoItineris\itineris" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JavaScript Debug.index.html (1)">
+    <configuration name="index.html (1)" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/ProyectoItineris/itineris/templates/itineris/index.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="index.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/ProyectoItineris/web_app/index.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
     <configuration name="ProyectoItineris" type="Python.DjangoServer" factoryName="Django server">
       <module name="ProyectoItineris" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -77,6 +138,12 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.index.html (1)" />
+        <item itemvalue="JavaScript Debug.index.html" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

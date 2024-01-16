@@ -4,7 +4,7 @@
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Itineris</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../static/itineris/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         <div class="sd-header">
             <div class="image-text">
                 <span class="image">
-                    <img src="images/logo_reducido.png" alt="logo">
+                    <img src="../../static/itineris/images/logo_reducido.png" alt="logo">
                 </span>
 
                 <div class="text header-text">
@@ -76,130 +76,112 @@
 </nav>
     <section class="your-businness">
         <div>
-            <h1 class="text">Mis Vehículos</h1>
+            <h1 class="text">Mis viajes</h1>
             
             <div class="table-container">
                 <div class="row-travel">
                     <div class="row-filter">
                         <div class="col-filter">
-                            <p>Marca</p>
-                            <select class="form-control" tabindex="4">
-                                <option value="Todos">Todos</option>
-                                <option value="">a</option>
-                                <option value="">b</option>
-                                <option value="">c</option>
-                            </select>
+                            <p>Fecha desde</p>
+                            <input type="date">
                         </div>
                         <div class="col-filter">
-                            <p>Modelo</p>
-                            <select class="form-control" tabindex="4">
-                                <option value="Todos">Todos</option>
-                                <option value="">a</option>
-                                <option value="">b</option>
-                                <option value="">c</option>
-                            </select>
+                            <p>Fecha hasta</p>
+                            <input type="date">
                         </div>
                         <div class="col-filter">
-                            <p>Patente</p>
+                            <p>Estado</p>
                             <select class="form-control" tabindex="4">
                                 <option value="Todos">Todos</option>
-                                <option value="">a</option>
-                                <option value="">b</option>
-                                <option value="">c</option>
+                                <option value="Completado">Completado</option>
+                                <option value="Cancelado">Cancelado</option>
+                                <option value="En proceso">En proceso</option>
                             </select>
                         </div>
                         <div class="col-filter">
                             <p>Ordernar por:</p>
                             <select class="form-control" tabindex="3">
-                                <option value="1">Marca</option>
-                                <option value="3">Modelo</option>
-                                <option value="4">Patente</option>
+                                <option value="1">Fecha</option>
+                                <option value="3">Monto</option>
+                                <option value="4">Estado</option>
                             </select>
-                        </div>
-                        <div class="center">
-                            <i class="fa fa-plus-square fa-lg" id="btn-add-vehicle"></i>
                         </div>
                     </div>
                     <br>
                     <table class="content-table">
                         <thead>
                             <tr>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Patente</th>
-                                <th></th>
-                                <th></th>
+                                <th class="date"        >Fecha salida</th>
+                                <th class="origin"      >Origen</th>
+                                <th class="destination" >Destino</th>
+                                <th class="passanger"   >Pasajeros</th>
+                                <th class="more-info"   ></th>
+                                <th class="cancel"      ></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>1</td>
-                                <td>2</td>
-                                <td>3</td>
-                                <td><i class="fa fa-info-circle fa-lg table-icon" id="btn-more-info"></i></i></td>
-                                <td><i class="fa fa-times-circle fa-lg table-icon" id="btn-cancel-travel"></i></td>
+                                <td class="date"       >1</td>
+                                <td class="origin"     >2</td>
+                                <td class="destination">3</td>
+                                <td class="passanger"  >4</td>
+                                <td class="more-info"  ><i class="fa fa-info-circle fa-lg table-icon" id="btn-more-info"></i></i></td>
+                                <td class="cancel"     ><i class="fa fa-times-circle fa-lg table-icon" id="btn-cancel-travel"></i></td>
+                                
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
-
-                <dialog class="travel-modal" id="create-vehicle">
-                    <h3>Cargar un nuevo vehículo</h3>
-                    
-                        <p>Marca</p>
-                        <input type="text">
-                        <p>Modelo</p>
-                        <input type="text">
-                        <p>Patente</p>
-                        <input type="text">
-                    
-                    
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-add-cancel">CANCELAR</button>
-                        <button type="submit" class="modal-btn" id="btn-add-create">CREAR</button>
-                    </div>
-                </dialog>
-
                 <dialog class="travel-modal" id="info-modal">
-                    <h3>Viajes del vehículo</h3>               
+                    <h3>Detalle del viaje</h3>
+                    <p>Fecha Salida:</p>
+                    <p>Salida:</p>
+                    <p>Destino:</p>
+                    <p>Pasajeros:</p>
+                    <a href="">Ruta óptima</a>
                     <div class="scroll-table">
                         <table class="content-table">
                             <thead>
                                 <tr>
-                                    <th>Fecha salida</th>
-                                    <th>Origen</th>
-                                    <th>Destino</th>
-                                    <th>Pasajeros</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Teléfono</th>
+                                    <th>Email</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class=>1</td>
-                                    <td class=>2</td>
-                                    <td class=>3</td>
-                                    <td class=>4</td>                                   
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="row-modal">
                         <button type="submit" class="modal-btn" id="btn-close-more-info">CERRAR</button>
+                        <button type="submit" class="modal-btn" id="btn-export"><i class='bx bxs-file-export'></i>EXPORTAR</button>
                     </div>
                 </dialog>
                 <dialog class="travel-modal" id="cancel-modal">
                     <h3>Detalle del viaje</h3>
-                    <p>Marca:</p>
-                    <p>Modelo:</p>
-                    <p>Patente:</p>
-                    <h3>¿Está seguro que quieres eliminar este vehículo?</h3>
+                    <p>Fecha Salida:</p>
+                    <p>Salida:</p>
+                    <p>Destino:</p>
+                    <p>Pasajeros:</p>
+                    <h3>¿Está seguro que quiere cancelar este viaje?</h3>
                     <div class="row-modal">
                         <button type="submit" class="modal-btn" id="btn-close-cancel">SALIR</button>
-                        <button type="submit" class="modal-btn" id="btn-delete-travel">SI, ELIMINAR</button>
+                        <button type="submit" class="modal-btn" id="btn-delete-travel">SI, CANCELAR</button>
                     </div>
                 </dialog>
             </div>
+            
         </div>
+        <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
+        
+        
     </section>
 
     <!---------------- JavaScript to toggle the menu ----------------------->
@@ -214,11 +196,7 @@
                 
                 btn_cancel_travel = document.querySelector("#btn-cancel-travel"),
                 btn_close_cancel = document.querySelector("#btn-close-cancel"),
-                cancel_modal = document.querySelector("#cancel-modal"),
-                
-                btn_add_vehicle = document.querySelector("#btn-add-vehicle"),
-                btn_add_cancel = document.querySelector("#btn-add-cancel"),
-                add_vehicle_modal = document.querySelector("#create-vehicle");
+                cancel_modal = document.querySelector("#cancel-modal");
 
                 /* MODAL MORE-INFO */
                 btn_more_info.addEventListener("click", () =>{
@@ -229,21 +207,12 @@
                 }
                 )
                 
-                /* MODAL CANCEL TRIP */
+                /* MODAL MORE-INFO */
                 btn_cancel_travel.addEventListener("click", () =>{
                     cancel_modal.showModal();
                 })
                 btn_close_cancel.addEventListener("click", () =>{
                     cancel_modal.close()
-                }
-                )
-
-                /* MODAL ADD VEHICLE */
-                btn_add_vehicle.addEventListener("click", () =>{
-                    add_vehicle_modal.showModal();
-                })
-                btn_add_cancel.addEventListener("click", () =>{
-                    add_vehicle_modal.close()
                 }
                 )
 

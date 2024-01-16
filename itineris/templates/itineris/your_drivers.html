@@ -4,7 +4,7 @@
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Itineris</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../static/itineris/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         <div class="sd-header">
             <div class="image-text">
                 <span class="image">
-                    <img src="images/logo_reducido.png" alt="logo">
+                    <img src="../../static/itineris/images/logo_reducido.png" alt="logo">
                 </span>
 
                 <div class="text header-text">
@@ -76,72 +76,125 @@
 </nav>
     <section class="your-businness">
         <div>
-            <h1 class="text">Pagos</h1>
+            <h1 class="text">Contuctores</h1>
             
             <div class="table-container">
                 <div class="row-travel">
                     <div class="row-filter">
                         <div class="col-filter">
-                            <p>Fecha desde</p>
-                            <input type="date">
-                        </div>
-                        <div class="col-filter">
-                            <p>Fecha hasta</p>
-                            <input type="date">
-                        </div>
-                        <div class="col-filter">
-                            <p>Estado</p>
+                            <p>Nombre</p>
                             <select class="form-control" tabindex="4">
                                 <option value="Todos">Todos</option>
-                                <option value="Completado">Completado</option>
-                                <option value="Cancelado">Cancelado</option>
-                                <option value="En proceso">En proceso</option>
+                                <option value="">a</option>
+                                <option value="">b</option>
+                                <option value="">c</option>
                             </select>
                         </div>
                         <div class="col-filter">
-                            <p>Ordernar por:</p>
-                            <select class="form-control" tabindex="3">
-                                <option value="1">Fecha</option>
-                                <option value="3">Monto</option>
-                                <option value="4">Estado</option>
+                            <p>Apellido</p>
+                            <select class="form-control" tabindex="4">
+                                <option value="Todos">Todos</option>
+                                <option value="">a</option>
+                                <option value="">b</option>
+                                <option value="">c</option>
                             </select>
+                        </div>
+                        <div class="center">
+                            <i class="fa fa-plus-square fa-lg" id="btn-add-driver"></i>
                         </div>
                     </div>
                     <br>
                     <table class="content-table">
                         <thead>
                             <tr>
-                                <th class="date">Fecha</th>
-                                <th>ID Viaje</th>
-                                <th>Monto</th>
-                                <th>Estado</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="date">1</td>
+                                <td>1</td>
                                 <td>2</td>
                                 <td>3</td>
-                                <td>4</td>
+                                <td><i class="fa fa-times-circle fa-lg table-icon" id="btn-delete-driver"></i></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+
+                <dialog class="travel-modal" id="create-driver">
+                    <h3>Cargar un nuevo conductor</h3>
+                    
+                        <p>Nombre</p>
+                        <input type="text">
+                        <p>Apellido</p>
+                        <input type="text">
+                        <p>DNI</p>
+                        <input type="text">
+                        <p class="inline-block">Licencia Conducir</p><i class="fa fa-info-circle" title="Recomendamos subir una imagen de la licencia de conducir"></i>
+                        <input type="file" id="license" name="license">
+                    
+                    <div class="row-modal">
+                        <button type="submit" class="modal-btn" id="btn-add-cancel">CANCELAR</button>
+                        <button type="submit" class="modal-btn" id="btn-add-create">CREAR</button>
+                    </div>
+                </dialog>
+
+                <dialog class="travel-modal" id="delete-modal">
+                    <h3>Conductor/h3>
+                    <p>Apellido:</p>
+                    <p>Nombre:</p>
+                    <p>DNI:</p>
+                    <h3>¿Está seguro que quieres eliminar a este conductor?</h3>
+                    <div class="row-modal">
+                        <button type="submit" class="modal-btn" id="btn-close-del-modal">SALIR</button>
+                        <button type="submit" class="modal-btn" id="btn-confirm-delete">SI, ELIMINAR</button>
+                    </div>
+                </dialog>
             </div>
-            
         </div>
-        
     </section>
 
     <!---------------- JavaScript to toggle the menu ----------------------->
     <script>
         const   body = document.querySelector("body"),
                 sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle");
+                toggle = sidebar.querySelector(".toggle"),
+                
+                btn_cancel_travel = document.querySelector("#btn-delete-driver"),
+                btn_close_cancel = document.querySelector("#btn-close-del-modal"),
+                cancel_modal = document.querySelector("#delete-modal"),
+                
+                btn_add_driver = document.querySelector("#btn-add-driver"),
+                btn_add_cancel = document.querySelector("#btn-add-cancel"),
+                add_driver_modal = document.querySelector("#create-driver");
+                
+                /* MODAL CANCEL TRIP */
+                btn_cancel_travel.addEventListener("click", () =>{
+                    cancel_modal.showModal();
+                })
+                btn_close_cancel.addEventListener("click", () =>{
+                    cancel_modal.close()
+                }
+                )
 
+                /* MODAL ADD VEHICLE */
+                btn_add_driver.addEventListener("click", () =>{
+                    add_driver_modal.showModal();
+                })
+                btn_add_cancel.addEventListener("click", () =>{
+                    add_driver_modal.close()
+                }
+                )
+
+                /* SIDE NAVBAR */
                 toggle.addEventListener("click", () =>{
                     sidebar.classList.toggle("close");
                 })
+
     </script>
     
 </body>
