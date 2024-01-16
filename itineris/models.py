@@ -47,7 +47,7 @@ class City(models.Model):
 
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
-    travel_id = models.ForeignKey("Travel", on_delete=models.CASCADE)
+    travel_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey("User", on_delete=models.CASCADE)
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
