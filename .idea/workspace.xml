@@ -7,8 +7,6 @@
     <list default="true" id="f0498913-6b7b-42c0-9a01-f1943fa64f58" name="Changes" comment="Initial Django setup">
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/f54956d0-8efc-43a8-a665-fafafb1e9b2b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f54956d0-8efc-43a8-a665-fafafb1e9b2b.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProyectoItineris/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProyectoItineris/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/itineris/templates/itineris/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/templates/itineris/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/itineris/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/itineris/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/itineris/views.py" afterDir="false" />
     </list>
@@ -47,24 +45,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JavaScript Debug.index.html (1).executor": "Run",
-    "JavaScript Debug.index.html.executor": "Run",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/PycharmProjects/ProyectoItineris",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JavaScript Debug.index.html (1).executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/PycharmProjects/ProyectoItineris&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\scara\Documents\ProyectoItineris\itineris\templates\itineris\css" />
@@ -127,6 +125,7 @@
       <updated>1700849892066</updated>
       <workItem from="1700849942200" duration="1826000" />
       <workItem from="1705500983526" duration="4953000" />
+      <workItem from="1705518233011" duration="1127000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Django setup">
       <option name="closed" value="true" />
