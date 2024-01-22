@@ -14,13 +14,13 @@
 <body>
     <section class="header">
         <nav>
-            <a href="index.html"> <img src="../../static/itineris/images/logo.png"> </a>
+            <a href="{% url 'index' %}"> <img src="../../static/itineris/images/logo.png"> </a>
             <div class="nav-links" id="navLinks">
                 <i class="fa fa-times" onclick="hideMenu()"></i>
                 <ul>
-                    <li><a href="index.html">INICIO</a></li>
+                    <li><a href="{% url 'index' %}">INICIO</a></li>
                     <li><a href="">EMPRESAS</a></li>
-                    <li><a href="">TRABAJA CON NOSOTROS </a></li>
+                    <li><a href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS </a></li>
                 </ul>
             </div>
             <i class="fa fa-bars" onclick="showMenu()"></i>

@@ -13,21 +13,21 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-<section class="header">
-    <nav class="nav-header">
-        <a href="index.html"> <img src="../../static/itineris/images/logo.png"> </a>
-        <div class="nav-links" id="navLinks">
-            <i class="fa fa-times" onclick="hideMenu()"></i>
-            <ul>
-                <li><a href="index.html">INICIO</a></li>
-                <li><a href="">EMPRESAS</a></li>
-                <li><a href="work-with-us.html">TRABAJA CON NOSOTROS </a></li>
-                <li><a href="login.html">INICIO DE SESION</a></li>
-                <li><a href="sign-in.html">REGISTRARSE</a></li>
-            </ul>
-        </div>
-        <i class="fa fa-bars" onclick="showMenu()"></i>
-    </nav>
+    <section class="header">
+        <nav class="nav-header">
+            <a href="{% url 'index' %}"> <img src="../../static/itineris/images/logo.png"> </a>
+            <div class="nav-links" id="navLinks">
+                <i class="fa fa-times" onclick="hideMenu()"></i>
+                <ul>
+                    <li><a href="{% url 'index' %}">INICIO</a></li>
+                    <li><a href="">EMPRESAS</a></li>
+                    <li><a href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS </a></li>
+                    <li><a href="{% url 'login' %}">INICIO DE SESION</a></li>
+                    <li><a href="{% url 'sign-in' %}">REGISTRARSE</a></li>
+                </ul>
+            </div>
+            <i class="fa fa-bars" onclick="showMenu()"></i>
+        </nav>
 
     <div class="text-box">
         <h1>¿A donde querés ir?</h1>
