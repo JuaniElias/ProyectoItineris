@@ -1,7 +1,6 @@
 *{
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif;
 }
 .header{
     min-height: 100vh;
@@ -10,15 +9,6 @@
     background-position: center;
     background-size: cover;
     position: relative;
-}
-nav{
-    display: flex;
-    padding: 2% 6%;
-    justify-content: space-between;
-    align-items: center;
-}
-nav img{
-    width: 150px;
 }
 .nav-links{
     flex: 1;
@@ -52,7 +42,7 @@ nav img{
     color: #fff;
     position: absolute;
     /* top: 50%; */
-    left: 50%; 
+    left: 50%;
     transform: translate(-50%, -50%);
     text-align: left;
 }
@@ -130,7 +120,7 @@ nav .fa{
     .bus-time{
         font-size: 12px;
     }
-    
+
     .bus-travel-time, .bus-info{
         font-size: 10px;
     }
@@ -320,7 +310,7 @@ input, select{
 .wrapper-class input[type="radio"] {
     width: 15px;
 }
-  
+
 .wrapper-class label {
     display: inline;
     margin-left: 5px;
@@ -384,7 +374,7 @@ input, select{
 }
 
 .sidebar.close{
-    width: 60px;  
+    width: 60px;
 }
 
 .sidebar.close .text{
