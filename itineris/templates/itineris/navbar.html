@@ -8,7 +8,7 @@
 <body>
 <nav class="navbar sticky-top navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
   <div class="container-fluid">
-    <a class="navbar-brand d-flex align-items-center" href="#">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
       <img src="{% static 'itineris/images/itineris_icon_48px.png' %}" alt="Logo" height="48" class="d-inline-block align-text-top">
       <span class="ml-2">ITINERIS</span>
     </a>
@@ -21,12 +21,12 @@
           <a class="nav-link" href="#">EMPRESAS</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">TRABAJA CON NOSOTROS</a>
+          <a class="nav-link" href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS</a>
         </li>
       </ul>
       <form class="d-flex" role="search">
-        <a class="btn btn-outline-secondary me-2" type="button">INICIO DE SESION</a>
-        <a class="btn btn-success " type="button">REGISTRARSE</a>
+        <a class="btn btn-outline-secondary me-2" type="button" href="{% url 'login' %}">INICIO DE SESION</a>
+        <a class="btn btn-success " type="button" href="{% url 'sign-in' %}">REGISTRARSE</a>
       </form>
     </div>
   </div>
