@@ -16,4 +16,5 @@ urlpatterns = [
     path("your_payments.html/", views.your_payments, name="your_payments"),
     path("your_travels.html/", views.your_travels, name="your_travels"),
     path("your_vehicles.html/", views.your_vehicles, name="your_vehicles"),
+    path("navbar.html/", views.navbar, name="navbar"),
 ]

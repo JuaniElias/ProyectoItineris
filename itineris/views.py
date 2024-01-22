@@ -53,3 +53,7 @@ def your_travels(request):
 
 def your_vehicles(request):
     return render(request, "itineris/your_vehicles.html")
+
+
+def navbar(request):
+    return render(request, "itineris/navbar.html")
