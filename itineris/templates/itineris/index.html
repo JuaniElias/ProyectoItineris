@@ -12,21 +12,6 @@
 </head>
 <body>
 <section class="header">
-    {% comment %}
-    <nav class="nav-header">
-        <a href="{% url 'index' %}"> <img src="../../static/itineris/images/logo.png"> </a>
-        <div class="nav-links" id="navLinks">
-            <i class="fa fa-times" onclick="hideMenu()"></i>
-            <ul>
-                <li><a href="{% url 'index' %}">INICIO</a></li>
-                <li><a href="">EMPRESAS</a></li>
-                <li><a href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS </a></li>
-                <li><a href="{% url 'login' %}">INICIO DE SESION</a></li>
-                <li><a href="{% url 'sign-in' %}">REGISTRARSE</a></li>
-            </ul>
-        </div>
-        <i class="fa fa-bars" onclick="showMenu()"></i>
-    </nav>  {% endcomment %}
 
     {% include 'itineris/navbar.html' %}
 
