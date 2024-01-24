@@ -16,7 +16,7 @@ def login(request):
 
 
 def sign_in(request):
-    return render(request, "itineris/sign-in.html")
+    return render(request, "itineris/sign-up.html")
 
 
 def about(request):
@@ -32,7 +32,7 @@ def pre_checkout(request):
 
 
 def sign_in_business(request):
-    return render(request, "itineris/sign-in-business.html")
+    return render(request, "itineris/sign-up-business.html")
 
 
 def travel_result(request):
