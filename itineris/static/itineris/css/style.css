@@ -22,6 +22,9 @@
 .nav-link:hover::after{
     width: 100%;
 }
+.btn.nav-button{
+    border-radius: 20px;
+}
 .text-box{
     width: 90%;
     color: #fff;
