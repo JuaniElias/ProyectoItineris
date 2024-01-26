@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
@@ -31,18 +31,16 @@
         </div>
         <div class="row-login">
             <div class="travel-col">
-                <form class="comment-form">
-                    <p>Email</p>
-                    <input type="email" placeholder="email">
-                    <p>Contraseña</p>
-                    <input type="password" placeholder="contraseña">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
                     <br>
                     <br>
                     <center>
                         <button type="submit" class="hero-btn">Ingresar</button>
                         <br>
-                        <a href="sign-in.html">¿No tienes una cuenta? Registrate</a>
-                    </center> 
+                        <a href="{% url 'sign-in' %}">¿No tienes una cuenta? Registrate</a>
+                    </center>
                 </form>
             </div>
         </div>

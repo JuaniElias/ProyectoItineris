@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .forms import InputForm
 
 
 # Create your views here.
@@ -12,7 +13,7 @@ def work_with_us(request):
 
 
 def login(request):
-    return render(request, "itineris/login.html")
+    return render(request, "registration/login.html")
 
 
 def sign_in(request):
