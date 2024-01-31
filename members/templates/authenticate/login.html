@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+{% extends 'itineris/base.html' %}
 <head>
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
@@ -17,13 +18,14 @@
             <h2>Iniciar sesión</h2>
         </div>
         <form action="" method=POST>
+            {% csrf_token %}
             <div class="row-login">
                 <div class="travel-col">
                     <form class="comment-form">
                         <p>Email</p>
-                        <input type="email" placeholder="email">
+                        <input type="email" placeholder="email" name="email">
                         <p>Contraseña</p>
-                        <input type="password" placeholder="contraseña">
+                        <input type="password" placeholder="contraseña" name="password">
                         <br>
                         <br>
                         <center>
