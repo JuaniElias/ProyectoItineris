@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-{% extends 'itineris/base.html' %}
 <head>
     <meta name="viewport" content="with=device-with, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
@@ -37,7 +36,22 @@
                 </div>
             </div>
         </form>
-        
+
+        <div class="container">
+      {% if messages %}
+        {% for message in messages %}
+
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}
+      {% endblock %}
+    </div>
 
     </section>
     <section class="footer">
