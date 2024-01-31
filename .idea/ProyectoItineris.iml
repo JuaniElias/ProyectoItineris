@@ -23,7 +23,8 @@
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$MODULE_DIR$/../ProyectoItineris\templates" />
+        <option value="$MODULE_DIR$/itineris/templates/itineris" />
+        <option value="$MODULE_DIR$/itineris/templates" />
       </list>
     </option>
   </component>

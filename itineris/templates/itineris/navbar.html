@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>navbar</title>
+    <link rel="icon" href="{% static 'itineris/images/favicon.ico' %}" >
+</head>
+<body>
+<nav class="navbar sticky-top navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+      <img src="{% static 'itineris/images/itineris_icon_48px.png' %}" alt="Logo" height="48" class="d-inline-block align-text-top">
+      <span class="ml-2">ITINERIS</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'sign-up-business' %}">EMPRESAS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <a class="btn btn-outline-secondary me-2 nav-button" type="button" href="{% url 'login' %}">INICIO DE SESION</a>
+        <a class="btn btn-success nav-button" type="button" href="{% url 'sign-up' %}">REGISTRARSE</a>
+      </form>
+    </div>
+  </div>
+</nav>
+</body>
+</html>

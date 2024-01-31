@@ -15,7 +15,7 @@ def login(request):
     return render(request, "itineris/login.html")
 
 
-def sign_in(request):
+def sign_up(request):
     return render(request, "itineris/sign-up.html")
 
 
@@ -31,7 +31,7 @@ def pre_checkout(request):
     return render(request, "itineris/pre-checkout.html")
 
 
-def sign_in_business(request):
+def sign_up_business(request):
     return render(request, "itineris/sign-up-business.html")
 
 
@@ -53,3 +53,7 @@ def your_travels(request):
 
 def your_vehicles(request):
     return render(request, "itineris/your_vehicles.html")
+
+
+def navbar(request):
+    return render(request, "itineris/navbar.html")
