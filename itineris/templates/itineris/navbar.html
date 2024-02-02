@@ -26,8 +26,12 @@
         </li>
       </ul>
       <form class="d-flex" role="search">
-        <a class="btn btn-outline-secondary me-2 nav-button" type="button" href="{% url 'login' %}">INICIO DE SESION</a>
-        <a class="btn btn-success nav-button" type="button" href="{% url 'sign-up' %}">REGISTRARSE</a>
+          {% if user.is_authenticated %}
+              <a class="btn btn-outline-secondary me-2 nav-button" type="button" href="{% url 'logout' %}">CERRAR SESION</a>
+          {% else %}
+              <a class="btn btn-outline-secondary me-2 nav-button" type="button" href="{% url 'login' %}">INICIAR SESION</a>
+              <a class="btn btn-success nav-button" type="button" href="{% url 'sign-up' %}">REGISTRARSE</a>
+          {% endif %}
       </form>
     </div>
   </div>

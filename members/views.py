@@ -10,10 +10,16 @@ def login_user(request):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('')
+            return redirect('index')
         else:
             messages.success(request, 'Hubo un error al iniciar el usuario, intente otra vez')
             return redirect('login')
 
     else:
         return render(request, 'authenticate/login.html')
+
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, 'Se ha cerrado su  sesión')
+    return redirect('index')
