@@ -66,6 +66,9 @@ class User(models.Model):
     city = models.ForeignKey("City", on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.username
+
 
 class Company(models.Model):
     company_id = models.AutoField(primary_key=True)
