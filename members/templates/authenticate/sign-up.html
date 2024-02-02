@@ -7,44 +7,16 @@
         There was an error with your form...
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-
-
-
 {% endif %}
-    <div class="row">
+
+    <div class="shadow p-4 mb-5 bg-body rounded">
         <h1>Crear una cuenta</h1>
-    </div>
-    <form action="{% url 'sign-up' %}" method=POST>
-    {% csrf_token %}
-        {{ form.as_p }}
-    <input type="submit" value="Submit" class="btn btn-secondary">
-    </form>
-    <div class="row-login">
-        <div class="travel-col">
-            <form class="comment-form">
-                <p>DNI</p>
-                <input type="text" placeholder="DNI">
-                <div class="row">
-                    <div class="col-form">
-                        <p>Nombre</p>
-                        <input type="text" placeholder="Nombre">
-                    </div>
 
-                    <div class="col-form">
-                        <p>Apellido</p>
-                        <input type="text" placeholder="Apellido">
-                    </div>
-                </div>
-                <p>Email</p>
-                <input type="email" placeholder="email">
-                <br>
-                <br>
-                <center>
-                    <button type="submit" class="hero-btn">Crear cuenta</button>
-                </center>
-
-            </form>
-        </div>
+        <form action="{% url 'sign-up' %}" method=POST>
+        {% csrf_token %}
+            {{ form.as_p }}
+        <input type="submit" value="Registrarse" class="btn btn-secondary">
+        </form>
     </div>
 
 {% endblock %}
