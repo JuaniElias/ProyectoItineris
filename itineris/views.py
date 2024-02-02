@@ -11,14 +11,6 @@ def work_with_us(request):
     return render(request, "itineris/work-with-us.html")
 
 
-def login(request):
-    return render(request, "itineris/login.html")
-
-
-def sign_up(request):
-    return render(request, "itineris/sign-up.html")
-
-
 def about(request):
     return render(request, "itineris/about_us.html")
 

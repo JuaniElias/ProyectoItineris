@@ -57,14 +57,15 @@ class Traveler(models.Model):
 
 
 class User(models.Model):
-    user_id = models.AutoField(primary_key=True)
+    user_id = models.CharField(primary_key=True, max_length=8, unique=True)
     username = models.CharField(max_length=15)
     password = models.CharField(max_length=20)
     email = models.EmailField()
     phone = models.CharField(max_length=30)
     address = models.CharField(max_length=50)
     city = models.ForeignKey("City", on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.username
@@ -73,9 +74,9 @@ class User(models.Model):
 class Company(models.Model):
     company_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=30)
-    address = models.CharField(max_length=50)
-    license = models.FileField()
+    phone_number = models.CharField(max_length=30, default='')
+    address = models.CharField(max_length=50, default='')
+    license = models.FileField(default='')
 
 
 class Province(models.Model):
