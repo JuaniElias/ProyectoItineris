@@ -4,9 +4,9 @@ from django import forms
 
 
 class RegistrationForm(UserCreationForm):
+    username = forms.CharField(label='DNI', max_length=8)
     first_name = forms.CharField(label='Nombre')
     last_name = forms.CharField(label='Apellido')
-    email = forms.EmailField(label='Email')
 
     class Meta:
         model = User
