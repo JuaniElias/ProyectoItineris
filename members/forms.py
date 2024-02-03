@@ -1,10 +1,16 @@
 from django.contrib.auth.forms import UserCreationForm
+from django.core.validators import RegexValidator
+
 from itineris.models import CustomUser
+
 from django import forms
 
 
 class RegistrationForm(UserCreationForm):
-    username = forms.CharField(label='DNI', max_length=8)
+    # Valida que el DNI sean solo numeros
+    dni_validator = RegexValidator(regex=r'^\d+$', message='El DNI debe estar compuesto solo por numeros.')
+
+    username = forms.CharField(label='DNI', max_length=8, validators=[dni_validator])
     first_name = forms.CharField(label='Nombre')
     last_name = forms.CharField(label='Apellido')
     phone = forms.CharField(label='Telefono')
