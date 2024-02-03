@@ -1,28 +1,33 @@
 {% extends 'itineris/base.html' %}
 
 {% block content %}
+
+    {% include 'itineris/navbar.html' %}
+    <br>
+<div class="container">
+<div class="shadow p-4 mb-5 bg-body rounded">
 <div class="row">
+
     <h1>Iniciar sesión</h1>
-</div>
-<form action="" method=POST>
-    {% csrf_token %}
-    <div class="row-login">
-        <div class="travel-col">
-            <form class="comment-form">
-                <p>Username</p>
-                <input type="text" placeholder="email" name="username">
-                <p>Contraseña</p>
-                <input type="password" placeholder="contraseña" name="password">
-                <br>
-                <br>
-                <center>
-                    <button type="submit" class="hero-btn">Ingresar</button>
-                    <br>
-                    <a href="sign-up.html">¿No tienes una cuenta? Registrate</a>
-                </center>
-            </form>
-        </div>
     </div>
-</form>
+        <form action="" method=POST>
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Email address</label>
+                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="tuemail@mail.com" name="username">
+
+                <label for="inputPassword5" class="form-label">Password</label>
+                <input type="password" id="inputPassword5" class="form-control" name="password">
+
+            </div>
+
+            <div class="d-grid gap-2 col-6 mx-auto">
+                    <button class="btn btn-primary" type="submit">Ingresar</button>
+            </div>
+
+        </form>
+    </div>
+</div>
 
 {% endblock %}
