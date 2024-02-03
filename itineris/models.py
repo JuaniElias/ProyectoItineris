@@ -60,7 +60,6 @@ class Traveler(models.Model):
 class CustomUser(AbstractUser):
     phone = models.CharField(max_length=30)
     address = models.CharField(max_length=50)
-    city = models.ForeignKey("City", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.username
