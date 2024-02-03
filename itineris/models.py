@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Travel(models.Model):
@@ -50,22 +50,17 @@ class City(models.Model):
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
     travel_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey("User", on_delete=models.CASCADE)
+    username = models.ForeignKey("User", on_delete=models.CASCADE)
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
     feedback = models.TextField(max_length=200)
 
 
-class User(models.Model):
-    user_id = models.CharField(primary_key=True, max_length=8, unique=True)
-    username = models.CharField(max_length=15)
-    password = models.CharField(max_length=20)
-    email = models.EmailField()
+class CustomUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=30)
     address = models.CharField(max_length=50)
     city = models.ForeignKey("City", on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.username
