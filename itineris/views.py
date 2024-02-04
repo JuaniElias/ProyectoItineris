@@ -11,14 +11,6 @@ def work_with_us(request):
     return render(request, "itineris/work-with-us.html")
 
 
-def login(request):
-    return render(request, "itineris/login.html")
-
-
-def sign_up(request):
-    return render(request, "itineris/sign-up.html")
-
-
 def about(request):
     return render(request, "itineris/about_us.html")
 
@@ -29,10 +21,6 @@ def create_travel(request):
 
 def pre_checkout(request):
     return render(request, "itineris/pre-checkout.html")
-
-
-def sign_up_business(request):
-    return render(request, "itineris/sign-up-business.html")
 
 
 def travel_result(request):

@@ -1,74 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="with=device-with, initial-scale=1.0">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Itineris</title>
-    <link rel="stylesheet" href="../../static/itineris/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% extends 'itineris/base.html' %}
 
-</head>
-<body>
-    <section class="sub-header">
-        <nav>
-            <a href="{% url 'index' %}"> <img src="../../static/itineris/images/logo.png"> </a>
-            <div class="nav-links" id="navLinks">
-                <i class="fa fa-times" onclick="hideMenu()"></i>
-                <ul>
-                    <li><a href="{% url 'index' %}">INICIO</a></li>
-                    <li><a href="">EMPRESAS</a></li>
-                    <li><a href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS </a></li>
-                    <li><a href="{% url 'login' %}">INICIO DE SESION</a></li>
-                    <li><a href="{% url 'sign-up' %}">REGISTRARSE</a></li>
-                </ul>
-            </div>
-            <i class="fa fa-bars" onclick="showMenu()"></i>
-        </nav>
-            <h1>Sobre Nosotros</h1>
-    </section>
+{% block content %}
+
+{% include 'itineris/navbar.html' %}
+    <br>
+<div class="container">
+<h1>Sobre Nosotros</h1>
     <section class="about-us">
 
         <div class="row">
-
-            <div class="about-col">
-                <h1>title</h1>
-                <p>lorem ipsus</p>
-                <a href="" class="hero-btn">EXPLORE</a>
+            <div class="wwu-col">
+                <h1>Lorem ipsum</h1>
+                <p>Información general de como nos manejamos, que ofremos bla bla bla, abajo hay un botón que brinda información de contacto para trabajar con nosotros.
+                    También hay que poner tipo un link directo a crear una cuenta de "empresa" donde tienen que cargar toda la información pertinente.
+                </p>
             </div>
-
-            <div class="about-col">
-                <img src="">
+            <div class="wwu-col">
+                <img src="../../static/itineris/images/team-work.jpg">
             </div>
-
         </div>
     </section>
+</div>
 
-    <section class="footer">
-        <h4>Sobre nosotros</h4>
-        <p>lorem ipsus</p>
-        <div class="icons">
-            <i class="fa fa-facebook"></i>
-            <i class="fa fa-twitter"></i>
-            <i class="fa fa-instagram"></i>
-        </div>
-    </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        var navLinks = document.getElementById("navLinks")
-
-        function showMenu(){
-            navLinks.style.right = "0";
-        }
-
-        function hideMenu(){
-            navLinks.style.right = "-200px";
-        }
-
-
-    </script>
-</body>
-</html >
+{% endblock %}
