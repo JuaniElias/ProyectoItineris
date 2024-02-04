@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'itineris',
     'members',
 ]
+AUTH_USER_MODEL = "itineris.CustomUser"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

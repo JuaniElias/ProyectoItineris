@@ -1,4 +1,8 @@
+from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -50,32 +54,85 @@ class City(models.Model):
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
     travel_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey("User", on_delete=models.CASCADE)
+    dni = models.ForeignKey("CustomUser", on_delete=models.CASCADE)
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
     feedback = models.TextField(max_length=200)
 
 
-class User(models.Model):
-    user_id = models.CharField(primary_key=True, max_length=8, unique=True)
-    username = models.CharField(max_length=15)
-    password = models.CharField(max_length=20)
-    email = models.EmailField()
+class CustomUser(AbstractUser):
+    class Role(models.TextChoices):
+        ADMIN = "ADMIN", "Admin"
+        CLIENT = "CLIENT", "Client"
+        COMPANY = "COMPANY", "Company"
+
+    base_role = Role.ADMIN
+
     phone = models.CharField(max_length=30)
-    address = models.CharField(max_length=50)
-    city = models.ForeignKey("City", on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
+    address = models.CharField(max_length=100)
+    role = models.CharField(choices=Role.choices, max_length=50)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.role = self.base_role
+            return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.username
 
 
-class Company(models.Model):
-    company_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=30, default='')
-    address = models.CharField(max_length=50, default='')
+class ClientManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=CustomUser.Role.CLIENT)
+
+
+class Client(CustomUser):
+    base_role = CustomUser.Role.CLIENT
+
+    client = ClientManager()
+
+    class Meta:
+        proxy = True
+
+
+@receiver(post_save, sender=Client)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "CLIENT":
+        ClientProfile.objects.create(user=instance)
+
+
+class ClientProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    client_id = models.AutoField(primary_key=True)
+
+    def __str__(self):
+        return self.user.first_name
+
+
+class CompanyManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=CustomUser.Role.COMPANY)
+
+
+class Company(CustomUser):
+    base_role = CustomUser.Role.COMPANY
+
+    company = CompanyManager()
+
+    class Meta:
+        proxy = True
+
+
+@receiver(post_save, sender=Company)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "COMPANY":
+        CompanyProfile.objects.create(user=instance)
+
+
+class CompanyProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     license = models.FileField(default='')
 
 
