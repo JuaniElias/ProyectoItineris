@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import RegexValidator
 
-from itineris.models import CustomUser
+from itineris.models import Client, Company
 
 from django import forms
 
@@ -16,14 +16,32 @@ class RegistrationForm(UserCreationForm):
     phone = forms.CharField(label='Telefono')
 
     class Meta:
-        model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'phone', 'password1', 'password2')
+        model = Client
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-control'
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
+        self.fields['email'].widget.attrs['class'] = 'form-control'
+        self.fields['phone'].widget.attrs['class'] = 'form-control'
+        self.fields['password1'].widget.attrs['class'] = 'form-control'
+        self.fields['password2'].widget.attrs['class'] = 'form-control'
+
+
+class RegistrationFormCompany(UserCreationForm):
+
+    username = forms.CharField(label='Nombre de la empresa', max_length=100)
+    phone = forms.CharField(label='Teléfono')
+
+    class Meta:
+        model = Company
+        fields = ('username', 'email', 'phone', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super(RegistrationFormCompany, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['password1'].widget.attrs['class'] = 'form-control'

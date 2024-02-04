@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from members.forms import RegistrationForm
+from members.forms import RegistrationForm, RegistrationFormCompany
 
 
 def login_user(request):
@@ -13,7 +13,7 @@ def login_user(request):
             login(request, user)
             return redirect('index')
         else:
-            messages.success(request, 'Hubo un error al iniciar el usuario, intente otra vez')
+            messages.success(request, 'Hubo un error al iniciar el usuario, intente otra vez.')
             return redirect('login')
 
     else:
@@ -22,7 +22,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    messages.success(request, 'Se ha cerrado su  sesión')
+    messages.success(request, 'Se ha cerrado su  sesión.')
     return redirect('index')
 
 
@@ -35,11 +35,30 @@ def signup_user(request):
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
             login(request, user)
-            messages.success(request, "Registration Successful!")
+            messages.success(request, "Se ha registrado correctamente.")
             return redirect('index')
     else:
         form = RegistrationForm()
 
     return render(request, 'authenticate/sign-up.html', {
+        'form': form,
+    })
+
+
+def signup_business(request):
+    if request.method == "POST":
+        form = RegistrationFormCompany(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            company = authenticate(username=username, password=password)
+            login(request, company)
+            messages.success(request, "Se ha registrado correctamente.")
+            return redirect('create_travel')
+    else:
+        form = RegistrationFormCompany()
+
+    return render(request, 'authenticate/sign-up-business.html', {
         'form': form,
     })

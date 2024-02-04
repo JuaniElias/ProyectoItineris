@@ -23,10 +23,6 @@ def pre_checkout(request):
     return render(request, "itineris/pre-checkout.html")
 
 
-def sign_up_business(request):
-    return render(request, "itineris/sign-up-business.html")
-
-
 def travel_result(request):
     return render(request, "itineris/travel_result.html")
 
