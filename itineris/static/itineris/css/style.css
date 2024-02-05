@@ -527,7 +527,7 @@ input[type="number"]{
 }
 
 .col-filter input, .col-filter select{
-    height: 20px;
+    height: 35px;
     width: 70px;
 }
 
