@@ -1,79 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="with=device-with, initial-scale=1.0">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Itineris</title>
-    <link rel="stylesheet" href="../../static/itineris/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
+{% extends 'itineris/base.html' %}
+
+{% block content %}
+
+{% include 'itineris/navbar-business.html' %}
 <body>
-    <nav class="sidebar close">
-            
-        <div class="sd-header">
-            <div class="image-text">
-                <span class="image">
-                    <img src="../../static/itineris/images/logo_reducido.png" alt="logo">
-                </span>
-
-                <div class="text header-text">
-                    <span class="businness">"Empresa"</span>
-                </div>
-                <div>
-                    <i class='bx bx-chevron-right toggle'></i>
-                </div>  
-            </div>
-        </div>
-
-        <div class="menu-bar">
-            <div class="menu">
-                <ul class="menu-links">
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_travels' %}">
-                            <i class='bx bx-trip icon'></i>
-                            <span class="text sb-nav-text">Mis Viajes</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link ">
-                        <a href="{% url 'create_travel' %}">
-                            <i class='bx bx-book-add icon'></i>
-                            <span class="text sb-nav-text">Crear un viaje</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_vehicles' %}">
-                            <i class='bx bx-bus icon'></i>
-                            <span class="text sb-nav-text">Mis Vehículos</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_drivers' %}">
-                            <i class='bx bx-user icon'></i>
-                            <span class="text sb-nav-text">Conductores</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_payments' %}">
-                            <i class='bx bx-wallet-alt icon'></i>
-                            <span class="text sb-nav-text">Pagos</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href=""> 
-                            <i class='bx bx-log-out icon'></i>
-                            <span class="text sb-nav-text">Salir</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    
-
-</nav>
     <section class="your-businness">
         <div>
             <h1 class="text">Crear Viaje</h1>
@@ -155,4 +85,4 @@
     </script>
     
 </body>
-</html>
+{% endblock %}
