@@ -10,17 +10,20 @@
 
     <h1>Iniciar sesión</h1>
     </div>
+    <br>
         <form action="" method=POST>
             {% csrf_token %}
 
             <div class="mb-3">
-                <label for="exampleFormControlInput1" class="form-label">Email address</label>
-                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="tuemail@mail.com" name="username">
-
-                <label for="inputPassword5" class="form-label">Password</label>
+                <label for="exampleFormControlInput1" class="form-label">DNI</label>
+                <input type="text" class="form-control" id="exampleFormControlInput1" name="username">
+                <br>
+                <label for="inputPassword5" class="form-label">Contraseña</label>
                 <input type="password" id="inputPassword5" class="form-control" name="password">
 
             </div>
+            
+            <br>
 
             <div class="d-grid gap-2 col-6 mx-auto">
                     <button class="btn btn-primary" type="submit">Ingresar</button>
