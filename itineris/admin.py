@@ -16,5 +16,3 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 
 admin.site.register(City)
-
-admin.site.register(ClientProfile)

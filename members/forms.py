@@ -33,16 +33,14 @@ class RegistrationFormCompany(UserCreationForm):
     dni_validator = RegexValidator(regex=r'^\d+$', message='El CUIT debe estar compuesto sólo por números.')
 
     username = forms.CharField(label='CUIT', max_length=11, validators=[dni_validator])
-    phone = forms.CharField(label='Teléfono')
 
     class Meta:
         model = Company
-        fields = ('username', 'email', 'phone', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
         super(RegistrationFormCompany, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
-        self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['password1'].widget.attrs['class'] = 'form-control'
         self.fields['password2'].widget.attrs['class'] = 'form-control'

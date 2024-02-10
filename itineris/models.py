@@ -68,8 +68,6 @@ class CustomUser(AbstractUser):
 
     base_role = Role.ADMIN
 
-    phone = models.CharField(max_length=30)
-    address = models.CharField(max_length=100)
     role = models.CharField(choices=Role.choices, max_length=50)
 
     def save(self, *args, **kwargs):
@@ -104,7 +102,10 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 class ClientProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    client_id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone = models.CharField(max_length=30)
+    address = models.CharField(max_length=100)
 
     def __str__(self):
         return self.user.first_name
@@ -133,7 +134,10 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 class CompanyProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    license = models.FileField(default='')
+    company_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=30)
+    address = models.CharField(max_length=100)
+    license = models.FileField(default=None)
 
 
 class Province(models.Model):
