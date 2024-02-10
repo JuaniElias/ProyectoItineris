@@ -11,6 +11,8 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            if user.role == 'COMPANY':
+                return redirect('your_travels')
             return redirect('index')
         else:
             messages.success(request, 'Hubo un error al iniciar el usuario, intente otra vez.')

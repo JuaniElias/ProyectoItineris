@@ -14,9 +14,15 @@
   </head>
   
   <body>
-      {% block content %}
-          
-      {% endblock %}
+  
+  {% if user.role == 'COMPANY' %}
+    {% include 'itineris/navbar-business.html' %}
+  {% else %}
+    {% include 'itineris/navbar.html' %}
+  {% endif %}
+  {% block content %}
+      
+  {% endblock %}
     {% comment %}{% include 'itineris/footer.html' %}{% endcomment %}
 
 
