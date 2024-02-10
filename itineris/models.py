@@ -138,6 +138,7 @@ class CompanyProfile(models.Model):
     phone = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
     license = models.FileField(default=None)
+    is_verified = models.BooleanField(default=False)
 
 
 class Province(models.Model):

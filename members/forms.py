@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import RegexValidator
 
-from itineris.models import Client, Company
+from itineris.models import Client, Company, CompanyProfile
 
 from django import forms
 
@@ -12,7 +12,7 @@ class RegistrationForm(UserCreationForm):
     username = forms.CharField(label='DNI', max_length=8, validators=[dni_validator])
     first_name = forms.CharField(label='Nombre')
     last_name = forms.CharField(label='Apellido')
-    phone = forms.CharField(label='Telefono')
+    phone = forms.CharField(label='Teléfono')
 
     class Meta:
         model = Client
@@ -44,3 +44,22 @@ class RegistrationFormCompany(UserCreationForm):
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['password1'].widget.attrs['class'] = 'form-control'
         self.fields['password2'].widget.attrs['class'] = 'form-control'
+
+
+class BusinessDetails(forms.ModelForm):
+
+    company_name = forms.CharField(label='Nombre de empresa', max_length=100)
+    phone = forms.CharField(label='Teléfono')
+    address = forms.CharField(label='Dirección')
+    license = forms.FileField(label='Licencia CNRT', required=False)
+
+    class Meta:
+        model = CompanyProfile
+        fields = ('company_name', 'phone', 'address', 'license',)
+
+    def __init__(self, *args, **kwargs):
+        super(BusinessDetails, self).__init__(*args, **kwargs)
+        self.fields['company_name'].widget.attrs['class'] = 'form-control'
+        self.fields['phone'].widget.attrs['class'] = 'form-control'
+        self.fields['address'].widget.attrs['class'] = 'form-control'
+        self.fields['license'].widget.attrs['class'] = 'form-control'
