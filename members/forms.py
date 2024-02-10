@@ -7,8 +7,7 @@ from django import forms
 
 
 class RegistrationForm(UserCreationForm):
-    # Valida que el DNI sean solo numeros
-    dni_validator = RegexValidator(regex=r'^\d+$', message='El DNI debe estar compuesto solo por numeros.')
+    dni_validator = RegexValidator(regex=r'^\d+$', message='El DNI debe estar compuesto sólo por números.')
 
     username = forms.CharField(label='DNI', max_length=8, validators=[dni_validator])
     first_name = forms.CharField(label='Nombre')
@@ -31,8 +30,9 @@ class RegistrationForm(UserCreationForm):
 
 
 class RegistrationFormCompany(UserCreationForm):
+    dni_validator = RegexValidator(regex=r'^\d+$', message='El CUIT debe estar compuesto sólo por números.')
 
-    username = forms.CharField(label='Nombre de la empresa', max_length=100)
+    username = forms.CharField(label='CUIT', max_length=11, validators=[dni_validator])
     phone = forms.CharField(label='Teléfono')
 
     class Meta:
