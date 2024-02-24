@@ -359,8 +359,8 @@ input, select{
     background: var(--primary-color);
     border-radius: 50%;
     color: var(--sidebar-color);
-    font-size: 22px;
-    padding-left: 2px;
+    font-size: 14px;
+    padding-left: 5px;
     padding-top: 2px;
     transition: var(--tran-03);
     cursor: pointer;

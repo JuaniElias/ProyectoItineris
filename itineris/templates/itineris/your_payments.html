@@ -9,16 +9,16 @@
             
             <div class="table-container">
                 <div class="row-travel">
-                    <div class="row-filter">
-                        <div class="col-filter">
+                    <div class="row">
+                        <div class="col">
                             <p>Fecha desde</p>
                             <input type="date">
                         </div>
-                        <div class="col-filter">
+                        <div class="col">
                             <p>Fecha hasta</p>
                             <input type="date">
                         </div>
-                        <div class="col-filter">
+                        <div class="col">
                             <p>Estado</p>
                             <select class="form-control" tabindex="4">
                                 <option value="Todos">Todos</option>
@@ -27,7 +27,7 @@
                                 <option value="En proceso">En proceso</option>
                             </select>
                         </div>
-                        <div class="col-filter">
+                        <div class="col">
                             <p>Ordernar por:</p>
                             <select class="form-control" tabindex="3">
                                 <option value="1">Fecha</option>
@@ -57,21 +57,7 @@
                     </table>
                 </div>
             </div>
-            
         </div>
-        
     </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        const   body = document.querySelector("body"),
-                sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle");
-
-                toggle.addEventListener("click", () =>{
-                    sidebar.classList.toggle("close");
-                })
-    </script>
-    
 </body>
 {% endblock %}

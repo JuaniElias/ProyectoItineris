@@ -28,9 +28,6 @@
                                 <option value="">c</option>
                             </select>
                         </div>
-                        <div class="center">
-                            <i class="fa fa-plus-square fa-lg" id="btn-add-driver"></i>
-                        </div>
                     </div>
                     <br>
                     <table class="content-table">
@@ -39,7 +36,11 @@
                                 <th>Apellido</th>
                                 <th>Nombre</th>
                                 <th>DNI</th>
-                                <th></th>
+                                <th>
+                                    <button id="btn-add-driver" class="btn">
+                                        <i class="bi bi-plus-circle" > Agregar</i>
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +48,7 @@
                                 <td>1</td>
                                 <td>2</td>
                                 <td>3</td>
-                                <td><i class="fa fa-times-circle fa-lg table-icon" id="btn-delete-driver"></i></td>
+                                <td><i id="btn-delete-driver" class="btn bi bi-trash3" ></i></td>
                             </tr>
                         </tbody>
                     </table>
@@ -63,7 +64,7 @@
                         <input type="text">
                         <p>DNI</p>
                         <input type="text">
-                        <p class="inline-block">Licencia Conducir</p><i class="fa fa-info-circle" title="Recomendamos subir una imagen de la licencia de conducir"></i>
+                        <p class="inline-block">Licencia Conducir</p><i class="bi bi-info-circle table-icon" title="Recomendamos subir una imagen de la licencia de conducir"></i>
                         <input type="file" id="license" name="license">
                     
                     <div class="row-modal">
@@ -89,11 +90,7 @@
 
     <!---------------- JavaScript to toggle the menu ----------------------->
     <script>
-        const   body = document.querySelector("body"),
-                sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle"),
-                
-                btn_cancel_travel = document.querySelector("#btn-delete-driver"),
+        const   btn_cancel_travel = document.querySelector("#btn-delete-driver"),
                 btn_close_cancel = document.querySelector("#btn-close-del-modal"),
                 cancel_modal = document.querySelector("#delete-modal"),
                 
@@ -101,29 +98,23 @@
                 btn_add_cancel = document.querySelector("#btn-add-cancel"),
                 add_driver_modal = document.querySelector("#create-driver");
                 
-                /* MODAL CANCEL TRIP */
-                btn_cancel_travel.addEventListener("click", () =>{
-                    cancel_modal.showModal();
-                })
-                btn_close_cancel.addEventListener("click", () =>{
-                    cancel_modal.close()
-                }
-                )
+            /* MODAL CANCEL TRIP */
+            btn_cancel_travel.addEventListener("click", () =>{
+                cancel_modal.showModal();
+            })
+            btn_close_cancel.addEventListener("click", () =>{
+                cancel_modal.close()
+            }
+            )
 
-                /* MODAL ADD VEHICLE */
-                btn_add_driver.addEventListener("click", () =>{
-                    add_driver_modal.showModal();
-                })
-                btn_add_cancel.addEventListener("click", () =>{
-                    add_driver_modal.close()
-                }
-                )
-
-                /* SIDE NAVBAR */
-                toggle.addEventListener("click", () =>{
-                    sidebar.classList.toggle("close");
-                })
-
+            /* MODAL ADD VEHICLE */
+            btn_add_driver.addEventListener("click", () =>{
+                add_driver_modal.showModal();
+            })
+            btn_add_cancel.addEventListener("click", () =>{
+                add_driver_modal.close()
+            }
+            )
     </script>
     
 </body>
