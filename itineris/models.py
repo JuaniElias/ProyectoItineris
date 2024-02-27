@@ -8,9 +8,9 @@ from django.dispatch import receiver
 # Create your models here.
 class Travel(models.Model):
     travel_id = models.AutoField(primary_key=True)
-    company_id = models.ForeignKey("Company", on_delete=models.CASCADE)
-    driver_id = models.ForeignKey("Driver", on_delete=models.CASCADE)
-    plate_number = models.ForeignKey("Vehicle", on_delete=models.CASCADE)
+    company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
+    driver = models.ForeignKey("Driver", on_delete=models.CASCADE)
+    plate = models.ForeignKey("Vehicle", on_delete=models.CASCADE)
     city_origin = models.CharField(max_length=20)
     city_destination = models.CharField(max_length=20)
     datetime_departure = models.DateTimeField()
@@ -22,7 +22,7 @@ class Travel(models.Model):
 
 class Driver(models.Model):
     driver_id = models.AutoField(primary_key=True)
-    company_id = models.ForeignKey("Company", on_delete=models.CASCADE)
+    company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     license_number = models.CharField(max_length=20)
     email = models.EmailField()
@@ -31,12 +31,12 @@ class Driver(models.Model):
 
 class Vehicle(models.Model):
     plate_number = models.CharField(max_length=10, unique=True, primary_key=True)
-    company_id = models.ForeignKey("Company", on_delete=models.CASCADE)
+    company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
     brand = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
     capacity = models.IntegerField()
     color = models.CharField(max_length=20)
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, default="available")
 
 
 class City(models.Model):
@@ -54,7 +54,7 @@ class City(models.Model):
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
     travel_id = models.AutoField(primary_key=True)
-    dni = models.ForeignKey("CustomUser", on_delete=models.CASCADE)
+    client = models.ForeignKey("ClientProfile", on_delete=models.CASCADE)
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
     feedback = models.TextField(max_length=200)

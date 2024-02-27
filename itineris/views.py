@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
+from itineris.forms import AddVehicle
+from itineris.models import CompanyProfile
 
 
 # Create your views here.
@@ -40,7 +42,22 @@ def your_travels(request):
 
 
 def your_vehicles(request):
-    return render(request, "itineris/your_vehicles.html")
+    user_id = request.user.id
+    company = get_object_or_404(CompanyProfile, user_id=user_id)
+
+    if request.method == "POST":
+        form = AddVehicle(request.POST)
+        if form.is_valid():
+            new_vehicle = form.save(commit=False)
+            new_vehicle.company_id_id = company.id
+            new_vehicle.save()
+            return redirect('your_vehicles')
+    else:
+        form = AddVehicle()
+
+    return render(request, "itineris/your_vehicles.html", {
+        'form': form,
+    })
 
 
 def navbar(request):

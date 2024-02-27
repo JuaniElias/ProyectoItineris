@@ -64,7 +64,6 @@ def sign_up_business(request):
 
 
 def finish_sign_up_business(request):
-
     if 'user_id' not in request.session:
         return redirect('sign-up-business')
 

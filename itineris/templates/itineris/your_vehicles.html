@@ -54,8 +54,8 @@
                                 <th>Modelo</th>
                                 <th>Patente</th>
                                 <th> 
-                                    <button id="btn-add-vehicle" class="btn">
-                                        <i class="bi bi-plus-circle" > Agregar</i>
+                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        <i class="bi bi-plus-circle"> Agregar</i>
                                     </button>
                                 </th>
                                 <th></th>
@@ -77,23 +77,25 @@
                     </table>
                 </div>
 
-
-                <dialog class="travel-modal" id="create-vehicle">
-                    <h3>Cargar un nuevo vehículo</h3>
-                    
-                        <p>Marca</p>
-                        <input type="text">
-                        <p>Modelo</p>
-                        <input type="text">
-                        <p>Patente</p>
-                        <input type="text">
-                    
-                    
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-add-cancel">CANCELAR</button>
-                        <button type="submit" class="modal-btn" id="btn-add-create">CREAR</button>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="{% url 'your_vehicles' %}" method=POST>
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar vehículo</button>
+                        </form>
+                      </div>
                     </div>
-                </dialog>
+                  </div>
+                </div>
 
                 <dialog class="travel-modal" id="info-modal">
                     <h3>Viajes del vehículo</h3>               
@@ -144,11 +146,7 @@
             
                 btn_cancel_travel = document.querySelector("#btn-cancel-travel"),
                 btn_close_cancel = document.querySelector("#btn-close-cancel"),
-                cancel_modal = document.querySelector("#cancel-modal"),
-                
-                btn_add_vehicle = document.querySelector("#btn-add-vehicle"),
-                btn_add_cancel = document.querySelector("#btn-add-cancel"),
-                add_vehicle_modal = document.querySelector("#create-vehicle");
+                cancel_modal = document.querySelector("#cancel-modal");
 
             /* MODAL MORE-INFO */
             btn_more_info.addEventListener("click", () =>{
