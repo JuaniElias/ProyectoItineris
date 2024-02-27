@@ -50,11 +50,13 @@
                     <table class="content-table">
                         <thead>
                             <tr>
+                                <th>Patente</th>
                                 <th>Marca</th>
                                 <th>Modelo</th>
-                                <th>Patente</th>
+                                <th>Capacidad</th>
+                                <th>Estado</th>
                                 <th> 
-                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#addVehicle">
                                         <i class="bi bi-plus-circle"> Agregar</i>
                                     </button>
                                 </th>
@@ -62,23 +64,27 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for vehicle in request.user.companyprofile.vehicle_set.all %}
                             <tr>
-                                <td>1</td>
-                                <td>2</td>
-                                <td>3</td>
+                                <td>{{ vehicle.plate_number }}</td>
+                                <td>{{ vehicle.brand }}</td>
+                                <td>{{ vehicle.model }}</td>
+                                <td>{{ vehicle.capacity }}</td>
+                                <td>{{ vehicle.status }}</td>
                                 <td>
-                                    <button id="btn-more-info" class="btn">
+                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#travelsVehicle">
                                         <i  class="bi bi-info-circle" ></i>
                                     </button>
                                 </td>
                                 <td><i id="btn-cancel-travel" class="btn bi bi-trash3" ></i></td>
-                            </tr>
+                            <tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Modal -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id="addVehicle" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -97,32 +103,26 @@
                   </div>
                 </div>
 
-                <dialog class="travel-modal" id="info-modal">
-                    <h3>Viajes del vehículo</h3>               
-                    <div class="scroll-table">
-                        <table class="content-table">
-                            <thead>
-                                <tr>
-                                    <th>Fecha salida</th>
-                                    <th>Origen</th>
-                                    <th>Destino</th>
-                                    <th>Pasajeros</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class=>1</td>
-                                    <td class=>2</td>
-                                    <td class=>3</td>
-                                    <td class=>4</td>                                   
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Modal -->
+                <div class="modal fade" id="travelsVehicle" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="{% url 'your_vehicles' %}" method=POST>
+                            
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar vehículo</button>
+                        </form>
+                      </div>
                     </div>
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-close-more-info">CERRAR</button>
-                    </div>
-                </dialog>
+                  </div>
+                </div>
+            
+            
                 <dialog class="travel-modal" id="cancel-modal">
                     <h3>Detalle del vehiculo</h3>
                     <p>Marca:</p>

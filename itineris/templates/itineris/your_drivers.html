@@ -5,9 +5,8 @@
 <body>
     <section class="your-businness">
         <div>
+            <div class="container">
             <h1 class="text">Conductores</h1>
-            
-            <div class="table-container">
                 <div class="row-travel">
                     <div class="row">
                         <div class="col">
@@ -30,48 +29,59 @@
                         </div>
                     </div>
                     <br>
-                    <table class="content-table">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th>Apellido</th>
                                 <th>Nombre</th>
-                                <th>DNI</th>
+                                <th>N° Licencia</th>
+                                <th>Email</th>
+                                <th>Numero de teléfono</th>
                                 <th>
-                                    <button id="btn-add-driver" class="btn">
-                                        <i class="bi bi-plus-circle" > Agregar</i>
+                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#addDriver">
+                                        <i class="bi bi-plus-circle"> Agregar</i>
                                     </button>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for driver in request.user.companyprofile.driver_set.all %}
                             <tr>
-                                <td>1</td>
-                                <td>2</td>
-                                <td>3</td>
-                                <td><i id="btn-delete-driver" class="btn bi bi-trash3" ></i></td>
-                            </tr>
+                                <td>{{ driver.name }}</td>
+                                <td>{{ driver.license_number }}</td>
+                                <td>{{ driver.email }}</td>
+                                <td>{{ driver.phone_number }}</td>
+                                <td>
+                                    <button id="btn-more-info" class="btn">
+                                        <i  class="bi bi-info-circle" ></i>
+                                    </button>
+                                </td>
+                                <td><i id="btn-cancel-travel" class="btn bi bi-trash3" ></i></td>
+                            <tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
 
-                <dialog class="travel-modal" id="create-driver">
-                    <h3>Cargar un nuevo conductor</h3>
-                    
-                        <p>Nombre</p>
-                        <input type="text">
-                        <p>Apellido</p>
-                        <input type="text">
-                        <p>DNI</p>
-                        <input type="text">
-                        <p class="inline-block">Licencia Conducir</p><i class="bi bi-info-circle table-icon" title="Recomendamos subir una imagen de la licencia de conducir"></i>
-                        <input type="file" id="license" name="license">
-                    
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-add-cancel">CANCELAR</button>
-                        <button type="submit" class="modal-btn" id="btn-add-create">CREAR</button>
+                <!-- Modal -->
+                <div class="modal fade" id="addDriver" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addDriverLabel">Agregue un conductor nuevo</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="{% url 'your_drivers' %}" method=POST>
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar conductor</button>
+                        </form>
+                      </div>
                     </div>
-                </dialog>
+                  </div>
+                </div>
 
                 <dialog class="travel-modal" id="delete-modal">
                     <h3>Conductor</h3>
@@ -107,7 +117,7 @@
             }
             )
 
-            /* MODAL ADD VEHICLE */
+            /* MODAL ADD DRIVER */
             btn_add_driver.addEventListener("click", () =>{
                 add_driver_modal.showModal();
             })

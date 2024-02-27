@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
-from .models import CustomUser, Vehicle
+from .models import CustomUser, Vehicle, Driver
 
 from django import forms
 
@@ -36,3 +36,22 @@ class AddVehicle(forms.ModelForm):
         self.fields['model'].widget.attrs['class'] = 'form-control'
         self.fields['capacity'].widget.attrs['class'] = 'form-control'
         self.fields['color'].widget.attrs['class'] = 'form-control'
+
+
+class AddDriver(forms.ModelForm):
+
+    name = forms.CharField(label='Nombre y apellido', max_length=100, required=True)
+    license_number = forms.CharField(label='Número de licencia', max_length=100, required=True)
+    email = forms.EmailField(label='Email', max_length=100)
+    phone_number = forms.CharField(label='Teléfono', max_length=100)
+
+    class Meta:
+        model = Driver
+        fields = ('name', 'license_number', 'email', 'phone_number',)
+
+    def __init__(self, *args, **kwargs):
+        super(AddDriver, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['class'] = 'form-control'
+        self.fields['license_number'].widget.attrs['class'] = 'form-control'
+        self.fields['email'].widget.attrs['class'] = 'form-control'
+        self.fields['phone_number'].widget.attrs['class'] = 'form-control'

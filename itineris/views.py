@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from itineris.forms import AddVehicle
+from itineris.forms import AddVehicle, AddDriver
 from itineris.models import CompanyProfile
 
 
@@ -30,7 +30,22 @@ def travel_result(request):
 
 
 def your_drivers(request):
-    return render(request, "itineris/your_drivers.html")
+    user_id = request.user.id
+    company = get_object_or_404(CompanyProfile, user_id=user_id)
+
+    if request.method == "POST":
+        form = AddDriver(request.POST)
+        if form.is_valid():
+            new_driver = form.save(commit=False)
+            new_driver.company_id = company.id
+            new_driver.save()
+            return redirect('your_drivers')
+    else:
+        form = AddDriver()
+
+    return render(request, "itineris/your_drivers.html", {
+        'form': form,
+    })
 
 
 def your_payments(request):
@@ -49,7 +64,7 @@ def your_vehicles(request):
         form = AddVehicle(request.POST)
         if form.is_valid():
             new_vehicle = form.save(commit=False)
-            new_vehicle.company_id_id = company.id
+            new_vehicle.company_id = company.id
             new_vehicle.save()
             return redirect('your_vehicles')
     else:

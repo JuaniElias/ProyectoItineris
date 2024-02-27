@@ -24,7 +24,7 @@ class Driver(models.Model):
     driver_id = models.AutoField(primary_key=True)
     company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
-    license_number = models.CharField(max_length=20)
+    license_number = models.CharField(max_length=30)
     email = models.EmailField()
     phone_number = models.IntegerField()
 
@@ -36,7 +36,7 @@ class Vehicle(models.Model):
     model = models.CharField(max_length=20)
     capacity = models.IntegerField()
     color = models.CharField(max_length=20)
-    status = models.CharField(max_length=20, default="available")
+    status = models.CharField(max_length=20, default="Disponible")
 
 
 class City(models.Model):
