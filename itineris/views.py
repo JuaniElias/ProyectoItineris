@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from itineris.forms import AddVehicle, AddDriver
-from itineris.models import CompanyProfile
+from itineris.models import CompanyProfile, Vehicle
 
 
 # Create your views here.
@@ -73,6 +73,12 @@ def your_vehicles(request):
     return render(request, "itineris/your_vehicles.html", {
         'form': form,
     })
+
+
+def delete_vehicle(request, plate_number):
+    vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
+    vehicle.delete()
+    return redirect('your_vehicles')  # Redirect to the view displaying the table
 
 
 def navbar(request):

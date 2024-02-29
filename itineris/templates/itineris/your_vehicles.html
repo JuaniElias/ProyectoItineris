@@ -6,7 +6,6 @@
     <section class="your-businness">
         <div>
             <h1 class="text">Mis Vehículos</h1>
-            
             <div class="table-container">
                 <div class="row-travel">
                     <div class="row">
@@ -76,64 +75,55 @@
                                         <i  class="bi bi-info-circle" ></i>
                                     </button>
                                 </td>
-                                <td><i id="btn-cancel-travel" class="btn bi bi-trash3" ></i></td>
+                                <td>
+                                    <a href="{% url 'delete_vehicle' vehicle.plate_number %}">
+                                      <i class="btn bi bi-trash3"></i>
+                                    </a>
+                                </td>
                             <tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Modal -->
+                <!-- Add Vehicle Modal -->
                 <div class="modal fade" id="addVehicle" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form action="{% url 'your_vehicles' %}" method=POST>
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Agregar vehículo</button>
-                        </form>
-                      </div>
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="addVehicleLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{% url 'your_vehicles' %}" method=POST>
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Agregar vehículo</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
 
-                <!-- Modal -->
+                <!-- Info Vehicle Modal -->
                 <div class="modal fade" id="travelsVehicle" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form action="{% url 'your_vehicles' %}" method=POST>
-                            
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Agregar vehículo</button>
-                        </form>
-                      </div>
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{% url 'your_vehicles' %}" method=POST>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Agregar vehículo</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
             
-            
-                <dialog class="travel-modal" id="cancel-modal">
-                    <h3>Detalle del vehiculo</h3>
-                    <p>Marca:</p>
-                    <p>Modelo:</p>
-                    <p>Patente:</p>
-                    <h3>¿Está seguro que quieres eliminar este vehículo?</h3>
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-close-cancel">SALIR</button>
-                        <button type="submit" class="modal-btn" id="btn-delete-travel">SI, ELIMINAR</button>
-                    </div>
-                </dialog>
             </div>
         </div>
     </section>
@@ -144,7 +134,7 @@
                 btn_close_info = document.querySelector("#btn-close-more-info"),
                 info_modal = document.querySelector("#info-modal"),
             
-                btn_cancel_travel = document.querySelector("#btn-cancel-travel"),
+                btn_cancel_travel = document.querySelector("#btn-delete-vehicle"),
                 btn_close_cancel = document.querySelector("#btn-close-cancel"),
                 cancel_modal = document.querySelector("#cancel-modal");
 
