@@ -9,6 +9,7 @@ urlpatterns = [
     path("pre_checkout", views.pre_checkout, name="pre_checkout"),
     path("travel_result", views.travel_result, name="travel_result"),
     path("your_drivers", views.your_drivers, name="your_drivers"),
+    path('delete_driver/<str:driver_id>/', views.delete_driver, name='delete_driver'),
     path("your_payments", views.your_payments, name="your_payments"),
     path("your_travels", views.your_travels, name="your_travels"),
     path("your_vehicles", views.your_vehicles, name="your_vehicles"),

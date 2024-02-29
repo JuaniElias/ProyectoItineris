@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from itineris.forms import AddVehicle, AddDriver
-from itineris.models import CompanyProfile, Vehicle
+from itineris.models import CompanyProfile, Vehicle, Driver
 
 
 # Create your views here.
@@ -46,6 +46,12 @@ def your_drivers(request):
     return render(request, "itineris/your_drivers.html", {
         'form': form,
     })
+
+
+def delete_driver(request, driver_id):
+    driver = get_object_or_404(Driver, driver_id=driver_id)
+    driver.delete()
+    return redirect('your_drivers')  # Redirect to the view displaying the table
 
 
 def your_payments(request):
