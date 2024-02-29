@@ -1,8 +1,15 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.core.exceptions import ValidationError
+from django.http import request
 
-from .models import CustomUser, Vehicle, Driver
+from .models import CustomUser, Vehicle, Driver, Travel
 
 from django import forms
+
+
+def validate_positive(value):
+    if value <= 0:
+        raise ValidationError('Debe ingresar un numero mayor que cero')
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -17,12 +24,52 @@ class CustomUserChangeForm(UserChangeForm):
         fields = ('username', 'email')
 
 
-class AddVehicle(forms.ModelForm):
+class AddTravel(forms.ModelForm):
+    city_origin = forms.CharField(label='Origen', max_length=100, required=True)
+    city_destination = forms.CharField(label='Destino', max_length=100, required=True)
+    datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True
+                                             , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}))
+    estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
+                                                     widget=forms.widgets.DateTimeInput(
+                                                         attrs={'type': 'datetime-local'}))
+    fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
+    driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none())
+    vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none())
 
+    def clean(self):
+        cleaned_data = super().clean()
+        datetime_departure = cleaned_data.get('datetime_departure')
+        estimated_datetime_arrival = cleaned_data.get('estimated_datetime_arrival')
+
+        if datetime_departure and estimated_datetime_arrival:
+            if datetime_departure >= estimated_datetime_arrival:
+                raise forms.ValidationError('La fecha de llegada debe ser mayor que la fecha de salida.')
+
+        return cleaned_data
+
+    class Meta:
+        model = Travel
+        fields = ('city_origin', 'city_destination', 'datetime_departure', 'estimated_datetime_arrival', 'fee',
+                  'driver', 'vehicle',)
+
+    def __init__(self, company_id, *args, **kwargs):
+        super(AddTravel, self).__init__(*args, **kwargs)
+        self.fields['city_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['city_destination'].widget.attrs['class'] = 'form-control'
+        self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
+        self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
+        self.fields['fee'].widget.attrs['class'] = 'form-control'
+        self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id))
+        self.fields['driver'].widget.attrs['class'] = 'form-control'
+        self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id))
+        self.fields['vehicle'].widget.attrs['class'] = 'form-control'
+
+
+class AddVehicle(forms.ModelForm):
     plate_number = forms.CharField(label='Patente', max_length=20, required=True)
     brand = forms.CharField(label='Marca', max_length=100)
     model = forms.CharField(label='Modelo', max_length=100)
-    capacity = forms.IntegerField(label='Capacidad')
+    capacity = forms.IntegerField(label='Capacidad', validators=[validate_positive])
     color = forms.CharField(label='Color', required=False)
 
     class Meta:
@@ -39,7 +86,6 @@ class AddVehicle(forms.ModelForm):
 
 
 class AddDriver(forms.ModelForm):
-
     name = forms.CharField(label='Nombre y apellido', max_length=100, required=True)
     license_number = forms.CharField(label='Número de licencia', max_length=100, required=True)
     email = forms.EmailField(label='Email', max_length=100)

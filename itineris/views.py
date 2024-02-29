@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from itineris.forms import AddVehicle, AddDriver
+from itineris.forms import AddVehicle, AddDriver, AddTravel
 from itineris.models import CompanyProfile, Vehicle, Driver
 
 
@@ -18,7 +17,23 @@ def about(request):
 
 
 def create_travel(request):
-    return render(request, "itineris/create_travel.html")
+    user_id = request.user.id
+    company = get_object_or_404(CompanyProfile, user_id=user_id)
+
+    if request.method == "POST":
+        form = AddTravel(company.id, request.POST)
+        if form.is_valid():
+            new_travel = form.save(commit=False)
+            new_travel.company_id = company.id
+            new_travel.duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
+            new_travel.save()
+            return redirect('create_travel')
+    else:
+        form = AddTravel(company.id)
+
+    return render(request, "itineris/create_travel.html", {
+        'form': form,
+    })
 
 
 def pre_checkout(request):

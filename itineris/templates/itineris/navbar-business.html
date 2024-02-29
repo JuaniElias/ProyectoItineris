@@ -28,22 +28,22 @@
         <div class="menu-bar">
             <div class="menu">
                 <ul class="menu-links">
+                     <li class="sb-nav-link ">
+                        <a href="{% url 'create_travel' %}">
+                            <i class='bi bi-calendar-plus icon'></i>
+                            <span class="text sb-nav-text">Crear viaje</span>
+                        </a>
+                    </li>
                     <li class="sb-nav-link">
                         <a href="{% url 'your_travels' %}">
                             <i class='bi bi-signpost-split icon'></i>
-                            <span class="text sb-nav-text">Mis Viajes</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link ">
-                        <a href="{% url 'create_travel' %}">
-                            <i class='bi bi-calendar-plus icon'></i>
-                            <span class="text sb-nav-text">Crear un viaje</span>
+                            <span class="text sb-nav-text">Viajes</span>
                         </a>
                     </li>
                     <li class="sb-nav-link">
                         <a href="{% url 'your_vehicles' %}">
                             <i class='bi bi-bus-front icon'></i>
-                            <span class="text sb-nav-text">Mis Vehículos</span>
+                            <span class="text sb-nav-text">Vehículos</span>
                         </a>
                     </li>
                     <li class="sb-nav-link">

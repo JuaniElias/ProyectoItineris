@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -10,23 +12,27 @@ class Travel(models.Model):
     travel_id = models.AutoField(primary_key=True)
     company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
     driver = models.ForeignKey("Driver", on_delete=models.CASCADE)
-    plate = models.ForeignKey("Vehicle", on_delete=models.CASCADE)
+    vehicle = models.ForeignKey("Vehicle", on_delete=models.CASCADE)
     city_origin = models.CharField(max_length=20)
     city_destination = models.CharField(max_length=20)
     datetime_departure = models.DateTimeField()
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
     estimated_datetime_arrival = models.DateTimeField()
-    distance = models.FloatField()
+    duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
     fee = models.FloatField()
 
 
 class Driver(models.Model):
     driver_id = models.AutoField(primary_key=True)
     company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)
+    surname = models.CharField(max_length=100)
     license_number = models.CharField(max_length=30)
     email = models.EmailField()
     phone_number = models.IntegerField()
+
+    def __str__(self):
+        return self.name + ' ' + self.surname + " (" + self.license_number + ")"
 
 
 class Vehicle(models.Model):
@@ -37,6 +43,9 @@ class Vehicle(models.Model):
     capacity = models.IntegerField()
     color = models.CharField(max_length=20)
     status = models.CharField(max_length=20, default="Disponible")
+
+    def __str__(self):
+        return self.brand + ' ' + self.model + " (" + self.plate_number + ")"
 
 
 class City(models.Model):

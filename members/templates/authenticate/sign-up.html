@@ -15,9 +15,9 @@
         <h1>Crear una cuenta</h1>
 
         <form action="{% url 'sign-up' %}" method=POST>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Registrarse" class="btn btn-secondary">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Registrarse" class="btn btn-secondary">
         </form>
     </div>
 </div>
