@@ -33,6 +33,7 @@
                         <thead>
                             <tr>
                                 <th>Nombre</th>
+                                <th>Apellido</th>
                                 <th>N° Licencia</th>
                                 <th>Email</th>
                                 <th>Numero de teléfono</th>
@@ -47,6 +48,7 @@
                             {% for driver in request.user.companyprofile.driver_set.all %}
                             <tr>
                                 <td>{{ driver.name }}</td>
+                                <td>{{ driver.surname }}</td>
                                 <td>{{ driver.license_number }}</td>
                                 <td>{{ driver.email }}</td>
                                 <td>{{ driver.phone_number }}</td>

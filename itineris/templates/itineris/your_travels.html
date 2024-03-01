@@ -40,23 +40,34 @@
                     <table class="content-table">
                         <thead>
                             <tr>
-                                <th class="date"        >Fecha salida</th>
+                                <th class="date"        >Fecha y Hora salida</th>
                                 <th class="origin"      >Origen</th>
                                 <th class="destination" >Destino</th>
-                                <th class="passanger"   >Pasajeros</th>
+                                <th class="capacity"   >Capacidad</th>
+                                <th class="fee"         >Tarifa</th>
                                 <th class="more-info"   ></th>
                                 <th class="cancel"      ></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="date"       >1</td>
-                                <td class="origin"     >2</td>
-                                <td class="destination">3</td>
-                                <td class="passanger"  >4</td>
-                                <td class="more-info"  ><i class="bi bi-info-circle table-icon" id="btn-more-info"></i></td>
-                                <td class="cancel"     ><i class="bi bi-x-circle fa-lg table-icon" id="btn-cancel-travel"></i></td>
-                            </tr>
+                            {% for travel in request.user.companyprofile.travel_set.all %}
+                                <tr>
+                                    <td>{{ travel.datetime_departure }}</td>
+                                    <td>{{ travel.city_origin }}</td>
+                                    <td>{{ travel.city_destination }}</td>
+                                    <td>{{ travel.vehicle.capacity }}</td>
+                                    <td>{{ travel.fee }}</td>
+                                    <td>
+                                        <button id="btn-more-info" class="btn">
+                                            <i  class="bi bi-info-circle" ></i>
+                                        </button>
+                                    </td>
+                                    <td> 
+                                        <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
+                                            <i class="btn bi bi-trash3"></i>
+                                        </a>
+                                    </td>
+                                {% endfor %}
                         </tbody>
                     </table>
                 </div>

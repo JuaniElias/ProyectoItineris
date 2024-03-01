@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from itineris.forms import AddVehicle, AddDriver, AddTravel
-from itineris.models import CompanyProfile, Vehicle, Driver
+from itineris.models import CompanyProfile, Vehicle, Driver, Travel
 
 
 # Create your views here.
@@ -75,6 +75,12 @@ def your_payments(request):
 
 def your_travels(request):
     return render(request, "itineris/your_travels.html")
+
+
+def delete_travel(request, travel_id):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travel.delete()
+    return redirect('your_travels')  # Redirect to the view displaying the table
 
 
 def your_vehicles(request):
