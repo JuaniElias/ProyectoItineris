@@ -1,34 +1,27 @@
 {% extends 'itineris/base.html' %}
 
 {% block content %}
-
     <br>
-<div class="container">
-<div class="shadow p-4 mb-5 bg-body rounded">
-<div class="row">
 
-    <h1>Iniciar sesión</h1>
-    </div>
-    <br>
-        <form action="" method=POST>
-            {% csrf_token %}
-
-            <div class="mb-3">
-                <label for="exampleFormControlInput1" class="form-label">DNI o CUIT si es empresa</label>
-                <input type="text" class="form-control" id="exampleFormControlInput1" name="username">
+<div class="container" >
+    <div class="row justify-content-center">
+        <div class="col-md-5 p-4 shadow bg-body rounded">
+            <h1>Iniciar sesión</h1>
+            <form action="" method=POST>
+                {% csrf_token %}
+                <div class="mb-6">
+                    <label for="exampleFormControlInput1" class="form-label">DNI o CUIT si es empresa</label>
+                    <input type="text" class="form-control" id="exampleFormControlInput1" name="username">
+                    <br>
+                    <label for="inputPassword5" class="form-label">Contraseña</label>
+                    <input type="password" id="inputPassword5" class="form-control" name="password">
+                </div>
                 <br>
-                <label for="inputPassword5" class="form-label">Contraseña</label>
-                <input type="password" id="inputPassword5" class="form-control" name="password">
-
-            </div>
-            
-            <br>
-
-            <div class="d-grid gap-2 col-6 mx-auto">
+                <div class="d-grid gap-2 col-6 mx-auto">
                     <button class="btn btn-primary" type="submit" style="background-color:#6C757D; border-color: #6C757D">Ingresar</button>
-            </div>
-
-        </form>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
