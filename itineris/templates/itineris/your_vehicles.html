@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<body>
     <section class="your-businness">
         <div>
             <h1 class="text">Vehículos</h1>
@@ -48,58 +47,60 @@
                     <br>
                     <table class="content-table">
                         <thead>
-                            <tr>
-                                <th>Patente</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Capacidad</th>
-                                <th>Estado</th>
-                                <th> 
-                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#addVehicle">
-                                        <i class="bi bi-plus-circle"> Agregar</i>
-                                    </button>
-                                </th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th>Patente</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Capacidad</th>
+                            <th>Estado</th>
+                            <th>
+                                <button class="btn" data-bs-toggle="modal" data-bs-target="#addVehicle">
+                                    <i class="bi bi-plus-circle"> Agregar</i>
+                                </button>
+                            </th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {% for vehicle in request.user.companyprofile.vehicle_set.all %}
-                                <tr>
-                                    <td>{{ vehicle.plate_number }}</td>
-                                    <td>{{ vehicle.brand }}</td>
-                                    <td>{{ vehicle.model }}</td>
-                                    <td>{{ vehicle.capacity }}</td>
-                                    <td>{{ vehicle.status }}</td>
-                                    <td>
-                                        <button class="btn" data-bs-toggle="modal" data-bs-target="#travelsVehicle">
-                                            <i  class="bi bi-info-circle" ></i>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'delete_vehicle' vehicle.plate_number %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?')">
-                                            <i class="btn bi bi-trash3"></i>
-                                        </a>
-                                    </td>
-                                <tr>
-                            {% endfor %}
+                        {% for vehicle in request.user.companyprofile.vehicle_set.all %}
+                            <tr>
+                                <td>{{ vehicle.plate_number }}</td>
+                                <td>{{ vehicle.brand }}</td>
+                                <td>{{ vehicle.model }}</td>
+                                <td>{{ vehicle.capacity }}</td>
+                                <td>{{ vehicle.status }}</td>
+                                <td>
+                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#travelsVehicle">
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <a href="{% url 'delete_vehicle' vehicle.plate_number %}"
+                                       onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?')">
+                                        <i class="btn bi bi-trash3"></i>
+                                    </a>
+                                </td>
+                            <tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                
-            
+
                 <!-- Add Vehicle Modal -->
                 <div class="modal fade" id="addVehicle" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="addVehicleLabel">Agregue un vehiculo</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form action="{% url 'your_vehicles' %}" method=POST>
                                     {% csrf_token %}
                                     {{ form.as_p }}
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar
+                                    </button>
                                     <button type="submit" class="btn btn-primary">Agregar vehículo</button>
                                 </form>
                             </div>
@@ -113,7 +114,8 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel">Viajes del vehiculo</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form action="{% url 'your_vehicles' %}" method=POST>
@@ -123,50 +125,8 @@
                         </div>
                     </div>
                 </div>
-            
-                
-            
             </div>
         </div>
     </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        const   btn_more_info = document.querySelector("#btn-more-info"),
-                btn_close_info = document.querySelector("#btn-close-more-info"),
-                info_modal = document.querySelector("#info-modal"),
-            
-                btn_cancel_travel = document.querySelector("#btn-delete-vehicle"),
-                btn_close_cancel = document.querySelector("#btn-close-cancel"),
-                cancel_modal = document.querySelector("#cancel-modal");
-
-            /* MODAL MORE-INFO */
-            btn_more_info.addEventListener("click", () =>{
-                info_modal.showModal();
-            })
-            btn_close_info.addEventListener("click", () =>{
-                info_modal.close()
-            }
-            )
-            
-            /* MODAL CANCEL TRIP */
-            btn_cancel_travel.addEventListener("click", () =>{
-                cancel_modal.showModal();
-            })
-            btn_close_cancel.addEventListener("click", () =>{
-                cancel_modal.close()
-            }
-            )
-
-            /* MODAL ADD VEHICLE */
-            btn_add_vehicle.addEventListener("click", () =>{
-                add_vehicle_modal.showModal();
-            })
-            btn_add_cancel.addEventListener("click", () =>{
-                add_vehicle_modal.close()
-            }
-            )
-    </script>
     
-</body>
 {% endblock %}
