@@ -1,83 +1,74 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>navbar</title>
-    <link rel="icon" href="{% static 'itineris/images/favicon.ico' %}" >
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="sd-header">
-            <div class="image-text">
+
+<nav class="sidebar">
+    <div class="sd-header">
+        <div class="image-text">
                 <span class="image">
-                    <img src="../../static/itineris/images/logo_reducido.png" alt="logo">
+                    <img src="{% static 'itineris/images/logo_reducido.png' %}" alt="logo">
                 </span>
 
-                <div class="text header-text">
+            <div class="text header-text">
                     <span class="businness">
                         <b>{{ user.companyprofile.company_name }}</b>
                     </span>
-                </div>
-                <div>
-                    <i class='bi bi-chevron-right toggle'></i>
-                </div>
+            </div>
+            <div>
+                <i class='bi bi-chevron-right toggle'></i>
             </div>
         </div>
+    </div>
 
-        <div class="menu-bar">
-            <div class="menu">
-                <ul class="menu-links">
-                     <li class="sb-nav-link ">
-                        <a href="{% url 'create_travel' %}">
-                            <i class='bi bi-calendar-plus icon'></i>
-                            <span class="text sb-nav-text">Crear viaje</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_travels' %}">
-                            <i class='bi bi-signpost-split icon'></i>
-                            <span class="text sb-nav-text">Viajes</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_vehicles' %}">
-                            <i class='bi bi-bus-front icon'></i>
-                            <span class="text sb-nav-text">Vehículos</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_drivers' %}">
-                            <i class='bi bi-person icon'></i>
-                            <span class="text sb-nav-text">Conductores</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'your_payments' %}">
-                            <i class='bi bi-wallet icon'></i>
-                            <span class="text sb-nav-text">Pagos</span>
-                        </a>
-                    </li>
-                    <li class="sb-nav-link">
-                        <a href="{% url 'logout' %}">
-                            <i class='bi bi-box-arrow-left icon'></i>
-                            <span class="text sb-nav-text">Salir</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+    <div class="menu-bar">
+        <div class="menu">
+            <ul class="menu-links">
+                <li class="sb-nav-link ">
+                    <a href="{% url 'create_travel' %}">
+                        <i class='bi bi-calendar-plus icon'></i>
+                        <span class="text sb-nav-text">Crear viaje</span>
+                    </a>
+                </li>
+                <li class="sb-nav-link">
+                    <a href="{% url 'your_travels' %}">
+                        <i class='bi bi-signpost-split icon'></i>
+                        <span class="text sb-nav-text">Viajes</span>
+                    </a>
+                </li>
+                <li class="sb-nav-link">
+                    <a href="{% url 'your_vehicles' %}">
+                        <i class='bi bi-bus-front icon'></i>
+                        <span class="text sb-nav-text">Vehículos</span>
+                    </a>
+                </li>
+                <li class="sb-nav-link">
+                    <a href="{% url 'your_drivers' %}">
+                        <i class='bi bi-person icon'></i>
+                        <span class="text sb-nav-text">Conductores</span>
+                    </a>
+                </li>
+                <li class="sb-nav-link">
+                    <a href="{% url 'your_payments' %}">
+                        <i class='bi bi-wallet icon'></i>
+                        <span class="text sb-nav-text">Pagos</span>
+                    </a>
+                </li>
+                <li class="sb-nav-link">
+                    <a href="{% url 'logout' %}">
+                        <i class='bi bi-box-arrow-left icon'></i>
+                        <span class="text sb-nav-text">Salir</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        const   body = document.querySelector("body"),
-                sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle");
+<!---------------- JavaScript to toggle the menu ----------------------->
+<script>
+    const body = document.querySelector("body"),
+        sidebar = body.querySelector(".sidebar"),
+        toggle = sidebar.querySelector(".toggle");
 
-                toggle.addEventListener("click", () =>{
-                    sidebar.classList.toggle("close");
-                })
-    </script>
-</body>
-</html>
+    toggle.addEventListener("click", () => {
+        sidebar.classList.toggle("close");
+    })
+</script>
