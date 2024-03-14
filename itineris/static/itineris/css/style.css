@@ -343,7 +343,7 @@ input, select{
     display: flex;
     flex-direction: column;
 }
-.header-text .businness{
+.header-text .business{
     font-weight: 600;
 }
 
@@ -422,7 +422,7 @@ input, select{
     color: var(--sidebar-color);
 }
 
-.your-businness{
+.your-business{
     position: relative;
     left: 278px;
     width: calc(100% - 88px);
@@ -430,7 +430,7 @@ input, select{
     transition: var(--tran-05);
 }
 
-.your-businness .text{
+.your-business .text{
     font-size: 40px;
     font-weight: 800;
     color: var(--primary-color-light);
@@ -438,7 +438,7 @@ input, select{
     padding-top: 3%;
 }
 
-.sidebar.close ~ .your-businness{
+.sidebar.close ~ .your-business{
     left: 88px;
     width: calc(100% - 88px);
 }
