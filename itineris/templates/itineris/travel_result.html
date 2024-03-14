@@ -1,82 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="with=device-with, initial-scale=1.0">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Itineris</title>
-    <link rel="stylesheet" href="../../static/itineris/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> 
+{% extends 'itineris/base.html' %}
 
-</head>
-<body>
-    <section class="header">
-        <nav>
-            <a href="{% url 'index' %}"> <img src="../../static/itineris/images/logo.png"> </a>
-            <div class="nav-links" id="navLinks">
-                <i class="fa fa-times" onclick="hideMenu()"></i>
-                <ul>
-                    <li><a href="{% url 'index' %}">INICIO</a></li>
-                    <li><a href="">EMPRESAS</a></li>
-                    <li><a href="{% url 'work-with-us' %}">TRABAJA CON NOSOTROS </a></li>
-                    <li><a href="{% url 'login' %}">INICIO DE SESION</a></li>
-                    <li><a href="{% url 'sign-up' %}">REGISTRARSE</a></li>
-                </ul>
+{% block content %}
+<div class="container">
+{% for travel in travels %}
+    <div class="row mt-5">
+        <div class="card text-center">
+            <div class="card-header">
+                <p>{{ travel.company.company_name }}</p>
             </div>
-            <i class="fa fa-bars" onclick="showMenu()"></i>
-        </nav>
+            <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
 
-        <div class="row-bus">
-            <div class="bus-col">
-                <div class="bus-details">
-                    <img src="../../static/itineris/images/logo.png">
-                    <div></div>
-                    <div>
-                        <div class="bus-info">Sale</div>
-                        <div class="bus-time">22:30</div>
-                        <div class="bus-info">Chajarí</div>
-                    </div>
-                    <div class="larger-div">
-                        <br>
-                        <div class="bus-travel-time">
-                            <hr class="line">
-                            <i class="fa fa-bus" aria-hidden="true"></i>
-                            08h 30m
-                            <hr class="line">
+                        </div>
+                        <div class="col-md-2">
+                            <p>{{ travel.city_origin }}</p>
+                            <p>{{ travel.datetime_departure }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <p>tiempo de viaje</p>
+                            <p>{{ travel.duration }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <p>{{ travel.city_destination }}</p>
+                            <p>{{ travel.estimated_datetime_arrival }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary">${{ travel.fee|floatformat }}</button>
                         </div>
                     </div>
-                    <div>
-                        <div class="bus-info">Llega</div>
-                        <div class="bus-time">07:00</div>
-                        <div class="bus-info">Rosario Terminal</div>
-                    </div>
-                    
-                    <div>
-                        <br>
-                        <button type="submit" class="hero-btn"> $37.000 por persona</button>
-                    </div>
-                    <div></div>
-              </div>
+                </div>
+                <div class="card-footer text-body-secondary">
+                    Quedan {{ travel.vehicle.capacity}} - {{travel.traveler_set.count}} lugares disponibles
+                </div>
             </div>
-        </div>
-    </section>
+    </div>
+    {% endfor %}
+</div>
 
-    <section>
-        
-          
-    </section>
-
-    <section class="footer">
-        <h4>Sobre nosotros</h4>
-        <p>lorem ipsus</p>
-        <div class="icons">
-            <i class="fa fa-facebook"></i>
-            <i class="fa fa-twitter"></i>
-            <i class="fa fa-instagram"></i>
-        </div>
-    </section>
 
     <!---------------- JavaScript to toggle the menu ----------------------->
     <script>
@@ -92,5 +53,4 @@
 
 
     </script>
-</body>
-</html>
+{% endblock %}

@@ -62,11 +62,11 @@ class City(models.Model):
 
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
-    travel_id = models.AutoField(primary_key=True)
+    travel = models.ForeignKey("Travel", on_delete=models.CASCADE)
     client = models.ForeignKey("ClientProfile", on_delete=models.CASCADE)
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
-    feedback = models.TextField(max_length=200)
+    feedback = models.TextField(max_length=200, null=True)
 
 
 class CustomUser(AbstractUser):

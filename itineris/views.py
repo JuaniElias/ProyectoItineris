@@ -41,7 +41,9 @@ def pre_checkout(request):
 
 
 def travel_result(request):
-    return render(request, "itineris/travel_result.html")
+    travels = Travel.objects.all()
+
+    return render(request, "itineris/travel_result.html", {'travels': travels})
 
 
 def your_drivers(request):
