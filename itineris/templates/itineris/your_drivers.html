@@ -2,33 +2,11 @@
 
 {% block content %}
     
-<body>
-    <section class="your-businness">
+    <section class="your-business">
         <div>
-            <div class="container">
             <h1 class="text">Conductores</h1>
+            <div class="col-md-10 table-container">
                 <div class="row-travel">
-                    <div class="row">
-                        <div class="col">
-                            <p>Nombre</p>
-                            <select class="form-control" tabindex="4">
-                                <option value="Todos">Todos</option>
-                                <option value="">a</option>
-                                <option value="">b</option>
-                                <option value="">c</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <p>Apellido</p>
-                            <select class="form-control" tabindex="4">
-                                <option value="Todos">Todos</option>
-                                <option value="">a</option>
-                                <option value="">b</option>
-                                <option value="">c</option>
-                            </select>
-                        </div>
-                    </div>
-                    <br>
                     <table class="table">
                         <thead>
                             <tr>
@@ -108,11 +86,11 @@
         const   btn_cancel_travel = document.querySelector("#btn-delete-driver"),
                 btn_close_cancel = document.querySelector("#btn-close-del-modal"),
                 cancel_modal = document.querySelector("#delete-modal"),
-                
+    
                 btn_add_driver = document.querySelector("#btn-add-driver"),
                 btn_add_cancel = document.querySelector("#btn-add-cancel"),
                 add_driver_modal = document.querySelector("#create-driver");
-                
+    
             /* MODAL CANCEL TRIP */
             btn_cancel_travel.addEventListener("click", () =>{
                 cancel_modal.showModal();
@@ -121,7 +99,7 @@
                 cancel_modal.close()
             }
             )
-
+    
             /* MODAL ADD DRIVER */
             btn_add_driver.addEventListener("click", () =>{
                 add_driver_modal.showModal();
@@ -131,6 +109,4 @@
             }
             )
     </script>
-    
-</body>
 {% endblock %}

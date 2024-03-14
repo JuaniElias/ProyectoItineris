@@ -447,8 +447,6 @@ input, select{
 .table-container{
     display: flex;
     padding: 15px;
-    min-width: 600px;
-    max-width: 800px;
 }
 
 .sidebar.close ~ .table-container{
