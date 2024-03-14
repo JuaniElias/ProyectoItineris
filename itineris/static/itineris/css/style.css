@@ -101,7 +101,6 @@ nav .fa{
 .row-bus{
     margin-top: 5%;
     margin-right: 3%;
-    justify-content: center;
     display: flex;
     justify-content: space-between;
 }
@@ -130,7 +129,7 @@ nav .fa{
 .bus-time{
     font-size: 35px;
     font-weight: 800;
-    margin: 0%;
+    margin: 0;
 }
 
 .bus-travel-time{
@@ -170,7 +169,7 @@ nav .fa{
 }
 
 .footer{
-    width: 100;
+    width: 100%;
     text-align: center;
     padding: 30px 0;
 }
@@ -190,7 +189,7 @@ nav .fa{
 /* About us page*/
 .sub-header{
     height: 50vh;
-    width: 100;
+    width: 100%;
     background-image: linear-gradient(rgba(4, 9, 30, 0.5), rgba(4, 9, 30, 0.5)), url('../images/team-work.jpg');
     background-position: center;
     background-size: cover;
@@ -227,7 +226,6 @@ nav .fa{
     margin: 15px 0;
     box-sizing: border-box;
     border: none;
-    outline: none;
     outline: none;
     background-color: #ffffff;
 }
@@ -426,7 +424,6 @@ input, select{
 
 .your-businness{
     position: relative;
-    height: 100vh;
     left: 278px;
     width: calc(100% - 88px);
     background-color: #545F8D;
@@ -566,7 +563,7 @@ dialog::backdrop{
 
 .scroll-table th {
     position: sticky;
-    top: 0px;
+    top: 0;
 }
 
 .scroll-table{
