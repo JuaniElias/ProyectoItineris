@@ -2,40 +2,42 @@
 
 {% block content %}
 <div class="container">
-{% for travel in travels %}
-    <div class="row mt-5">
-        <div class="card text-center">
-            <div class="card-header">
-                <p>{{ travel.company.company_name }}</p>
-            </div>
-            <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-
-                        </div>
-                        <div class="col-md-2">
-                            <p>{{ travel.city_origin }}</p>
-                            <p>{{ travel.datetime_departure }}</p>
-                        </div>
-                        <div class="col-md-2">
-                            <p>tiempo de viaje</p>
-                            <p>{{ travel.duration }}</p>
-                        </div>
-                        <div class="col-md-2">
-                            <p>{{ travel.city_destination }}</p>
-                            <p>{{ travel.estimated_datetime_arrival }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-primary">${{ travel.fee|floatformat }}</button>
+    <div class="row">
+        <div class="col-12">
+            {% for travel in travels %}
+                <div class="card text-center mb-4">
+                    <div class="card-header">
+                        <p>{{ travel.company.company_name }}</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+    
+                            </div>
+                            <div class="col-md-2">
+                                <p>{{ travel.city_origin }}</p>
+                                <p>{{ travel.datetime_departure }}</p>
+                            </div>
+                            <div class="col-md-2">
+                                <p>tiempo de viaje</p>
+                                <p>{{ travel.duration }}</p>
+                            </div>
+                            <div class="col-md-2">
+                                <p>{{ travel.city_destination }}</p>
+                                <p>{{ travel.estimated_datetime_arrival }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary">${{ travel.fee|floatformat }}</button>
+                            </div>
                         </div>
                     </div>
+                    <div class="card-footer text-body-secondary">
+                        Quedan {{ travel.vehicle.capacity}} - {{travel.traveler_set.count}} lugares disponibles
+                    </div>
                 </div>
-                <div class="card-footer text-body-secondary">
-                    Quedan {{ travel.vehicle.capacity}} - {{travel.traveler_set.count}} lugares disponibles
-                </div>
-            </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
 </div>
 
 
