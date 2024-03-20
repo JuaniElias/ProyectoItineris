@@ -10,11 +10,11 @@ from django.dispatch import receiver
 # Create your models here.
 class Travel(models.Model):
     travel_id = models.AutoField(primary_key=True)
-    company = models.ForeignKey("CompanyProfile", on_delete=models.CASCADE)
-    driver = models.ForeignKey("Driver", on_delete=models.CASCADE)
-    vehicle = models.ForeignKey("Vehicle", on_delete=models.CASCADE)
-    city_origin = models.CharField(max_length=20)
-    city_destination = models.CharField(max_length=20)
+    company = models.ForeignKey("CompanyProfile", on_delete=models.DO_NOTHING)
+    driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING)
+    vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
+    city_origin = models.ForeignKey("City", on_delete=models.DO_NOTHING, related_name="city_origin")
+    city_destination = models.ForeignKey("City", on_delete=models.DO_NOTHING, related_name="city_destination")
     datetime_departure = models.DateTimeField()
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
     estimated_datetime_arrival = models.DateTimeField()

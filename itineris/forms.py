@@ -1,8 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
-from django.http import request
 
-from .models import CustomUser, Vehicle, Driver, Travel
+from .models import CustomUser, Vehicle, Driver, Travel, City
 
 from django import forms
 
@@ -25,16 +24,17 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class AddTravel(forms.ModelForm):
-    city_origin = forms.CharField(label='Origen', max_length=100, required=True)
-    city_destination = forms.CharField(label='Destino', max_length=100, required=True)
+    city_origin = forms.ModelChoiceField(label='Origen', queryset=City.objects.all(), empty_label="", required=True)
+    city_destination = forms.ModelChoiceField(label='Destino', queryset=City.objects.all(), empty_label="", required=True)
+
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True
                                              , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}))
     estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
                                                      widget=forms.widgets.DateTimeInput(
                                                          attrs={'type': 'datetime-local'}))
     fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
-    driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none())
-    vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none())
+    driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
+    vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
 
     def clean(self):
         cleaned_data = super().clean()
