@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from .models import CustomUser, Vehicle, Driver, Travel, City
 
 from django import forms
+from django_select2 import forms as s2forms
 
 
 def validate_positive(value):
@@ -23,10 +24,13 @@ class CustomUserChangeForm(UserChangeForm):
         fields = ('username', 'email')
 
 
-class AddTravel(forms.ModelForm):
-    city_origin = forms.ModelChoiceField(label='Origen', queryset=City.objects.all(), empty_label="", required=True)
-    city_destination = forms.ModelChoiceField(label='Destino', queryset=City.objects.all(), empty_label="", required=True)
+class CityWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        "city_name__icontains",
+    ]
 
+
+class AddTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True
                                              , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}))
     estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
@@ -51,11 +55,13 @@ class AddTravel(forms.ModelForm):
         model = Travel
         fields = ('city_origin', 'city_destination', 'datetime_departure', 'estimated_datetime_arrival', 'fee',
                   'driver', 'vehicle',)
+        widgets = {
+            "city_origin": CityWidget,
+            "city_destination": CityWidget,
+        }
 
     def __init__(self, company_id, *args, **kwargs):
         super(AddTravel, self).__init__(*args, **kwargs)
-        self.fields['city_origin'].widget.attrs['class'] = 'form-control'
-        self.fields['city_destination'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
         self.fields['fee'].widget.attrs['class'] = 'form-control'

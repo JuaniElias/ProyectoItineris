@@ -1,8 +1,9 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("select2/", include("django_select2.urls")),
     path("work-with-us", views.work_with_us, name="work-with-us"),
     path("about-us", views.about, name="about-us"),
     path("create_travel", views.create_travel, name="create_travel"),

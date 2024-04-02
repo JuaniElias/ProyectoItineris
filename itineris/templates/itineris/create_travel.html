@@ -1,7 +1,10 @@
 {% extends 'itineris/base.html' %}
 
 {% block content %}
-
+<head>
+    <title>Crear viaje</title>
+    
+</head>
 <body>
     <section class="your-business">
         <div>
@@ -15,22 +18,7 @@
                     </form>
                 </div>
             </div>
-            
-            
         </div>
-        
     </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        const   body = document.querySelector("body"),
-                sidebar = body.querySelector(".sidebar"),
-                toggle = sidebar.querySelector(".toggle");
-
-                toggle.addEventListener("click", () =>{
-                    sidebar.classList.toggle("close");
-                })
-    </script>
-    
 </body>
 {% endblock %}
