@@ -1,5 +1,7 @@
 asgiref==3.8.1
 Django==5.0.3
+django-appconf==1.0.6
+django-select2==8.1.2
 googlemaps==4.10.0
 jupyter==1.0.0
 numpy==1.26.4
