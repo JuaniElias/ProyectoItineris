@@ -57,7 +57,7 @@ class City(models.Model):
         verbose_name_plural = "cities"
 
     def __str__(self):
-        return self.city_name
+        return self.city_name + ' (' + self.province.name + ')'
 
 
 # Esta es una relación, cómo se haría?
