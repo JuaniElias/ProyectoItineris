@@ -107,3 +107,21 @@ class AddDriver(forms.ModelForm):
         self.fields['license_number'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone_number'].widget.attrs['class'] = 'form-control'
+
+class SearchTravel(forms.ModelForm):
+    datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True
+                                             , widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    passenger = forms.IntegerField(label='Pasajeros', min_value=1)
+
+    class Meta:
+        model = Travel
+        fields = ('city_origin', 'city_destination', 'datetime_departure', 'passenger')
+        widgets = {
+            "city_origin": CityWidget,
+            "city_destination": CityWidget,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(SearchTravel, self).__init__(*args, **kwargs)
+        self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
+        self.fields['passenger'].widget.attrs['class'] = 'form-control'

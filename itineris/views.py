@@ -1,12 +1,28 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from itineris.forms import AddVehicle, AddDriver, AddTravel
+from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel
 from itineris.models import CompanyProfile, Vehicle, Driver, Travel
 
 
 # Create your views here.
 def index(request):
-    return render(request, "itineris/index.html")
+    if request.method == "POST":
+        form = SearchTravel(request.POST)
+        if form.is_valid():
+            city_origin = form.cleaned_data['city_origin']
+            city_destination = form.cleaned_data['city_destination']
+            date_departure = form.cleaned_data['datetime_departure']
+            passenger = form.cleaned_data['passenger']
 
+            # Buscar vuelos que coincidan con los criterios
+            travels = Travel.objects.filter(city_origin = city_origin,
+                                          city_destination = city_destination,
+                                          datetime_departure = date_departure
+                                          # cantidad_disponible__gte=passenger
+                                            )
+            return render(request, 'travel_result.html', {'travels': travels})
+    else:
+        form = SearchTravel()
+    return render(request, 'itineris/index.html', {'form': form})
 
 def work_with_us(request):
     return render(request, "itineris/work-with-us.html")

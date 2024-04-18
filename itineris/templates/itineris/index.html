@@ -9,58 +9,13 @@
     <div class="row">
         <div class="travel-col">
             
-            <form class="comment-form">
-                <div class="input-group flex-nowrap">
-                <span class="input-group-text" id="addon-wrapping">Origen</span>
-                <input type="text" class="form-control" placeholder="Rosario, Santa Fe" aria-label="Origen" aria-describedby="addon-wrapping">
-                </div>
-                <br>
-                
-                <div class="input-group flex-nowrap">
-                <span class="input-group-text" id="addon-wrapping">Destino</span>
-                <input type="text" class="form-control" placeholder="Chajarí, Entre Ríos" aria-label="Destino" aria-describedby="addon-wrapping">
-                </div>
-                <br>
-    
-                <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="travel_type" id="solo_ida" value="solo_ida">
-                <label class="form-check-label" for="solo_ida">Sólo Ida</label>
-                </div>
-                
-                <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="travel_type" id="ida_vuelta" value="ida_vuelta">
-                <label class="form-check-label" for="ida_vuelta">Ida y Vuelta</label>
-                </div>
-                <br>
-                <br>
-                
-                <p>Fechas</p>
-                <div class="row-form">
-                    <div class="col-form">
-                        <p>Ida</p>
-                        <input type="date">
-                    </div>
-                    <div class="col-form">
-                        <p>Vuelta</p>
-                        <input type="date">
-                    </div>
-                </div>
-                
-                <p>Pasajeros</p>
-                <select class="form-control" tabindex="7">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                </select>
-                <br>
-                <br>
-                
-                <button type="submit" formaction="travel_result" class="hero-btn">BUSCAR</button>
+
+            <form action="{% url 'index' %}" method=POST>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Buscar" class="btn btn-primary">
             </form>
+
         </div>
     </div>
    </div>
