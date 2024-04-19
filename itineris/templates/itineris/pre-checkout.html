@@ -20,17 +20,17 @@
         <div class="row">
             <div class="travel-col">
                 <h2>Detalles del viaje</h2>
-                <p>Fecha salida:</p>
+                <p>Fecha y hora salida: {{ travel.datetime_departure }}</p>
                 <div class="row-form-2">
                     <div class="col-form-2">
-                        <p>Origen:</p>
+                        <p>Origen: {{ travel.city_origin }}</p>
                     </div>
                     <div class="col-form-2">
-                        <p>Destino:</p>
+                        <p>Destino: {{ travel.city_destination }}</p>
                     </div>
                 </div>
-                <p>Pasajeros:</p>
-                <p>Importe total:</p>
+                <p>Pasajeros: {{passengers}}</p>
+                <p>Importe total: ${{ travel.fee }}</p>
                 <div class="row-modal">
                     <a href=""><button type="submit" class="hero-btn">Volver</button></a>
                     <button type="submit" class="hero-btn">Siguiente</button>
@@ -38,184 +38,10 @@
             </div>
         </div>
         <div class="row">
-            <div class="travel-col">
-                <form class="comment-form">
-                    <h2>Datos 'N' Pasajero</h2>
-                    <br>
-                    <div class="row-form-2">
-                        <div class="col-form">
-                            <p>Nombre</p>
-                            <input type="text" placeholder="Igual al DNI">
-                        </div>
-                        <div class="col-form">
-                            <p>Apellido</p>
-                            <input type="text" placeholder="Igual al DNI">
-                        </div>
-                    </div>
-                    <div class="mini-row">
-                        <div class="row-form-2">
-                            <div class="col-form">
-                                <p>Nacionalidad</p>
-                                <select class="form-control" tabindex="7">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                </select>
-                            </div>
-                            <div class="col-form">
-                                <p>Fecha Nacimiento</p>
-                                <input type="date">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mini-row">
-                        <div class="row-form-2">
-                            <div class="col-form">
-                                <p>Género</p>
-                                <select class="form-control" tabindex="2">
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                </select>
-                            </div>
-                            <div class="col-form">
-                                <p>Tipo Documento</p>
-                                <select class="form-control" tabindex="3">
-                                    <option value="DNI">DNI</option>
-                                    <option value="Pasaporte">Pasaporte</option>
-                                    <option value="Otros">Otros</option>
-                                </select>
-                            </div>
-                            <div class="col-form">
-                                <p>N. Documento</p>
-                                <input type="text" placeholder="Sin puntos">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mini-row">
-                        <div class="row-form-2">
-                            <div class="col-form">
-                                <p>¿Donde te buscamos?</p>
-                        <input type="text" placeholder="Ej: Calle NRO, Ciudad">
-                            </div>
-                            <div class="col-form">
-                                <p>¿Donde te dejamos?</p>
-                        <input type="text" placeholder="Calle NRO, Ciudad">
-                            </div>
-                        </div>
-                    </div>
-                    
+            <div class="col-12">
+                {% for i in "x"|ljust:passengers %}
 
-                    <div class="mini-row">
-                        <p>Información de contacto</p>
-                        <div class="row-form">
-                            <div class="col-form">
-                                <p>Email</p>
-                                <input type="email" placeholder="email">
-                            </div>
-                            <div class="col-form">
-                                <p>Teléfono</p>
-                                <input type="text" placeholder="Teléfono">
-                            </div>
-                        </div>
-                    </div>                
-                </form>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="travel-col">
-                <form class="comment-form">
-                    <h2>Datos 'N' Pasajero</h2>
-                    <br>
-                    <div class="row-form-2">
-                        <div class="col-form">
-                            <p>Nombre</p>
-                            <input type="text" placeholder="Igual al DNI">
-                        </div>
-                        <div class="col-form">
-                            <p>Apellido</p>
-                            <input type="text" placeholder="Igual al DNI">
-                        </div>
-                    </div>
-                    <div class="mini-row">
-                        <div class="row-form-2">
-                            <div class="col-form">
-                                <p>Nacionalidad</p>
-                                <select class="form-control" tabindex="7">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                </select>
-                            </div>
-                            <div class="col-form">
-                                <p>Fecha Nacimiento</p>
-                                <input type="date">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mini-row">
-                        <div class="row-form-2">
-                            <div class="col-form">
-                                <p>Género</p>
-                                <select class="form-control" tabindex="2">
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                </select>
-                            </div>
-                            <div class="col-form">
-                                <p>Tipo Documento</p>
-                                <select class="form-control" tabindex="3">
-                                    <option value="DNI">DNI</option>
-                                    <option value="Pasaporte">Pasaporte</option>
-                                    <option value="Otros">Otros</option>
-                                </select>
-                            </div>
-                            <div class="col-form">
-                                <p>N. Documento</p>
-                                <input type="text" placeholder="Sin puntos">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mini-row">
-                        <div class="row-form-2">
-                            <div class="col-form">
-                                <p>¿Donde te buscamos?</p>
-                        <input type="text" placeholder="Ej: Calle NRO, Ciudad">
-                            </div>
-                            <div class="col-form">
-                                <p>¿Donde te dejamos?</p>
-                        <input type="text" placeholder="Calle NRO, Ciudad">
-                            </div>
-                        </div>
-                    </div>
-                    
-
-                    <div class="mini-row">
-                        <p>Información de contacto</p>
-                        <div class="row-form">
-                            <div class="col-form">
-                                <p>Email</p>
-                                <input type="email" placeholder="email">
-                            </div>
-                            <div class="col-form">
-                                <p>Teléfono</p>
-                                <input type="text" placeholder="Teléfono">
-                            </div>
-                        </div>
-                    </div>                
-                </form>
+                {% endfor %}
             </div>
         </div>
 

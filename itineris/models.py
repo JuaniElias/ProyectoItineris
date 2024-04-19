@@ -20,6 +20,14 @@ class Travel(models.Model):
     estimated_datetime_arrival = models.DateTimeField()
     duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
     fee = models.FloatField()
+    seats_left = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        # Check if the object is being created for the first time
+        if not self.pk:
+            # Initialize seats_left with the capacity of the linked vehicle
+            self.seats_left = self.vehicle.capacity
+        super().save(*args, **kwargs)
 
 
 class Driver(models.Model):

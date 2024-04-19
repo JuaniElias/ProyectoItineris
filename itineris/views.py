@@ -11,15 +11,16 @@ def index(request):
             city_origin = form.cleaned_data['city_origin']
             city_destination = form.cleaned_data['city_destination']
             date_departure = form.cleaned_data['datetime_departure']
-            passenger = form.cleaned_data['passenger']
+            passengers = form.cleaned_data['passengers']
 
             # Buscar vuelos que coincidan con los criterios
             travels = Travel.objects.all().filter(city_origin=city_origin,
                                                   city_destination=city_destination,
-                                                  # datetime_departure=date_departure,
-                                                  # cantidad_disponible__gte=passenger,
+                                                  datetime_departure__date=date_departure,
+                                                  seats_left__gte=passengers,
                                                   )
-            return render(request, 'itineris/travel_result.html', {'travels': travels})
+
+            return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers':passengers})
     else:
         form = SearchTravel()
     return render(request, 'itineris/index.html', {'form': form})
@@ -53,8 +54,10 @@ def create_travel(request):
     })
 
 
-def pre_checkout(request):
-    return render(request, "itineris/pre-checkout.html")
+def pre_checkout(request, travel_id, passengers):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+
+    return render(request, "itineris/pre-checkout.html", {'travel':travel, 'passengers':passengers})
 
 
 def travel_result(request):

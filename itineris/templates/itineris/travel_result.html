@@ -26,13 +26,26 @@
                                 <p>{{ travel.city_destination }}</p>
                                 <p>{{ travel.estimated_datetime_arrival }}</p>
                             </div>
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-primary">${{ travel.fee|floatformat }}</button>
-                            </div>
+                            {% if user.is_authenticated %}
+                                <div class="col-md-3">
+                                    <a href="{% url 'pre_checkout' travel.travel_id passengers%}">
+                                        <button type="button" class="btn btn-primary">${{ travel.fee|floatformat }}</button>
+                                    </a>
+                                </div>
+
+                            {% else %}
+                                <div class="col-md-3">
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                      ${{ travel.fee|floatformat }}
+                                    </button>
+                                </div>
+                            {% endif %}
+
                         </div>
                     </div>
                     <div class="card-footer text-body-secondary">
-                        Quedan {{ travel.vehicle.capacity}} - {{travel.traveler_set.count}} lugares disponibles
+                        Quedan {{ travel.seats_left }} lugares disponibles
                     </div>
                 </div>
             {% endfor %}
@@ -40,6 +53,28 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Inicie sesión antes de comprar</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Para realizar la compra de un pasaje primero debe iniciar sesión o registrarse.
+      </div>
+      <div class="modal-footer">
+          <a href="{% url 'login' %}">
+            <button type="button" class="btn btn-primary">Iniciar sesión</button>
+          </a>
+          <a href="{% url 'sign-up' %}">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Crear cuenta</button>
+          </a>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!---------------- JavaScript to toggle the menu ----------------------->
     <script>

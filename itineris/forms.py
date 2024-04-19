@@ -111,11 +111,11 @@ class AddDriver(forms.ModelForm):
 class SearchTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True
                                              , widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    passenger = forms.IntegerField(label='Pasajeros', min_value=1)
+    passengers = forms.IntegerField(label='Pasajeros', min_value=1)
 
     class Meta:
         model = Travel
-        fields = ('city_origin', 'city_destination', 'datetime_departure', 'passenger')
+        fields = ('city_origin', 'city_destination', 'datetime_departure', 'passengers')
         widgets = {
             "city_origin": CityWidget,
             "city_destination": CityWidget,
@@ -124,4 +124,6 @@ class SearchTravel(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(SearchTravel, self).__init__(*args, **kwargs)
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
-        self.fields['passenger'].widget.attrs['class'] = 'form-control'
+        self.fields['passengers'].widget.attrs['class'] = 'form-control'
+
+# class PreCheckout(forms.ModelForm):
