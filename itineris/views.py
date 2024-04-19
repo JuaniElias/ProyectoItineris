@@ -14,15 +14,16 @@ def index(request):
             passenger = form.cleaned_data['passenger']
 
             # Buscar vuelos que coincidan con los criterios
-            travels = Travel.objects.filter(city_origin = city_origin,
-                                          city_destination = city_destination,
-                                          datetime_departure = date_departure
-                                          # cantidad_disponible__gte=passenger
-                                            )
-            return render(request, 'travel_result.html', {'travels': travels})
+            travels = Travel.objects.all().filter(city_origin=city_origin,
+                                                  city_destination=city_destination,
+                                                  # datetime_departure=date_departure,
+                                                  # cantidad_disponible__gte=passenger,
+                                                  )
+            return render(request, 'itineris/travel_result.html', {'travels': travels})
     else:
         form = SearchTravel()
     return render(request, 'itineris/index.html', {'form': form})
+
 
 def work_with_us(request):
     return render(request, "itineris/work-with-us.html")
