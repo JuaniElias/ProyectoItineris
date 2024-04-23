@@ -1,9 +1,9 @@
 {% extends 'itineris/base.html' %}
 
 {% block content %}
-
+<div class="container">
     <div class="row">
-        <div class="travel-col">
+        <div class="col">
             <h2>Detalles del viaje</h2>
             <p>Fecha y hora salida: {{ travel.datetime_departure }}</p>
             <div class="row-form-2">
@@ -14,22 +14,24 @@
                     <p>Destino: {{ travel.city_destination }}</p>
                 </div>
             </div>
-            <p>Pasajeros: {{passengers}}</p>
+            <p>Pasajero: {{passengers}}</p>
             <p>Importe total: ${{ travel.fee }}</p>
             <div class="row-modal">
                 <a href=""><button type="submit" class="hero-btn">Volver</button></a>
-                <button type="submit" class="hero-btn">Siguiente</button>
+                
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-12">
-            {% for i in "x"|ljust:passengers %}
-                <form action="{% url 'pre_checkout' travel passengers%}" method=POST>
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                </form>
-            {% endfor %}
+        <div class="col">
+                <div class="card m-4 p-3">
+                    <form action="{% url 'pre_checkout' travel.travel_id passengers %}" method=POST>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Siguiente</button>
+                    </form>
+                </div>
         </div>
     </div>
+</div>
 {% endblock %}

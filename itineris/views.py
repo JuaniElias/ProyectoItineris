@@ -56,17 +56,17 @@ def create_travel(request):
 
 def pre_checkout(request, travel_id, passengers):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-
-    if request.method == "POST":
-        form = PreCheckout(request.POST)
-        if form.is_valid():
-            new_traveler = form.save(commit=False)
-            new_traveler.save()
-            return redirect('pre_checkout')
-    else:
-        form = PreCheckout()
-    return render(request, "itineris/pre-checkout.html",
-                  {'travel': travel, 'passengers': passengers, 'form': form})
+    for passenger in range(int(passengers)):
+        if request.method == "POST":
+            form = PreCheckout(request.POST)
+            if form.is_valid():
+                new_traveler = form.save(commit=False)
+                new_traveler.save()
+                return redirect('pre_checkout')
+        else:
+            form = PreCheckout()
+        return render(request, "itineris/pre-checkout.html",
+                      {'travel': travel, 'passengers': passenger + 1, 'form': form})
 
 
 def travel_result(request):
