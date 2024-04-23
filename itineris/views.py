@@ -56,6 +56,7 @@ def create_travel(request):
 
 def pre_checkout(request, travel_id, passengers):
     travel = get_object_or_404(Travel, travel_id=travel_id)
+
     if request.method == "POST":
         form = PreCheckout(request.POST)
         if form.is_valid():

@@ -26,8 +26,8 @@
         <div class="col-12">
             {% for i in "x"|ljust:passengers %}
                 <form action="{% url 'pre_checkout' travel passengers%}" method=POST>
-                            {% csrf_token %}
-                            {{ form.as_p }}
+                    {% csrf_token %}
+                    {{ form.as_p }}
                 </form>
             {% endfor %}
         </div>
