@@ -18,11 +18,7 @@
 
 <body>
 
-{% if user.role == 'COMPANY' %}
-    {% include 'itineris/navbar-business.html' %}
-{% else %}
-    {% include 'itineris/navbar.html' %}
-{% endif %}
+{% include 'itineris/navbar-business.html' %}
 {% block content %}
 
 {% endblock %}

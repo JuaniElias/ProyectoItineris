@@ -23,10 +23,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for driver in request.user.companyprofile.driver_set.all %}
+                            {% for driver in request.user.driver_set.all %}
                             <tr>
-                                <td>{{ driver.name }}</td>
-                                <td>{{ driver.surname }}</td>
+                                <td>{{ driver.first_name }}</td>
+                                <td>{{ driver.last_name }}</td>
                                 <td>{{ driver.license_number }}</td>
                                 <td>{{ driver.email }}</td>
                                 <td>{{ driver.phone_number }}</td>

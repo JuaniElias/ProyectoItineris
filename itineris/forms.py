@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, Vehicle, Driver, Travel, City, Traveler
+from .models import Company, Vehicle, Driver, Travel, City, Traveler
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -12,15 +12,15 @@ def validate_positive(value):
         raise ValidationError('Debe ingresar un numero mayor que cero')
 
 
-class CustomUserCreationForm(UserCreationForm):
+class CompanyCreationForm(UserCreationForm):
     class Meta:
-        model = CustomUser
+        model = Company
         fields = ('username', 'email')
 
 
-class CustomUserChangeForm(UserChangeForm):
+class CompanyChangeForm(UserChangeForm):
     class Meta:
-        model = CustomUser
+        model = Company
         fields = ('username', 'email')
 
 
@@ -92,18 +92,20 @@ class AddVehicle(forms.ModelForm):
 
 
 class AddDriver(forms.ModelForm):
-    name = forms.CharField(label='Nombre y apellido', max_length=100, required=True)
+    first_name = forms.CharField(label='Nombre', max_length=100, required=True)
+    last_name = forms.CharField(label='Apellido', max_length=100, required=True)
     license_number = forms.CharField(label='Número de licencia', max_length=100, required=True)
     email = forms.EmailField(label='Email', max_length=100)
     phone_number = forms.CharField(label='Teléfono', max_length=100)
 
     class Meta:
         model = Driver
-        fields = ('name', 'license_number', 'email', 'phone_number',)
+        fields = ('first_name', 'last_name', 'license_number', 'email', 'phone_number',)
 
     def __init__(self, *args, **kwargs):
         super(AddDriver, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['class'] = 'form-control'
+        self.fields['first_name'].widget.attrs['class'] = 'form-control'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['license_number'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone_number'].widget.attrs['class'] = 'form-control'

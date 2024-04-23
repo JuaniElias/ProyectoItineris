@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel, PreCheckout
-from itineris.models import CompanyProfile, Vehicle, Driver, Travel
+from itineris.models import Company, Vehicle, Driver, Travel
 
 
 # Create your views here.
@@ -35,8 +35,8 @@ def about(request):
 
 
 def create_travel(request):
-    user_id = request.user.id
-    company = get_object_or_404(CompanyProfile, user_id=user_id)
+    company_id = request.user.id
+    company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
         form = AddTravel(company.id, request.POST)
@@ -79,8 +79,8 @@ def travel_result(request):
 
 
 def your_drivers(request):
-    user_id = request.user.id
-    company = get_object_or_404(CompanyProfile, user_id=user_id)
+    id = request.user.id
+    company = get_object_or_404(Company, id=id)
 
     if request.method == "POST":
         form = AddDriver(request.POST)
@@ -118,8 +118,8 @@ def delete_travel(request, travel_id):
 
 
 def your_vehicles(request):
-    user_id = request.user.id
-    company = get_object_or_404(CompanyProfile, user_id=user_id)
+    id = request.user.id
+    company = get_object_or_404(Company, id=id)
 
     if request.method == "POST":
         form = AddVehicle(request.POST)

@@ -49,7 +49,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for travel in request.user.companyprofile.travel_set.all %}
+                            {% for travel in request.user.travel_set.all %}
                                 <tr>
                                     <td>{{ travel.datetime_departure }}</td>
                                     <td>{{ travel.city_origin }}</td>
