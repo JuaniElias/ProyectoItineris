@@ -61,12 +61,15 @@ def pre_checkout(request, travel_id, passengers):
             form = PreCheckout(request.POST)
             if form.is_valid():
                 new_traveler = form.save(commit=False)
+                new_traveler.travel = travel
                 new_traveler.save()
-                return redirect('pre_checkout')
+                #return render(request, "itineris/pre-checkout.html",
+                #              {'travel': travel, 'passengers': passenger + 1, 'form': form})
         else:
             form = PreCheckout()
         return render(request, "itineris/pre-checkout.html",
                       {'travel': travel, 'passengers': passenger + 1, 'form': form})
+    return redirect('index')
 
 
 def travel_result(request):

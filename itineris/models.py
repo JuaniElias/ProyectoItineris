@@ -71,7 +71,6 @@ class City(models.Model):
 # Esta es una relación, cómo se haría?
 class Traveler(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.CASCADE)
-    client = models.ForeignKey("ClientProfile", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     dni = models.CharField(max_length=8)
