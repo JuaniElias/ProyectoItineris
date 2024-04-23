@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel
+from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel, PreCheckout
 from itineris.models import CompanyProfile, Vehicle, Driver, Travel
 
 
@@ -20,7 +20,7 @@ def index(request):
                                                   seats_left__gte=passengers,
                                                   )
 
-            return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers':passengers})
+            return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers': passengers})
     else:
         form = SearchTravel()
     return render(request, 'itineris/index.html', {'form': form})
@@ -56,8 +56,16 @@ def create_travel(request):
 
 def pre_checkout(request, travel_id, passengers):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-
-    return render(request, "itineris/pre-checkout.html", {'travel':travel, 'passengers':passengers})
+    if request.method == "POST":
+        form = PreCheckout(request.POST)
+        if form.is_valid():
+            new_traveler = form.save(commit=False)
+            new_traveler.save()
+            return redirect('pre_checkout')
+    else:
+        form = PreCheckout()
+    return render(request, "itineris/pre-checkout.html",
+                  {'travel': travel, 'passengers': passengers, 'form': form})
 
 
 def travel_result(request):

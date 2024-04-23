@@ -1,65 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="with=device-with, initial-scale=1.0">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Itineris</title>
-    <link rel="stylesheet" href="../../static/itineris/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% extends 'itineris/base.html' %}
 
-</head>
-<body>
-    <section class="header">
-        <nav>
-            <a href="{% url 'index' %}"> <img src="../../static/itineris/images/logo.png"> </a>
-        </nav>
+{% block content %}
 
-        <div class="row">
-            <div class="travel-col">
-                <h2>Detalles del viaje</h2>
-                <p>Fecha y hora salida: {{ travel.datetime_departure }}</p>
-                <div class="row-form-2">
-                    <div class="col-form-2">
-                        <p>Origen: {{ travel.city_origin }}</p>
-                    </div>
-                    <div class="col-form-2">
-                        <p>Destino: {{ travel.city_destination }}</p>
-                    </div>
+    <div class="row">
+        <div class="travel-col">
+            <h2>Detalles del viaje</h2>
+            <p>Fecha y hora salida: {{ travel.datetime_departure }}</p>
+            <div class="row-form-2">
+                <div class="col-form-2">
+                    <p>Origen: {{ travel.city_origin }}</p>
                 </div>
-                <p>Pasajeros: {{passengers}}</p>
-                <p>Importe total: ${{ travel.fee }}</p>
-                <div class="row-modal">
-                    <a href=""><button type="submit" class="hero-btn">Volver</button></a>
-                    <button type="submit" class="hero-btn">Siguiente</button>
+                <div class="col-form-2">
+                    <p>Destino: {{ travel.city_destination }}</p>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                {% for i in "x"|ljust:passengers %}
-
-                {% endfor %}
+            <p>Pasajeros: {{passengers}}</p>
+            <p>Importe total: ${{ travel.fee }}</p>
+            <div class="row-modal">
+                <a href=""><button type="submit" class="hero-btn">Volver</button></a>
+                <button type="submit" class="hero-btn">Siguiente</button>
             </div>
         </div>
-
-    </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        var navLinks = document.getElementById("navLinks")
-
-        function showMenu(){
-            navLinks.style.right = "0";
-        }
-
-        function hideMenu(){
-            navLinks.style.right = "-200px";
-        }
-
-
-    </script>
-</body>
-</html >
+    </div>
+    <div class="row">
+        <div class="col-12">
+            {% for i in "x"|ljust:passengers %}
+                <form action="{% url 'pre_checkout' travel passengers%}" method=POST>
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

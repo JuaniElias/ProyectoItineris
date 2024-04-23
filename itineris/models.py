@@ -72,6 +72,11 @@ class City(models.Model):
 class Traveler(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.CASCADE)
     client = models.ForeignKey("ClientProfile", on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    dni = models.CharField(max_length=8)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30)
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
     feedback = models.TextField(max_length=200, null=True)

@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, Vehicle, Driver, Travel, City
+from .models import CustomUser, Vehicle, Driver, Travel, City, Traveler
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -108,6 +108,7 @@ class AddDriver(forms.ModelForm):
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone_number'].widget.attrs['class'] = 'form-control'
 
+
 class SearchTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True
                                              , widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -126,4 +127,26 @@ class SearchTravel(forms.ModelForm):
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['passengers'].widget.attrs['class'] = 'form-control'
 
-# class PreCheckout(forms.ModelForm):
+
+class PreCheckout(forms.ModelForm):
+    first_name = forms.CharField(label='Nombre', max_length=50, required=True)
+    last_name = forms.CharField(label='Apellido', max_length=50, required=True)
+    dni = forms.CharField(label='DNI', max_length=8, required=True)
+    email = forms.EmailField(label='Email', max_length=100, required=True)
+    phone = forms.CharField(label='Teléfono', max_length=30, required=True)
+    address_origin = forms.CharField(label='Dirección origen', max_length=50, required=True)
+    address_destination = forms.CharField(label='Dirección destino', max_length=50, required=True)
+
+    class Meta:
+        model = Traveler
+        fields = ('first_name', 'last_name', 'dni', 'email', 'phone', 'address_origin', 'address_destination')
+
+    def __init__(self, *args, **kwargs):
+        super(PreCheckout, self).__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['class'] = 'form-control'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control'
+        self.fields['dni'].widget.attrs['class'] = 'form-control'
+        self.fields['email'].widget.attrs['class'] = 'form-control'
+        self.fields['phone'].widget.attrs['class'] = 'form-control'
+        self.fields['address_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['address_destination'].widget.attrs['class'] = 'form-control'
