@@ -79,8 +79,8 @@ def travel_result(request):
 
 
 def your_drivers(request):
-    id = request.user.id
-    company = get_object_or_404(Company, id=id)
+    company_id = request.user.id
+    company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
         form = AddDriver(request.POST)
@@ -118,8 +118,8 @@ def delete_travel(request, travel_id):
 
 
 def your_vehicles(request):
-    id = request.user.id
-    company = get_object_or_404(Company, id=id)
+    company_id = request.user.id
+    company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
         form = AddVehicle(request.POST)
