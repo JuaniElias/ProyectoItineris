@@ -18,7 +18,11 @@
 
 <body>
 
-{% include 'itineris/navbar-business.html' %}
+{% if user.is_authenticated %}
+    {% include 'itineris/navbar-business.html' %}
+{% else %}
+    {% include 'itineris/navbar.html' %}
+{% endif %}
 {% block content %}
 
 {% endblock %}
