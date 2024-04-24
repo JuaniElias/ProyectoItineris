@@ -1,6 +1,7 @@
+from django.http import HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404, redirect
 from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel, PreCheckout
-from itineris.models import Company, Vehicle, Driver, Travel
+from itineris.models import Company, Vehicle, Driver, Travel, Traveler
 
 
 # Create your views here.
@@ -56,20 +57,27 @@ def create_travel(request):
 
 def pre_checkout(request, travel_id, passengers):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    for passenger in range(int(passengers)):
-        if request.method == "POST":
-            form = PreCheckout(request.POST)
-            if form.is_valid():
-                new_traveler = form.save(commit=False)
-                new_traveler.travel = travel
-                new_traveler.save()
-                # return render(request, "itineris/pre-checkout.html",
-                #              {'travel': travel, 'passengers': passenger + 1, 'form': form})
-        else:
-            form = PreCheckout()
-        return render(request, "itineris/pre-checkout.html",
-                      {'travel': travel, 'passengers': passenger + 1, 'form': form})
-    return redirect('index')
+    passenger_count = int(passengers)
+
+    travelers = request.session.get('travelers', [])
+
+    if request.method == "POST":
+        form = PreCheckout(request.POST)
+        if form.is_valid():
+            new_traveler = form.save(commit=False)
+            new_traveler.travel = travel
+            new_traveler.save()
+            travelers.append(new_traveler.id)
+            request.session['travelers'] = travelers
+            passenger_count -= 1
+            if passenger_count > 0:
+                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
+            else:
+                return redirect('checkout')
+    else:
+        form = PreCheckout()
+    return render(request, "itineris/pre-checkout.html",
+                  {'travel': travel, 'passengers': passenger_count, 'form': form})
 
 
 def travel_result(request):
@@ -144,3 +152,11 @@ def delete_vehicle(request, plate_number):
 
 def navbar(request):
     return render(request, "itineris/navbar.html")
+
+
+def checkout(request):
+    travelers = request.session.get('travelers')
+    if not travelers:
+        return HttpResponseBadRequest("No se han creado viajeros.")
+    travelers_obj = Traveler.objects.filter(id__in=travelers)
+    return render(request, "itineris/checkout.html", {'travelers': travelers_obj})
