@@ -27,7 +27,9 @@
                 <div class="card m-4 p-3">
                     <form action="{% url 'pre_checkout' travel.travel_id passengers %}" method=POST>
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        <table>
+                            {{ form.as_table }}
+                        </table>
                         <button type="submit" class="btn btn-primary">Siguiente</button>
                     </form>
                 </div>
