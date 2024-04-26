@@ -2,172 +2,75 @@
 
 {% block content %}
 
-    <section class="your-business">
-        <div>
-            <h1 class="text">Viajes</h1>
-            
-            <div class="col-lg-10 table-container">
-                <div class="row-travel">
-                    <div class="row">
-                        <div class="col">
-                            <p>Fecha desde</p>
-                            <input type="date">
-                        </div>
-                        <div class="col">
-                            <p>Fecha hasta</p>
-                            <input type="date">
-                        </div>
-                        <div class="col">
-                            <p>Estado</p>
-                            <select class="form-control" tabindex="4">
-                                <option value="Todos"       >Todos</option>
-                                <option value="Completado"  >Completado</option>
-                                <option value="Cancelado"   >Cancelado</option>
-                                <option value="En proceso"  >En proceso</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <p>Ordenar por:</p>
-                            <select class="form-control" tabindex="3">
-                                <option value="1"   >Fecha</option>
-                                <option value="3"   >Monto</option>
-                                <option value="4"   >Estado</option>
-                            </select>
-                        </div>
+<section class="your-business">
+    <div>
+        <h1 class="text">Viajes</h1>
+        
+        <div class="col-lg-10 table-container">
+            <div class="row-travel">
+                <div class="row">
+                    <div class="col">
+                        <p>Fecha desde</p>
+                        <input type="date">
                     </div>
-                    <br>
-                    <table class="content-table">
-                        <thead>
+                    <div class="col">
+                        <p>Fecha hasta</p>
+                        <input type="date">
+                    </div>
+                    <div class="col">
+                        <p>Estado</p>
+                        <select class="form-control" tabindex="4">
+                            <option value="Todos"       >Todos</option>
+                            <option value="Completado"  >Completado</option>
+                            <option value="Cancelado"   >Cancelado</option>
+                            <option value="En proceso"  >En proceso</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <p>Ordenar por:</p>
+                        <select class="form-control" tabindex="3">
+                            <option value="1"   >Fecha</option>
+                            <option value="3"   >Monto</option>
+                            <option value="4"   >Estado</option>
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th class="date"        >Fecha y Hora salida</th>
+                            <th class="origin"      >Origen</th>
+                            <th class="destination" >Destino</th>
+                            <th class="capacity"    >Capacidad</th>
+                            <th class="fee"         >Tarifa</th>
+                            <th class="more-info"   ></th>
+                            <th class="cancel"      ></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for travel in request.user.travel_set.all %}
                             <tr>
-                                <th class="date"        >Fecha y Hora salida</th>
-                                <th class="origin"      >Origen</th>
-                                <th class="destination" >Destino</th>
-                                <th class="capacity"    >Capacidad</th>
-                                <th class="fee"         >Tarifa</th>
-                                <th class="more-info"   ></th>
-                                <th class="cancel"      ></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for travel in request.user.travel_set.all %}
-                                <tr>
-                                    <td>{{ travel.datetime_departure }}</td>
-                                    <td>{{ travel.city_origin }}</td>
-                                    <td>{{ travel.city_destination }}</td>
-                                    <td>{{ travel.vehicle.capacity }}</td>
-                                    <td>${{ travel.fee }}</td>
-                                    <td>
-                                        <button id="btn-more-info" class="btn">
-                                            <i  class="bi bi-info-circle" ></i>
-                                        </button>
-                                    </td>
-                                    <td> 
-                                        <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
-                                            <i class="btn bi bi-trash3"></i>
-                                        </a>
-                                    </td>
-                                {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="modal fade" id="addDriver" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="addDriverLabel">Agregue un conductor nuevo</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form action="{% url 'your_drivers' %}" method=POST>
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Agregar conductor</button>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <dialog class="travel-modal" id="info-modal">
-                    <h3>Detalle del viaje</h3>
-                    <p>Fecha Salida:</p>
-                    <p>Salida:</p>
-                    <p>Destino:</p>
-                    <p>Pasajeros:</p>
-                    <a href="">Ruta óptima</a>
-                    <div class="scroll-table">
-                        <table class="content-table">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Apellido</th>
-                                    <th>Teléfono</th>
-                                    <th>Email</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>4</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-close-more-info">CERRAR</button>
-                        <button type="submit" class="modal-btn" id="btn-export"><i class='file-arrow-up icon'></i>EXPORTAR</button>
-                    </div>
-                </dialog>
-                <dialog class="travel-modal" id="cancel-modal">
-                    <h3>Detalle del viaje</h3>
-                    <p>Fecha Salida:</p>
-                    <p>Salida:</p>
-                    <p>Destino:</p>
-                    <p>Pasajeros:</p>
-                    <h3>¿Está seguro que quiere cancelar este viaje?</h3>
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-close-cancel">SALIR</button>
-                        <button type="submit" class="modal-btn" id="btn-delete-travel">SI, CANCELAR</button>
-                    </div>
-                </dialog>
+                                <td>{{ travel.datetime_departure }}</td>
+                                <td>{{ travel.city_origin }}</td>
+                                <td>{{ travel.city_destination }}</td>
+                                <td>{{ travel.vehicle.capacity }}</td>
+                                <td>${{ travel.fee }}</td>
+                                <td>
+                                    <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
+                                        <i class="bi bi-info-circle"></i>
+                                    </a>
+                                </td>
+                                <td> 
+                                    <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
+                                        <i class="btn bi bi-trash3"></i>
+                                    </a>
+                                </td>
+                            {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            
         </div>
-        <!---------------- POPUP parar mostrar la información del viaje seleccionado ----------------------->
-        
-        
-    </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        const   btn_more_info = document.querySelector("#btn-more-info"),
-                btn_close_info = document.querySelector("#btn-close-more-info"),
-                info_modal = document.querySelector("#info-modal"),
-                
-                btn_cancel_travel = document.querySelector("#btn-cancel-travel"),
-                btn_close_cancel = document.querySelector("#btn-close-cancel"),
-                cancel_modal = document.querySelector("#cancel-modal");
-
-            /* MODAL MORE-INFO */
-            btn_more_info.addEventListener("click", () =>{
-                info_modal.showModal();
-            })
-            btn_close_info.addEventListener("click", () =>{
-                info_modal.close()
-            }
-            )
-            
-            /* MODAL MORE-INFO */
-            btn_cancel_travel.addEventListener("click", () =>{
-                cancel_modal.showModal();
-            })
-            btn_close_cancel.addEventListener("click", () =>{
-                cancel_modal.close()
-            }
-            )
-    </script>
+    </div>
+</section>
 {% endblock %}

@@ -71,7 +71,7 @@ class City(models.Model):
         verbose_name_plural = "cities"
 
     def __str__(self):
-        return self.city_name + ' (' + self.province.name + ')'
+        return self.city_name + ' (' + self.province.acronym + ')'
 
 
 class Traveler(models.Model):
@@ -89,7 +89,7 @@ class Traveler(models.Model):
 class Province(models.Model):
     province_id = models.AutoField(primary_key=True),
     name = models.CharField(max_length=20)
-    abbreviation = models.CharField(max_length=4)
+    acronym = models.CharField(max_length=4)
 
     def __str__(self):
         return self.name

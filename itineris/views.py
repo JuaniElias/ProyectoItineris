@@ -24,7 +24,11 @@ def index(request):
             return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers': passengers})
     else:
         form = SearchTravel()
-    return render(request, 'itineris/index.html', {'form': form})
+
+    if request.user.is_authenticated:
+        return render(request, "itineris/your_travels.html")
+    else:
+        return render(request, "itineris/index.html", {'form': form})
 
 
 def work_with_us(request):
@@ -84,6 +88,12 @@ def travel_result(request):
     travels = Travel.objects.all()
 
     return render(request, "itineris/travel_result.html", {'travels': travels})
+
+
+def travel_detail(request, travel_id):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travelers = Traveler.objects.filter(travel_id=travel_id)
+    return render(request, "itineris/travel_detail.html", {'travel': travel, 'travelers': travelers})
 
 
 def your_drivers(request):
