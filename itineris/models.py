@@ -25,7 +25,7 @@ class Travel(models.Model):
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
     estimated_datetime_arrival = models.DateTimeField()
     duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
-    fee = models.FloatField()
+    fee = models.IntegerField()
     seats_left = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -89,6 +89,7 @@ class Traveler(models.Model):
 class Province(models.Model):
     province_id = models.AutoField(primary_key=True),
     name = models.CharField(max_length=20)
+    abbreviation = models.CharField(max_length=4)
 
     def __str__(self):
         return self.name

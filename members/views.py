@@ -30,8 +30,11 @@ def sign_up_business(request):
     if request.method == "POST":
         form = RegistrationFormCompany(request.POST)
         if form.is_valid():
-            user = form.save()
-            request.session['id'] = user.id
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            login(request, user)
             return redirect('your_travels')
     else:
         form = RegistrationFormCompany()
