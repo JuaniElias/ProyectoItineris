@@ -27,6 +27,7 @@ class Travel(models.Model):
     duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
     fee = models.IntegerField()
     seats_left = models.IntegerField(default=0)
+    status = models.CharField(max_length=50, default="Confirmado")
 
     def save(self, *args, **kwargs):
         # Check if the object is being created for the first time
@@ -84,6 +85,7 @@ class Traveler(models.Model):
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
     feedback = models.TextField(max_length=200, null=True)
+    status = models.CharField(max_length=50, default="En Proceso")
 
 
 class Province(models.Model):
