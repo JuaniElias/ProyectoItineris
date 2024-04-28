@@ -54,13 +54,13 @@ class Vehicle(models.Model):
     plate_number = models.CharField(max_length=10, unique=True, primary_key=True)
     company = models.ForeignKey("Company", on_delete=models.CASCADE)
     brand = models.CharField(max_length=20)
-    model = models.CharField(max_length=20)
+    car_model = models.CharField(max_length=20)
     capacity = models.IntegerField()
     color = models.CharField(max_length=20)
     status = models.CharField(max_length=20, default="Disponible")
 
     def __str__(self):
-        return self.brand + ' ' + self.model + " (" + self.plate_number + ")"
+        return self.brand + ' ' + self.car_model + " (" + self.plate_number + ")"
 
 
 class City(models.Model):
