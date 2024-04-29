@@ -32,10 +32,12 @@ class CityWidget(s2forms.ModelSelect2Widget):
 
 class AddTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True
-                                             , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}))
+                                             , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
+                                                                                         'id': 'datetime_departure'}))
     estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
                                                      widget=forms.widgets.DateTimeInput(
-                                                         attrs={'type': 'datetime-local'}))
+                                                         attrs={'type': 'datetime-local',
+                                                                'id': 'datetime_arrival'}))
     fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)

@@ -27,7 +27,7 @@ class Travel(models.Model):
     duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
     fee = models.IntegerField()
     seats_left = models.IntegerField(default=0)
-    status = models.CharField(max_length=50, default="Confirmado")
+    status = models.CharField(max_length=50, default="Agendado")
 
     def save(self, *args, **kwargs):
         # Check if the object is being created for the first time

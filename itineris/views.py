@@ -1,4 +1,6 @@
-from django.http import HttpResponseBadRequest
+from datetime import datetime
+
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel, PreCheckout
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
@@ -57,6 +59,37 @@ def create_travel(request):
     return render(request, "itineris/create_travel.html", {
         'form': form,
     })
+
+
+def get_available_drivers(request):
+    vehicle_departure = datetime.strptime(request.GET.get("salida"), '%Y-%m-%dT%H:%M').astimezone()
+    vehicle_arrival = datetime.strptime(request.GET.get("llegada"), '%Y-%m-%dT%H:%M').astimezone()
+
+    vehicle_exclude = []
+    driver_exclude = []
+
+    scheduled_travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
+
+    for travel in scheduled_travels:
+        if (vehicle_departure <= travel.estimated_datetime_arrival.astimezone()
+                and travel.datetime_departure.astimezone() <= vehicle_arrival):
+            vehicle_exclude.append(travel.vehicle_id)
+            driver_exclude.append(travel.driver_id)
+
+    # vehicles logic
+    available_vehicles = Vehicle.objects.filter(company_id=request.user.id, status='Disponible')
+    available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
+
+    # drivers logic
+    available_drivers = Driver.objects.filter(company_id=request.user.id)
+    available_drivers = available_drivers.exclude(driver_id__in=driver_exclude)
+
+    data_vehicles = [{'vehicle_id': vehicle.plate_number} for vehicle in available_vehicles]
+    data_drivers = [{'driver_id': driver.driver_id} for driver in available_drivers]
+
+    data = {'drivers': data_drivers, 'vehicles': data_vehicles}
+
+    return JsonResponse(data, safe=False)
 
 
 def pre_checkout(request, travel_id, passengers):
@@ -126,12 +159,14 @@ def your_payments(request):
 
 
 def your_travels(request):
-    return render(request, "itineris/your_travels.html")
+    travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
+    return render(request, "itineris/your_travels.html", {'travels': travels, })
 
 
 def delete_travel(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    travel.delete()
+    travel.status = 'Cancelado'
+    travel.save()
     return redirect('your_travels')  # Redirect to the view displaying the table
 
 

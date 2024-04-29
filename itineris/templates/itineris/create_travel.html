@@ -21,4 +21,37 @@
         </div>
     </section>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var datetime_departure = document.querySelector('#datetime_departure');
+        var datetime_arrival = document.querySelector('#datetime_arrival');
+        var vehicle_select = document.querySelector('#id_vehicle');
+        var driver_select = document.querySelector('#id_driver');
+
+        function updateVehicleOptions() {
+            var selected_departure = datetime_departure.value;
+            var selected_arrival = datetime_arrival.value;
+            // Realiza una solicitud AJAX para obtener el queryset actualizado basado en los horarios de salida y llegada
+            fetch(`/get_available_drivers?salida=${selected_departure}&llegada=${selected_arrival}`)
+                .then(response => response.text())
+                .then(data => {
+                    // Actualiza el dropdown con el HTML recibido
+                    driver_select.innerHTML = data['drivers'];
+                    vehicle_select.innerHTML = data['vehicles'];
+                });
+        }
+
+        // Agrega un listener al cambio en el campo de fecha y hora de salida
+        datetime_departure.addEventListener('change', function() {
+            updateVehicleOptions();
+        });
+
+        // Agrega un listener al cambio en el campo de fecha y hora de llegada
+        datetime_arrival.addEventListener('change', function() {
+            updateVehicleOptions();
+        });
+    });
+</script>
+
 {% endblock %}
