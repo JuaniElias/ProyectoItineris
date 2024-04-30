@@ -61,7 +61,7 @@ def create_travel(request):
     })
 
 
-def get_available_drivers(request):
+def get_available_options(request):
     vehicle_departure = datetime.strptime(request.GET.get("salida"), '%Y-%m-%dT%H:%M').astimezone()
     vehicle_arrival = datetime.strptime(request.GET.get("llegada"), '%Y-%m-%dT%H:%M').astimezone()
 

@@ -33,7 +33,7 @@
             const selected_departure = datetime_departure.value;
             const selected_arrival = datetime_arrival.value;
             // Realiza una solicitud AJAX para obtener el queryset actualizado basado en los horarios de salida y llegada
-            fetch(`/get_available_drivers?salida=${selected_departure}&llegada=${selected_arrival}`)
+            fetch(`/get_available_options?salida=${selected_departure}&llegada=${selected_arrival}`)
                 .then(response => response.json())  // Parsea la respuesta como JSON
                 .then(data => {
                     // Limpiar opciones anteriores
