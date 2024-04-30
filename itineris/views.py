@@ -73,23 +73,26 @@ def get_available_drivers(request):
     for travel in scheduled_travels:
         if (vehicle_departure <= travel.estimated_datetime_arrival.astimezone()
                 and travel.datetime_departure.astimezone() <= vehicle_arrival):
-            vehicle_exclude.append(travel.vehicle_id)
-            driver_exclude.append(travel.driver_id)
+            vehicle_exclude.append(travel.vehicle.plate_number)
+            driver_exclude.append(travel.driver.driver_id)
 
-    # vehicles logic
     available_vehicles = Vehicle.objects.filter(company_id=request.user.id, status='Disponible')
     available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
 
-    # drivers logic
     available_drivers = Driver.objects.filter(company_id=request.user.id)
-    available_drivers = available_drivers.exclude(driver_id__in=driver_exclude)
+    available_drivers = available_drivers.exclude(pk__in=driver_exclude)
 
-    data_vehicles = [{'vehicle_id': vehicle.plate_number} for vehicle in available_vehicles]
-    data_drivers = [{'driver_id': driver.driver_id} for driver in available_drivers]
+    # Crear una instancia del formulario
+    form = AddTravel(company_id=request.user.id)
+    # Llamar al método update_choices del formulario
+    form.update_choices(available_drivers, available_vehicles)
 
-    data = {'drivers': data_drivers, 'vehicles': data_vehicles}
+    data = {
+        'drivers': list(available_drivers.values('driver_id')),
+        'vehicles': list(available_vehicles.values('plate_number'))
+    }
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data)
 
 
 def pre_checkout(request, travel_id, passengers):

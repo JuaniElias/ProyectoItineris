@@ -34,12 +34,30 @@
             const selected_arrival = datetime_arrival.value;
             // Realiza una solicitud AJAX para obtener el queryset actualizado basado en los horarios de salida y llegada
             fetch(`/get_available_drivers?salida=${selected_departure}&llegada=${selected_arrival}`)
-                .then(response => response.text())
+                .then(response => response.json())  // Parsea la respuesta como JSON
                 .then(data => {
-                    // Actualiza el dropdown con el HTML recibido
-                    driver_select.innerHTML = data['drivers'];
-                    vehicle_select.innerHTML = data['vehicles'];
-                });
+                    // Limpiar opciones anteriores
+                    vehicle_select.innerHTML = '';
+                    driver_select.innerHTML = '';
+                    // Agregar nuevas opciones
+                    data['vehicles'].forEach(vehicle => {
+                        const option = document.createElement('option');
+                        // Comprobamos si el objeto vehicle es una cadena simple o un objeto
+                        const vehicleValue = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
+                        option.value = vehicleValue;
+                        option.textContent = vehicleValue;
+                        vehicle_select.appendChild(option);
+                    });
+                    data['drivers'].forEach(driver => {
+                        const option = document.createElement('option');
+                        // Comprobamos si el objeto driver es una cadena simple o un objeto
+                        const driverValue = typeof driver === 'object' ? driver.driver_id : driver;
+                        option.value = driverValue;
+                        option.textContent = driverValue;
+                        driver_select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error al obtener datos:', error)); // Manejar errores
         }
 
         // Agrega un listener al cambio en el campo de fecha y hora de salida
@@ -51,6 +69,9 @@
         datetime_arrival.addEventListener('change', function() {
             updateVehicleOptions();
         });
+
+        // Llamar a la función para cargar las opciones inicialmente
+        updateVehicleOptions();
     });
 </script>
 

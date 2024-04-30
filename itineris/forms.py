@@ -72,6 +72,10 @@ class AddTravel(forms.ModelForm):
         self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
 
+    def update_choices(self, available_drivers, available_vehicles):
+        self.fields['driver'].queryset = available_drivers
+        self.fields['vehicle'].queryset = available_vehicles
+
 
 class AddVehicle(forms.ModelForm):
     plate_number = forms.CharField(label='Patente', max_length=20, required=True)
