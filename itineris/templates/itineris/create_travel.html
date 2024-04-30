@@ -24,14 +24,14 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var datetime_departure = document.querySelector('#datetime_departure');
-        var datetime_arrival = document.querySelector('#datetime_arrival');
-        var vehicle_select = document.querySelector('#id_vehicle');
-        var driver_select = document.querySelector('#id_driver');
+        const datetime_departure = document.querySelector('#datetime_departure');
+        const datetime_arrival = document.querySelector('#datetime_arrival');
+        const vehicle_select = document.querySelector('#id_vehicle');
+        const driver_select = document.querySelector('#id_driver');
 
         function updateVehicleOptions() {
-            var selected_departure = datetime_departure.value;
-            var selected_arrival = datetime_arrival.value;
+            const selected_departure = datetime_departure.value;
+            const selected_arrival = datetime_arrival.value;
             // Realiza una solicitud AJAX para obtener el queryset actualizado basado en los horarios de salida y llegada
             fetch(`/get_available_drivers?salida=${selected_departure}&llegada=${selected_arrival}`)
                 .then(response => response.text())

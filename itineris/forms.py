@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import Company, Vehicle, Driver, Travel, City, Traveler
+from .models import Company, Vehicle, Driver, Travel, Traveler
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -31,9 +31,9 @@ class CityWidget(s2forms.ModelSelect2Widget):
 
 
 class AddTravel(forms.ModelForm):
-    datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True
-                                             , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
-                                                                                         'id': 'datetime_departure'}))
+    datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
+                                             widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
+                                                                                       'id': 'datetime_departure'}))
     estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
                                                      widget=forms.widgets.DateTimeInput(
                                                          attrs={'type': 'datetime-local',
