@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from members.forms import RegistrationFormCompany
+from members.forms import RegistrationForm
 
 
 def login_user(request):
@@ -26,9 +26,9 @@ def logout_user(request):
     return redirect('index')
 
 
-def sign_up_business(request):
+def register_user(request):
     if request.method == "POST":
-        form = RegistrationFormCompany(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']
@@ -37,8 +37,8 @@ def sign_up_business(request):
             login(request, user)
             return redirect('your_travels')
     else:
-        form = RegistrationFormCompany()
+        form = RegistrationForm()
 
-    return render(request, 'authenticate/sign-up-business.html', {
+    return render(request, 'authenticate/register_user.html', {
         'form': form,
     })
