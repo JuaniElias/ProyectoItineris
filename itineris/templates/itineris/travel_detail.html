@@ -3,48 +3,47 @@
 {% block content %}
 
 <section class="your-business">
-    <div>
-        <h1 class="text" id="travelModalLabel">Travel Details</h1>
-        <div class="col-lg-10 table-container">
-            <div class="row-travel">
-                <div class="row">
-                    <div class="col">
-                        
-                        <div class="modal-body">
-                            <p>Date and Time of Departure: {{ travel.datetime_departure }}</p>
-                            <p>Origin: {{ travel.city_origin }}</p>
-                            <p>Destination: {{ travel.city_destination }}</p>
-                        </div>
-                        <table class="content-table">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Apellido</th>
-                                    <th>DNI</th>
-                                    <th>Email</th>
-                                    <th>Teléfono</th>
-                                    <th>Dirección Origen</th>
-                                    <th>Dirección Destino</th>
-                                    <th>Feedback</th>
-                                </tr>
-    
-                            </thead>
-                            <tbody>
-                                {% for traveler in travelers %}
-                                    <tr>
-                                        <td>{{ traveler.first_name }}</td>
-                                        <td>{{ traveler.last_name }}</td>
-                                        <td>{{ traveler.dni }}</td>
-                                        <td>{{ traveler.email }}</td>
-                                        <td>{{ traveler.phone }}</td>
-                                        <td>{{ traveler.address_origin }}</td>
-                                        <td>{{ traveler.address_destination }}</td>
-                                        <td>{{ traveler.feedback }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+    <div class="col-lg-10 table-container">
+        <div class="row-travel">
+            <div class="row">
+                <div class="col">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="travelModalLabel">Travel Details</h5>
                     </div>
+                    <div class="modal-body">
+                        <p>Date and Time of Departure: {{ travel.datetime_departure }}</p>
+                        <p>Origin: {{ travel.city_origin }}</p>
+                        <p>Destination: {{ travel.city_destination }}</p>
+                    </div>
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>DNI</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Dirección Origen</th>
+                                <th>Dirección Destino</th>
+                                <th>Feedback</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            {% for traveler in travelers %}
+                                <tr>
+                                    <td>{{ traveler.first_name }}</td>
+                                    <td>{{ traveler.last_name }}</td>
+                                    <td>{{ traveler.dni }}</td>
+                                    <td>{{ traveler.email }}</td>
+                                    <td>{{ traveler.phone }}</td>
+                                    <td>{{ traveler.address_origin }}</td>
+                                    <td>{{ traveler.address_destination }}</td>
+                                    <td>{{ traveler.feedback }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
