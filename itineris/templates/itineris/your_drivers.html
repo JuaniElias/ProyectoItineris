@@ -80,33 +80,4 @@
             </div>
         </div>
     </section>
-
-    <!---------------- JavaScript to toggle the menu ----------------------->
-    <script>
-        const   btn_cancel_travel = document.querySelector("#btn-delete-driver"),
-                btn_close_cancel = document.querySelector("#btn-close-del-modal"),
-                cancel_modal = document.querySelector("#delete-modal"),
-    
-                btn_add_driver = document.querySelector("#btn-add-driver"),
-                btn_add_cancel = document.querySelector("#btn-add-cancel"),
-                add_driver_modal = document.querySelector("#create-driver");
-    
-            /* MODAL CANCEL TRIP */
-            btn_cancel_travel.addEventListener("click", () =>{
-                cancel_modal.showModal();
-            })
-            btn_close_cancel.addEventListener("click", () =>{
-                cancel_modal.close()
-            }
-            )
-    
-            /* MODAL ADD DRIVER */
-            btn_add_driver.addEventListener("click", () =>{
-                add_driver_modal.showModal();
-            })
-            btn_add_cancel.addEventListener("click", () =>{
-                add_driver_modal.close()
-            }
-            )
-    </script>
 {% endblock %}
