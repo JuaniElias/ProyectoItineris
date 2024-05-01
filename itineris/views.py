@@ -31,6 +31,14 @@ def index(request):
         return render(request, "itineris/index.html", {'form': form})
 
 
+def work_with_us(request):
+    return render(request, "itineris/work-with-us.html")
+
+
+def about(request):
+    return render(request, "itineris/about_us.html")
+
+
 def create_travel(request):
     company_id = request.user.id
     company = get_object_or_404(Company, id=company_id)
@@ -51,14 +59,42 @@ def create_travel(request):
     })
 
 
-def your_travels(request):
-    return render(request, "itineris/your_travels.html")
-
-
-def delete_travel(request, travel_id):
+def pre_checkout(request, travel_id, passengers):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    travel.delete()
-    return redirect('your_travels')
+    passenger_count = int(passengers)
+
+    travelers = request.session.get('travelers', [])
+
+    if request.method == "POST":
+        form = PreCheckout(request.POST)
+        if form.is_valid():
+            new_traveler = form.save(commit=False)
+            new_traveler.travel = travel
+            new_traveler.save()
+            travelers.append(new_traveler.id)
+            request.session['travelers'] = travelers
+            passenger_count -= 1
+            if passenger_count > 0:
+                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
+            else:
+                return redirect('checkout')
+    else:
+        form = PreCheckout()
+    return render(request, "itineris/pre-checkout.html",
+                  {'travel': travel, 'passengers': passenger_count, 'form': form})
+
+
+def travel_result(request):
+    travels = Travel.objects.all()
+
+    return render(request, "itineris/travel_result.html", {'travels': travels})
+
+
+def travel_detail(request, travel_id):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travelers = Traveler.objects.filter(travel_id=travel_id)
+    return render(request, "itineris/travel_detail.html",
+                  {'travel': travel, 'travelers': travelers})
 
 
 def your_drivers(request):
@@ -86,6 +122,20 @@ def delete_driver(request, driver_id):
     return redirect('your_drivers')
 
 
+def your_payments(request):
+    return render(request, "itineris/your_payments.html")
+
+
+def your_travels(request):
+    return render(request, "itineris/your_travels.html")
+
+
+def delete_travel(request, travel_id):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travel.delete()
+    return redirect('your_travels')
+
+
 def your_vehicles(request):
     company_id = request.user.id
     company = get_object_or_404(Company, id=company_id)
@@ -111,54 +161,8 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')
 
 
-def your_payments(request):
-    return render(request, "itineris/your_payments.html")
-
-
-def travel_result(request):
-    travels = Travel.objects.all()
-
-    return render(request, "itineris/travel_result.html", {'travels': travels})
-
-
-def travel_detail(request, travel_id):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    travelers = Traveler.objects.filter(travel_id=travel_id)
-    return render(request, "itineris/travel_detail.html",
-                  {'travel': travel, 'travelers': travelers})
-
-
-def work_with_us(request):
-    return render(request, "itineris/work-with-us.html")
-
-
-def about(request):
-    return render(request, "itineris/about_us.html")
-
-
-def pre_checkout(request, travel_id, passengers):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    passenger_count = int(passengers)
-
-    travelers = request.session.get('travelers', [])
-
-    if request.method == "POST":
-        form = PreCheckout(request.POST)
-        if form.is_valid():
-            new_traveler = form.save(commit=False)
-            new_traveler.travel = travel
-            new_traveler.save()
-            travelers.append(new_traveler.id)
-            request.session['travelers'] = travelers
-            passenger_count -= 1
-            if passenger_count > 0:
-                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
-            else:
-                return redirect('checkout')
-    else:
-        form = PreCheckout()
-    return render(request, "itineris/pre-checkout.html",
-                  {'travel': travel, 'passengers': passenger_count, 'form': form})
+def navbar(request):
+    return render(request, "itineris/navbar.html")
 
 
 def checkout(request):
