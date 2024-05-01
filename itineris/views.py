@@ -1,6 +1,6 @@
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404, redirect
-from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout
+from itineris.forms import AddVehicle, AddDriver, AddTravel, SearchTravel, PreCheckout
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
 
 
@@ -44,7 +44,7 @@ def create_travel(request):
     company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
-        form = CreateTravel(company.id, request.POST)
+        form = AddTravel(company.id, request.POST)
         if form.is_valid():
             new_travel = form.save(commit=False)
             new_travel.company_id = company.id
@@ -52,7 +52,7 @@ def create_travel(request):
             new_travel.save()
             return redirect('create_travel')
     else:
-        form = CreateTravel(company.id)
+        form = AddTravel(company.id)
 
     return render(request, "itineris/create_travel.html", {
         'form': form,
@@ -101,14 +101,14 @@ def your_drivers(request):
     company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
-        form = CreateDriver(request.POST)
+        form = AddDriver(request.POST)
         if form.is_valid():
             new_driver = form.save(commit=False)
             new_driver.company_id = company.id
             new_driver.save()
             return redirect('your_drivers')
     else:
-        form = CreateDriver()
+        form = AddDriver()
 
     return render(request, "itineris/your_drivers.html", {
         'form': form,
@@ -140,14 +140,14 @@ def your_vehicles(request):
     company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
-        form = CreateVehicle(request.POST)
+        form = AddVehicle(request.POST)
         if form.is_valid():
             new_vehicle = form.save(commit=False)
             new_vehicle.company_id = company.id
             new_vehicle.save()
             return redirect('your_vehicles')
     else:
-        form = CreateVehicle()
+        form = AddVehicle()
 
     return render(request, "itineris/your_vehicles.html", {
         'form': form,

@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import Company, Vehicle, Driver, Travel, Traveler
+from .models import Company, Vehicle, Driver, Travel, City, Traveler
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -30,7 +30,7 @@ class CityWidget(s2forms.ModelSelect2Widget):
     ]
 
 
-class CreateTravel(forms.ModelForm):
+class AddTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True
                                              , widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}))
     estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
@@ -61,7 +61,7 @@ class CreateTravel(forms.ModelForm):
         }
 
     def __init__(self, company_id, *args, **kwargs):
-        super(CreateTravel, self).__init__(*args, **kwargs)
+        super(AddTravel, self).__init__(*args, **kwargs)
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
         self.fields['fee'].widget.attrs['class'] = 'form-control'
@@ -71,7 +71,7 @@ class CreateTravel(forms.ModelForm):
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
 
 
-class CreateVehicle(forms.ModelForm):
+class AddVehicle(forms.ModelForm):
     plate_number = forms.CharField(label='Patente', max_length=20, required=True)
     brand = forms.CharField(label='Marca', max_length=100)
     model = forms.CharField(label='Modelo', max_length=100)
@@ -83,7 +83,7 @@ class CreateVehicle(forms.ModelForm):
         fields = ('plate_number', 'brand', 'model', 'capacity', 'color',)
 
     def __init__(self, *args, **kwargs):
-        super(CreateVehicle, self).__init__(*args, **kwargs)
+        super(AddVehicle, self).__init__(*args, **kwargs)
         self.fields['plate_number'].widget.attrs['class'] = 'form-control'
         self.fields['brand'].widget.attrs['class'] = 'form-control'
         self.fields['model'].widget.attrs['class'] = 'form-control'
@@ -91,7 +91,7 @@ class CreateVehicle(forms.ModelForm):
         self.fields['color'].widget.attrs['class'] = 'form-control'
 
 
-class CreateDriver(forms.ModelForm):
+class AddDriver(forms.ModelForm):
     first_name = forms.CharField(label='Nombre', max_length=100, required=True)
     last_name = forms.CharField(label='Apellido', max_length=100, required=True)
     license_number = forms.CharField(label='Número de licencia', max_length=100, required=True)
@@ -103,7 +103,7 @@ class CreateDriver(forms.ModelForm):
         fields = ('first_name', 'last_name', 'license_number', 'email', 'phone_number',)
 
     def __init__(self, *args, **kwargs):
-        super(CreateDriver, self).__init__(*args, **kwargs)
+        super(AddDriver, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['license_number'].widget.attrs['class'] = 'form-control'
