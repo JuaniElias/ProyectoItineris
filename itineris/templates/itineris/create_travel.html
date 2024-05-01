@@ -39,39 +39,42 @@
                     // Limpiar opciones anteriores
                     vehicle_select.innerHTML = '';
                     driver_select.innerHTML = '';
+
+                    // Agregar --------- como primera opción
+                    let emptyDriver = document.createElement('option');
+                    emptyDriver.textContent = '---------'
+                    driver_select.appendChild(emptyDriver);
+
                     // Agregar nuevas opciones
-                    data['vehicles'].forEach(vehicle => {
-                        const option = document.createElement('option');
-                        // Comprobamos si el objeto vehicle es una cadena simple o un objeto
-                        const vehicleValue = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
-                        option.value = vehicleValue;
-                        option.textContent = vehicleValue;
-                        vehicle_select.appendChild(option);
-                    });
                     data['drivers'].forEach(driver => {
                         const option = document.createElement('option');
                         // Comprobamos si el objeto driver es una cadena simple o un objeto
                         const driverValue = typeof driver === 'object' ? driver.driver_id : driver;
                         option.value = driverValue;
-                        option.textContent = driverValue;
+                        option.textContent = driver.first_name + ' ' + driver.last_name + ' (' + driver.license_number + ')';
                         driver_select.appendChild(option);
+                    });
+
+                    let emptyVehicle = document.createElement('option');
+                    emptyVehicle.textContent = '---------'
+                    vehicle_select.appendChild(emptyVehicle);
+                    data['vehicles'].forEach(vehicle => {
+                        const option = document.createElement('option');
+                        // Comprobamos si el objeto vehicle es una cadena simple o un objeto
+                        const vehicleValue = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
+                        option.value = vehicleValue;
+                        option.textContent = vehicle.brand + ' ' + vehicle.car_model + ' (' + vehicle.plate_number + ')';
+                        vehicle_select.appendChild(option);
                     });
                 })
                 .catch(error => console.error('Error al obtener datos:', error)); // Manejar errores
         }
 
         // Agrega un listener al cambio en el campo de fecha y hora de salida
-        datetime_departure.addEventListener('change', function() {
-            updateVehicleOptions();
-        });
+        datetime_departure.addEventListener('change', updateVehicleOptions);
 
         // Agrega un listener al cambio en el campo de fecha y hora de llegada
-        datetime_arrival.addEventListener('change', function() {
-            updateVehicleOptions();
-        });
-
-        // Llamar a la función para cargar las opciones inicialmente
-        updateVehicleOptions();
+        datetime_arrival.addEventListener('change', updateVehicleOptions);
     });
 </script>
 

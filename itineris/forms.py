@@ -69,30 +69,27 @@ class AddTravel(forms.ModelForm):
         self.fields['fee'].widget.attrs['class'] = 'form-control'
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id))
         self.fields['driver'].widget.attrs['class'] = 'form-control'
-        self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id))
+        self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id,
+                                                                                        status='Disponible'))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
-
-    def update_choices(self, available_drivers, available_vehicles):
-        self.fields['driver'].queryset = available_drivers
-        self.fields['vehicle'].queryset = available_vehicles
 
 
 class AddVehicle(forms.ModelForm):
     plate_number = forms.CharField(label='Patente', max_length=20, required=True)
     brand = forms.CharField(label='Marca', max_length=100)
-    model = forms.CharField(label='Modelo', max_length=100)
+    car_model = forms.CharField(label='Modelo', max_length=100)
     capacity = forms.IntegerField(label='Capacidad', validators=[validate_positive])
     color = forms.CharField(label='Color', required=False)
 
     class Meta:
         model = Vehicle
-        fields = ('plate_number', 'brand', 'model', 'capacity', 'color',)
+        fields = ('plate_number', 'brand', 'car_model', 'capacity', 'color',)
 
     def __init__(self, *args, **kwargs):
         super(AddVehicle, self).__init__(*args, **kwargs)
         self.fields['plate_number'].widget.attrs['class'] = 'form-control'
         self.fields['brand'].widget.attrs['class'] = 'form-control'
-        self.fields['model'].widget.attrs['class'] = 'form-control'
+        self.fields['car_model'].widget.attrs['class'] = 'form-control'
         self.fields['capacity'].widget.attrs['class'] = 'form-control'
         self.fields['color'].widget.attrs['class'] = 'form-control'
 

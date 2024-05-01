@@ -62,37 +62,32 @@ def create_travel(request):
 
 
 def get_available_options(request):
-    vehicle_departure = datetime.strptime(request.GET.get("salida"), '%Y-%m-%dT%H:%M').astimezone()
-    vehicle_arrival = datetime.strptime(request.GET.get("llegada"), '%Y-%m-%dT%H:%M').astimezone()
+    if request.GET.get("salida") != '' and request.GET.get("llegada") != '':
+        vehicle_departure = datetime.strptime(request.GET.get("salida"), '%Y-%m-%dT%H:%M').astimezone()
+        vehicle_arrival = datetime.strptime(request.GET.get("llegada"), '%Y-%m-%dT%H:%M').astimezone()
 
-    vehicle_exclude = []
-    driver_exclude = []
+        vehicle_exclude = []
+        driver_exclude = []
 
-    scheduled_travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
+        scheduled_travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
 
-    for travel in scheduled_travels:
-        if (vehicle_departure <= travel.estimated_datetime_arrival.astimezone()
-                and travel.datetime_departure.astimezone() <= vehicle_arrival):
-            vehicle_exclude.append(travel.vehicle.plate_number)
-            driver_exclude.append(travel.driver.driver_id)
+        for travel in scheduled_travels:
+            if (vehicle_departure <= travel.estimated_datetime_arrival.astimezone() and
+                    travel.datetime_departure.astimezone() <= vehicle_arrival):
+                vehicle_exclude.append(travel.vehicle.plate_number)
+                driver_exclude.append(travel.driver.driver_id)
+                available_vehicles = Vehicle.objects.filter(company_id=request.user.id, status='Disponible')
+                available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
 
-    available_vehicles = Vehicle.objects.filter(company_id=request.user.id, status='Disponible')
-    available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
+                available_drivers = Driver.objects.filter(company_id=request.user.id)
+                available_drivers = available_drivers.exclude(pk__in=driver_exclude)
+                data = {
+                    'drivers': list(available_drivers.values('driver_id', 'first_name', 'last_name', 'license_number')),
+                    'vehicles': list(available_vehicles.values('plate_number', 'brand', 'car_model', ))
+                }
 
-    available_drivers = Driver.objects.filter(company_id=request.user.id)
-    available_drivers = available_drivers.exclude(pk__in=driver_exclude)
-
-    # Crear una instancia del formulario
-    form = AddTravel(company_id=request.user.id)
-    # Llamar al método update_choices del formulario
-    form.update_choices(available_drivers, available_vehicles)
-
-    data = {
-        'drivers': list(available_drivers.values('driver_id')),
-        'vehicles': list(available_vehicles.values('plate_number'))
-    }
-
-    return JsonResponse(data)
+                return JsonResponse(data)
+    return JsonResponse({'message': 'Not found'})
 
 
 def pre_checkout(request, travel_id, passengers):
@@ -133,14 +128,11 @@ def travel_detail(request, travel_id):
 
 
 def your_drivers(request):
-    company_id = request.user.id
-    company = get_object_or_404(Company, id=company_id)
-
     if request.method == "POST":
         form = AddDriver(request.POST)
         if form.is_valid():
             new_driver = form.save(commit=False)
-            new_driver.company_id = company.id
+            new_driver.company_id = request.user.id
             new_driver.save()
             return redirect('your_drivers')
     else:
@@ -174,14 +166,11 @@ def delete_travel(request, travel_id):
 
 
 def your_vehicles(request):
-    company_id = request.user.id
-    company = get_object_or_404(Company, id=company_id)
-
     if request.method == "POST":
         form = AddVehicle(request.POST)
         if form.is_valid():
             new_vehicle = form.save(commit=False)
-            new_vehicle.company_id = company.id
+            new_vehicle.company_id = request.user.id
             new_vehicle.save()
             return redirect('your_vehicles')
     else:
