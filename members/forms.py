@@ -6,7 +6,7 @@ from itineris.models import Company
 from django import forms
 
 
-class RegistrationForm(UserCreationForm):
+class RegistrationFormCompany(UserCreationForm):
     dni_validator = RegexValidator(regex=r'^\d+$', message='El CUIT debe estar compuesto sólo por números.')
 
     username = forms.CharField(label='CUIT', max_length=11, validators=[dni_validator])
@@ -20,7 +20,7 @@ class RegistrationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', 'company_name', 'phone', 'address', 'license',)
 
     def __init__(self, *args, **kwargs):
-        super(RegistrationForm, self).__init__(*args, **kwargs)
+        super(RegistrationFormCompany, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['password1'].widget.attrs['class'] = 'form-control'

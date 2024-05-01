@@ -14,14 +14,14 @@ def index(request):
             date_departure = form.cleaned_data['datetime_departure']
             passengers = form.cleaned_data['passengers']
 
+            # Buscar vuelos que coincidan con los criterios
             travels = Travel.objects.all().filter(city_origin=city_origin,
                                                   city_destination=city_destination,
                                                   datetime_departure__date=date_departure,
                                                   seats_left__gte=passengers,
                                                   )
 
-            return render(request, 'itineris/travel_result.html',
-                          {'travels': travels, 'passengers': passengers})
+            return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers': passengers})
     else:
         form = SearchTravel()
 
@@ -93,8 +93,7 @@ def travel_result(request):
 def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travelers = Traveler.objects.filter(travel_id=travel_id)
-    return render(request, "itineris/travel_detail.html",
-                  {'travel': travel, 'travelers': travelers})
+    return render(request, "itineris/travel_detail.html", {'travel': travel, 'travelers': travelers})
 
 
 def your_drivers(request):
@@ -119,7 +118,7 @@ def your_drivers(request):
 def delete_driver(request, driver_id):
     driver = get_object_or_404(Driver, driver_id=driver_id)
     driver.delete()
-    return redirect('your_drivers')
+    return redirect('your_drivers')  # Redirect to the view displaying the table
 
 
 def your_payments(request):
@@ -133,7 +132,7 @@ def your_travels(request):
 def delete_travel(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travel.delete()
-    return redirect('your_travels')
+    return redirect('your_travels')  # Redirect to the view displaying the table
 
 
 def your_vehicles(request):
@@ -158,7 +157,7 @@ def your_vehicles(request):
 def delete_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
     vehicle.delete()
-    return redirect('your_vehicles')
+    return redirect('your_vehicles')  # Redirect to the view displaying the table
 
 
 def navbar(request):
