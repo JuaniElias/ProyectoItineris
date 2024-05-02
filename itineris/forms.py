@@ -30,7 +30,7 @@ class CityWidget(s2forms.ModelSelect2Widget):
     ]
 
 
-class AddTravel(forms.ModelForm):
+class CreateTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
                                              widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
                                                                                        'id': 'datetime_departure'}))
@@ -63,7 +63,7 @@ class AddTravel(forms.ModelForm):
         }
 
     def __init__(self, company_id, *args, **kwargs):
-        super(AddTravel, self).__init__(*args, **kwargs)
+        super(CreateTravel, self).__init__(*args, **kwargs)
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
         self.fields['fee'].widget.attrs['class'] = 'form-control'
@@ -74,7 +74,7 @@ class AddTravel(forms.ModelForm):
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
 
 
-class AddVehicle(forms.ModelForm):
+class CreateVehicle(forms.ModelForm):
     plate_number = forms.CharField(label='Patente', max_length=20, required=True)
     brand = forms.CharField(label='Marca', max_length=100)
     car_model = forms.CharField(label='Modelo', max_length=100)
@@ -86,7 +86,7 @@ class AddVehicle(forms.ModelForm):
         fields = ('plate_number', 'brand', 'car_model', 'capacity', 'color',)
 
     def __init__(self, *args, **kwargs):
-        super(AddVehicle, self).__init__(*args, **kwargs)
+        super(CreateVehicle, self).__init__(*args, **kwargs)
         self.fields['plate_number'].widget.attrs['class'] = 'form-control'
         self.fields['brand'].widget.attrs['class'] = 'form-control'
         self.fields['car_model'].widget.attrs['class'] = 'form-control'
@@ -94,7 +94,7 @@ class AddVehicle(forms.ModelForm):
         self.fields['color'].widget.attrs['class'] = 'form-control'
 
 
-class AddDriver(forms.ModelForm):
+class CreateDriver(forms.ModelForm):
     first_name = forms.CharField(label='Nombre', max_length=100, required=True)
     last_name = forms.CharField(label='Apellido', max_length=100, required=True)
     license_number = forms.CharField(label='Número de licencia', max_length=100, required=True)
@@ -106,7 +106,7 @@ class AddDriver(forms.ModelForm):
         fields = ('first_name', 'last_name', 'license_number', 'email', 'phone_number',)
 
     def __init__(self, *args, **kwargs):
-        super(AddDriver, self).__init__(*args, **kwargs)
+        super(CreateDriver, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['license_number'].widget.attrs['class'] = 'form-control'
