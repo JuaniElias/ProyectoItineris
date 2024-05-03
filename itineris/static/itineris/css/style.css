@@ -554,3 +554,11 @@ dialog::backdrop{
     color: #707070;
     cursor:pointer;
 }
+
+/* Datatables CSS */
+.dt-container input{
+    width: 300px;
+}
+.dt-container select{
+    width: 50px;
+}

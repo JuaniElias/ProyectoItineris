@@ -20,4 +20,5 @@ urlpatterns = [
     path("your_vehicles", views.your_vehicles, name="your_vehicles"),
     path('delete_vehicle/<str:plate_number>/', views.delete_vehicle, name='delete_vehicle'),
     path('checkout', views.checkout, name='checkout'),
+    path('travel_history', views.travel_history, name='travel_history'),
 ]

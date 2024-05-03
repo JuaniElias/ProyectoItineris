@@ -158,6 +158,14 @@ def your_travels(request):
     return render(request, "itineris/your_travels.html", {'travels': travels, })
 
 
+def travel_history(request):
+    travels = Travel.objects.filter(company_id=request.user.id)
+    vehicles = Vehicle.objects.filter(company_id=request.user.id)
+    drivers = Driver.objects.filter(company_id=request.user.id)
+    return render(request, "itineris/travel_history.html",
+                  {'travels': travels, 'vehicles': vehicles, 'drivers': drivers})
+
+
 def delete_travel(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travel.status = 'Cancelado'
@@ -185,10 +193,6 @@ def delete_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
     vehicle.delete()
     return redirect('your_vehicles')  # Redirect to the view displaying the table
-
-
-def navbar(request):
-    return render(request, "itineris/navbar.html")
 
 
 def checkout(request):

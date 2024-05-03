@@ -1,0 +1,117 @@
+{% extends 'itineris/base.html' %}
+
+{% block content %}
+
+<head>
+    <title>Historial de viajes</title>
+
+</head>
+
+<body>
+    <section class="your-business">
+        <div>
+            <h1 class="text">Historial de viajes</h1>
+
+            <div class="col-lg-10 table-container">
+                <div class="row-travel">
+                    <div class="row">
+
+                        <div class="col-md-5">
+                            <label>
+                                Conductor
+                                <select id="driverFilter" class="form-control">
+                                    <option value="all">Todos</option>
+                                    {% for driver in drivers %}
+                                        <option value="{{ driver.id }}">{{ driver }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-5">
+                            <label>
+                                Vehículo
+                                <select id="vehicleFilter" class="form-control">
+                                    <option value="all">Todos</option>
+                                    {% for vehicle in vehicles %}
+                                        <option value="{{ vehicle.id }}">{{ vehicle }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-2">
+                            <label>
+                                Estado
+                                <select id="statusFilter" class="form-control" >
+                                    <option value="all"       >Todos</option>
+                                    <option value="Completado"  >Completado</option>
+                                    <option value="Agendado"   >Agendado</option>
+                                    <option value="Cancelado"  >Cancelado</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <br>
+                    <table id="travel-history-table" class="content-table">
+                        <thead>
+                            <tr>
+                                <th> Fecha y Hora salida </th>
+                                <th> Fecha y Hora llegada </th>
+                                <th> Origen </th>
+                                <th> Destino </th>
+                                <th> Vehículo </th>
+                                <th> Conductor </th>
+                                <th> Estado </th>
+                                <th> Info </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for travel in travels %}
+                                <tr>
+                                    <td>{{ travel.datetime_departure }}</td>
+                                    <td>{{ travel.estimated_datetime_arrival }}</td>
+                                    <td>{{ travel.city_origin }}</td>
+                                    <td>{{ travel.city_destination }}</td>
+                                    <td>{{ travel.vehicle }}</td>
+                                    <td>{{ travel.driver }} </td>
+                                    <td>{{ travel.status }}</td>
+
+                                    <td>
+                                        <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
+                                            <i class="bi bi-info-circle"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<script>
+    const driverFilter = document.querySelector('#driverFilter');
+    const vehicleFilter = document.querySelector('#vehicleFilter');
+    const statusFilter = document.querySelector('#statusFilter');
+
+    const table = new DataTable('#travel-history-table');
+
+    // Custom range filtering function
+    table.search.fixed('range', function (searchStr, data, index) {
+        let driver_selected = driverFilter.options[driverFilter.selectedIndex].text;
+        let driver = data[5] || 0;
+        
+        return (driver_selected === driver && isNaN(driver_selected));
+    });
+
+    // Changes to the inputs will trigger a redraw to update the table
+    driverFilter.addEventListener('change', function () {
+        table.draw();
+    });
+
+</script>
+
+</body>
+
+{% endblock %}
