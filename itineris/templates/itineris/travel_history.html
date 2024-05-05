@@ -95,18 +95,22 @@
     const vehicleFilter = document.querySelector('#vehicleFilter');
     const statusFilter = document.querySelector('#statusFilter');
 
-    const table = new DataTable('#travel-history-table');
+    const table = new DataTable('#travel-history-table', {
+        language: {
+            url: '/static/itineris/localization/es-ES.json',
+        },
+    });
 
     // Custom range filtering function
     table.search.fixed('range', function (searchStr, data, index) {
         let driver_selected = driverFilter.options[driverFilter.selectedIndex].text;
         let vehicle_selected = vehicleFilter.options[vehicleFilter.selectedIndex].text;
         let status_selected = statusFilter.options[statusFilter.selectedIndex].text;
-        
+
         let driver = data[4] || "Todos";
         let vehicle = data[5] || "Todos";
         let status = data[6] || "Todos";
-        
+
         return (driver_selected === "Todos" || driver_selected === driver) &&
             (vehicle_selected === "Todos" || vehicle_selected === vehicle) &&
             (status_selected === "Todos" || status_selected === status);
