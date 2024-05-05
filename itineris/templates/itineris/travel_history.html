@@ -103,8 +103,8 @@
         let vehicle_selected = vehicleFilter.options[vehicleFilter.selectedIndex].text;
         let status_selected = statusFilter.options[statusFilter.selectedIndex].text;
         
-        let driver = data[5] || "Todos";
-        let vehicle = data[4] || "Todos";
+        let driver = data[4] || "Todos";
+        let vehicle = data[5] || "Todos";
         let status = data[6] || "Todos";
         
         return (driver_selected === "Todos" || driver_selected === driver) &&
