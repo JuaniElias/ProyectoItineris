@@ -20,7 +20,7 @@
                             <label>
                                 Conductor
                                 <select id="driverFilter" class="form-control">
-                                    <option value="all">Todos</option>
+                                    <option value="Todos">Todos</option>
                                     {% for driver in drivers %}
                                         <option value="{{ driver.id }}">{{ driver }}</option>
                                     {% endfor %}
@@ -31,7 +31,7 @@
                             <label>
                                 Vehículo
                                 <select id="vehicleFilter" class="form-control">
-                                    <option value="all">Todos</option>
+                                    <option value="Todos">Todos</option>
                                     {% for vehicle in vehicles %}
                                         <option value="{{ vehicle.id }}">{{ vehicle }}</option>
                                     {% endfor %}
@@ -42,10 +42,10 @@
                             <label>
                                 Estado
                                 <select id="statusFilter" class="form-control" >
-                                    <option value="all"       >Todos</option>
-                                    <option value="Completado"  >Completado</option>
-                                    <option value="Agendado"   >Agendado</option>
-                                    <option value="Cancelado"  >Cancelado</option>
+                                    <option value="Todos"     >Todos</option>
+                                    <option value="Completado">Completado</option>
+                                    <option value="Agendado"  >Agendado</option>
+                                    <option value="Cancelado" >Cancelado</option>
                                 </select>
                             </label>
                         </div>
@@ -58,8 +58,8 @@
                                 <th> Fecha y Hora llegada </th>
                                 <th> Origen </th>
                                 <th> Destino </th>
-                                <th> Vehículo </th>
                                 <th> Conductor </th>
+                                <th> Vehículo </th>
                                 <th> Estado </th>
                                 <th> Info </th>
                             </tr>
@@ -71,8 +71,8 @@
                                     <td>{{ travel.estimated_datetime_arrival }}</td>
                                     <td>{{ travel.city_origin }}</td>
                                     <td>{{ travel.city_destination }}</td>
-                                    <td>{{ travel.vehicle }}</td>
                                     <td>{{ travel.driver }} </td>
+                                    <td>{{ travel.vehicle }}</td>
                                     <td>{{ travel.status }}</td>
 
                                     <td>
@@ -100,13 +100,26 @@
     // Custom range filtering function
     table.search.fixed('range', function (searchStr, data, index) {
         let driver_selected = driverFilter.options[driverFilter.selectedIndex].text;
-        let driver = data[5] || 0;
+        let vehicle_selected = vehicleFilter.options[vehicleFilter.selectedIndex].text;
+        let status_selected = statusFilter.options[statusFilter.selectedIndex].text;
         
-        return (driver_selected === driver && isNaN(driver_selected));
+        let driver = data[5] || "Todos";
+        let vehicle = data[4] || "Todos";
+        let status = data[6] || "Todos";
+        
+        return (driver_selected === "Todos" || driver_selected === driver) &&
+            (vehicle_selected === "Todos" || vehicle_selected === vehicle) &&
+            (status_selected === "Todos" || status_selected === status);
     });
 
     // Changes to the inputs will trigger a redraw to update the table
     driverFilter.addEventListener('change', function () {
+        table.draw();
+    });
+    vehicleFilter.addEventListener('change', function () {
+        table.draw();
+    });
+    statusFilter.addEventListener('change', function () {
         table.draw();
     });
 
