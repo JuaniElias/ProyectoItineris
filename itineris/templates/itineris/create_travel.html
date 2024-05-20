@@ -49,7 +49,8 @@
                     data['drivers'].forEach(driver => {
                         const option = document.createElement('option');
                         // Comprobamos si el objeto driver es una cadena simple o un objeto
-                        option.value = typeof driver === 'object' ? driver.driver_id : driver;
+                        const driverValue = typeof driver === 'object' ? driver.driver_id : driver;
+                        option.value = driverValue;
                         option.textContent = driver.first_name + ' ' + driver.last_name + ' (' + driver.license_number + ')';
                         driver_select.appendChild(option);
                     });
@@ -57,11 +58,11 @@
                     let emptyVehicle = document.createElement('option');
                     emptyVehicle.textContent = '---------'
                     vehicle_select.appendChild(emptyVehicle);
-                    
                     data['vehicles'].forEach(vehicle => {
                         const option = document.createElement('option');
                         // Comprobamos si el objeto vehicle es una cadena simple o un objeto
-                        option.value = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
+                        const vehicleValue = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
+                        option.value = vehicleValue;
                         option.textContent = vehicle.brand + ' ' + vehicle.car_model + ' (' + vehicle.plate_number + ')';
                         vehicle_select.appendChild(option);
                     });
@@ -74,14 +75,6 @@
 
         // Agrega un listener al cambio en el campo de fecha y hora de llegada
         datetime_arrival.addEventListener('change', updateVehicleOptions);
-        
-        // Pone en gris todas las fechas y horas menores a la salida 
-        datetime_departure.addEventListener("change", function () {
-          let selectedDeparture = new Date(datetime_departure.value);
-          let minDate = new Date(selectedDeparture.getTime() + (60 * 60 * 1000));
-          
-          datetime_arrival.min = minDate.toISOString().slice(0, 16);
-        });
     });
 </script>
 
