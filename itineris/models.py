@@ -26,6 +26,7 @@ class Travel(models.Model):
     estimated_datetime_arrival = models.DateTimeField()
     duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
     fee = models.IntegerField()
+    payment_status = models.CharField(max_length=20, default="Pendiente")
     seats_left = models.IntegerField(default=0)
     status = models.CharField(max_length=50, default="Agendado")
 
