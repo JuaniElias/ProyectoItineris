@@ -62,7 +62,7 @@ def create_travel(request):
 
 
 def get_available_options(request):
-    if request.GET.get("salida") != '' and request.GET.get("llegada") != '':
+    if request.GET.get("salida") and request.GET.get("llegada"):
         vehicle_departure = datetime.strptime(request.GET.get("salida"), '%Y-%m-%dT%H:%M').astimezone()
         vehicle_arrival = datetime.strptime(request.GET.get("llegada"), '%Y-%m-%dT%H:%M').astimezone()
 
@@ -71,22 +71,23 @@ def get_available_options(request):
 
         scheduled_travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
 
+        available_vehicles = Vehicle.objects.filter(company_id=request.user.id, status='Disponible')
+        available_drivers = Driver.objects.filter(company_id=request.user.id)
+
         for travel in scheduled_travels:
+            print(type(travel.estimated_datetime_arrival.astimezone()))
             if (vehicle_departure <= travel.estimated_datetime_arrival.astimezone() and
                     travel.datetime_departure.astimezone() <= vehicle_arrival):
                 vehicle_exclude.append(travel.vehicle.plate_number)
                 driver_exclude.append(travel.driver.driver_id)
-                available_vehicles = Vehicle.objects.filter(company_id=request.user.id, status='Disponible')
-                available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
-
-                available_drivers = Driver.objects.filter(company_id=request.user.id)
-                available_drivers = available_drivers.exclude(pk__in=driver_exclude)
-                data = {
-                    'drivers': list(available_drivers.values('driver_id', 'first_name', 'last_name', 'license_number')),
-                    'vehicles': list(available_vehicles.values('plate_number', 'brand', 'car_model', ))
-                }
-
-                return JsonResponse(data)
+                
+        available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
+        available_drivers = available_drivers.exclude(pk__in=driver_exclude)
+        data = {
+            'drivers': list(available_drivers.values('driver_id', 'first_name', 'last_name', 'license_number')),
+            'vehicles': list(available_vehicles.values('plate_number', 'brand', 'car_model', ))
+        }
+        return JsonResponse(data)
     return JsonResponse({'message': 'Not found'})
 
 

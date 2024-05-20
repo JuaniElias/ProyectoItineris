@@ -31,43 +31,49 @@
 
         function updateVehicleOptions() {
             const selected_departure = datetime_departure.value;
+            console.log(selected_departure)
+            
             const selected_arrival = datetime_arrival.value;
             // Realiza una solicitud AJAX para obtener el queryset actualizado basado en los horarios de salida y llegada
-            fetch(`/get_available_options?salida=${selected_departure}&llegada=${selected_arrival}`)
-                .then(response => response.json())  // Parsea la respuesta como JSON
-                .then(data => {
-                    // Limpiar opciones anteriores
-                    vehicle_select.innerHTML = '';
-                    driver_select.innerHTML = '';
-
-                    // Agregar --------- como primera opción
-                    let emptyDriver = document.createElement('option');
-                    emptyDriver.textContent = '---------'
-                    driver_select.appendChild(emptyDriver);
-
-                    // Agregar nuevas opciones
-                    data['drivers'].forEach(driver => {
-                        const option = document.createElement('option');
-                        // Comprobamos si el objeto driver es una cadena simple o un objeto
-                        const driverValue = typeof driver === 'object' ? driver.driver_id : driver;
-                        option.value = driverValue;
-                        option.textContent = driver.first_name + ' ' + driver.last_name + ' (' + driver.license_number + ')';
-                        driver_select.appendChild(option);
-                    });
-
-                    let emptyVehicle = document.createElement('option');
-                    emptyVehicle.textContent = '---------'
-                    vehicle_select.appendChild(emptyVehicle);
-                    data['vehicles'].forEach(vehicle => {
-                        const option = document.createElement('option');
-                        // Comprobamos si el objeto vehicle es una cadena simple o un objeto
-                        const vehicleValue = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
-                        option.value = vehicleValue;
-                        option.textContent = vehicle.brand + ' ' + vehicle.car_model + ' (' + vehicle.plate_number + ')';
-                        vehicle_select.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error al obtener datos:', error)); // Manejar errores
+            if (selected_departure && selected_arrival){
+                fetch(`/get_available_options?salida=${selected_departure}&llegada=${selected_arrival}`)
+                    .then(response => response.json())  // Parsea la respuesta como JSON
+                    .then(data => {
+                        // Limpiar opciones anteriores
+                        vehicle_select.innerHTML = '';
+                        driver_select.innerHTML = '';
+                        console.log(data)
+                        // Agregar --------- como primera opción
+                        let emptyDriver = document.createElement('option');
+                        emptyDriver.textContent = '---------'
+                        driver_select.appendChild(emptyDriver);
+    
+                        // Agregar nuevas opciones
+                        data['drivers'].forEach(driver => {
+                            const option = document.createElement('option');
+                            // Comprobamos si el objeto driver es una cadena simple o un objeto
+                            const driverValue = typeof driver === 'object' ? driver.driver_id : driver;
+                            option.value = driverValue;
+                            option.textContent = driver.first_name + ' ' + driver.last_name + ' (' + driver.license_number + ')';
+                            driver_select.appendChild(option);
+                        });
+    
+                        let emptyVehicle = document.createElement('option');
+                        emptyVehicle.textContent = '---------'
+                        vehicle_select.appendChild(emptyVehicle);
+                        data['vehicles'].forEach(vehicle => {
+                            const option = document.createElement('option');
+                            // Comprobamos si el objeto vehicle es una cadena simple o un objeto
+                            const vehicleValue = typeof vehicle === 'object' ? vehicle.plate_number : vehicle;
+                            option.value = vehicleValue;
+                            option.textContent = vehicle.brand + ' ' + vehicle.car_model + ' (' + vehicle.plate_number + ')';
+                            vehicle_select.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error al obtener datos:', error)); // Manejar errores
+                
+            }
+            
         }
 
         // Agrega un listener al cambio en el campo de fecha y hora de salida
@@ -75,6 +81,14 @@
 
         // Agrega un listener al cambio en el campo de fecha y hora de llegada
         datetime_arrival.addEventListener('change', updateVehicleOptions);
+        
+        // Pone en gris todas las fechas y horas menores a la salida 
+        datetime_departure.addEventListener("change", function () {
+          let selectedDeparture = new Date(datetime_departure.value);
+          let minDate = new Date(selectedDeparture.getTime() + (60 * 60 * 1000));
+          
+          datetime_arrival.min = minDate.toISOString().slice(0, 16);
+        });
     });
 </script>
 
