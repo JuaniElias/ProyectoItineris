@@ -23,7 +23,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for driver in request.user.driver_set.all %}
+                            {% for driver in drivers %}
                             <tr>
                                 <td>{{ driver.first_name }}</td>
                                 <td>{{ driver.last_name }}</td>
@@ -34,7 +34,7 @@
                                     <button id="btn-more-info" class="btn">
                                         <i  class="bi bi-card-checklist" ></i>
                                     </button>
-                                </td>
+                                </td>.
                                 <td> 
                                     <a href="{% url 'delete_driver' driver.driver_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?')">
                                         <i class="btn bi bi-trash3"></i>

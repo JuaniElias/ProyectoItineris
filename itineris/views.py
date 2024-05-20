@@ -80,7 +80,7 @@ def get_available_options(request):
                     travel.datetime_departure.astimezone() <= vehicle_arrival):
                 vehicle_exclude.append(travel.vehicle.plate_number)
                 driver_exclude.append(travel.driver.driver_id)
-                
+
         available_vehicles = available_vehicles.exclude(plate_number__in=vehicle_exclude)
         available_drivers = available_drivers.exclude(pk__in=driver_exclude)
         data = {
@@ -129,6 +129,8 @@ def travel_detail(request, travel_id):
 
 
 def your_drivers(request):
+    drivers = Driver.objects.filter(company_id=request.user.id, active=True)
+
     if request.method == "POST":
         form = CreateDriver(request.POST)
         if form.is_valid():
@@ -141,12 +143,14 @@ def your_drivers(request):
 
     return render(request, "itineris/your_drivers.html", {
         'form': form,
+        'drivers': drivers
     })
 
 
 def delete_driver(request, driver_id):
     driver = get_object_or_404(Driver, driver_id=driver_id)
-    driver.delete()
+    driver.active = False
+    driver.save()
     return redirect('your_drivers')  # Redirect to the view displaying the table
 
 
@@ -175,6 +179,8 @@ def delete_travel(request, travel_id):
 
 
 def your_vehicles(request):
+    vehicles = Vehicle.objects.filter(company_id=request.user.id, active=True)
+
     if request.method == "POST":
         form = CreateVehicle(request.POST)
         if form.is_valid():
@@ -187,12 +193,14 @@ def your_vehicles(request):
 
     return render(request, "itineris/your_vehicles.html", {
         'form': form,
+        'vehicles': vehicles
     })
 
 
 def delete_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
-    vehicle.delete()
+    vehicle.active = False
+    vehicle.save()
     return redirect('your_vehicles')  # Redirect to the view displaying the table
 
 

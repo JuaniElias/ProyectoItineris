@@ -45,6 +45,7 @@ class Driver(models.Model):
     license_number = models.CharField(max_length=30)
     email = models.EmailField()
     phone_number = models.IntegerField()
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name + " (" + self.license_number + ")"
@@ -58,6 +59,7 @@ class Vehicle(models.Model):
     capacity = models.IntegerField()
     color = models.CharField(max_length=20)
     status = models.CharField(max_length=20, default="Disponible")
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.brand + ' ' + self.car_model + " (" + self.plate_number + ")"

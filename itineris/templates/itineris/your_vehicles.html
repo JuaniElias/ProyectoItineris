@@ -24,7 +24,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for vehicle in request.user.vehicle_set.all %}
+                        {% for vehicle in vehicles %}
                             <tr>
                                 <td>{{ vehicle.plate_number }}</td>
                                 <td>{{ vehicle.brand }}</td>
