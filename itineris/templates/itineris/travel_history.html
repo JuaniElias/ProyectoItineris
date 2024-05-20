@@ -61,6 +61,7 @@
                                 <th> Conductor </th>
                                 <th> Vehículo </th>
                                 <th> Estado </th>
+                                <th> Pago </th>
                                 <th> Info </th>
                             </tr>
                         </thead>
@@ -74,6 +75,7 @@
                                     <td>{{ travel.driver }} </td>
                                     <td>{{ travel.vehicle }}</td>
                                     <td>{{ travel.status }}</td>
+                                    <td>{{ travel.payment_status }}</td>
 
                                     <td>
                                         <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
