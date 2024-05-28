@@ -5,19 +5,15 @@
     <div class="row">
         <div class="col">
             {% for traveler in travelers %}
-                <div class="card text-center mb-4">
-                    <div class="card-body ">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <p>{{ traveler.first_name }}</p>
-                                <p>{{ traveler.last_name }}</p>
-                                <p>{{ traveler.dni }}</p>
-                                <p>{{ traveler.email }}</p>
-                                <p>{{ traveler.phone }}</p>
-                                <p>{{ traveler.address_origin }}</p>
-                                <p>{{ traveler.address_destination }}</p>
-                            </div>
-                        </div>
+                <div class="card mb-4" style="width: 18rem;">
+                    <div class="card-body">
+                        <p>{{ traveler.first_name }}</p>
+                        <p>{{ traveler.last_name }}</p>
+                        <p>{{ traveler.dni }}</p>
+                        <p>{{ traveler.email }}</p>
+                        <p>{{ traveler.phone }}</p>
+                        <p>{{ traveler.address_origin }}</p>
+                        <p>{{ traveler.address_destination }}</p>
                     </div>
                 </div>
             {% endfor %}
