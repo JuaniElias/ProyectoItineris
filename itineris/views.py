@@ -1,9 +1,15 @@
+import json
+import os
 from datetime import datetime
 
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
+import mercadopago
 
 
 # Create your views here.
@@ -91,31 +97,6 @@ def get_available_options(request):
     return JsonResponse({'message': 'Not found'})
 
 
-def pre_checkout(request, travel_id, passengers):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    passenger_count = int(passengers)
-
-    travelers = request.session.get('travelers', [])
-
-    if request.method == "POST":
-        form = PreCheckout(request.POST)
-        if form.is_valid():
-            new_traveler = form.save(commit=False)
-            new_traveler.travel = travel
-            new_traveler.save()
-            travelers.append(new_traveler.id)
-            request.session['travelers'] = travelers
-            passenger_count -= 1
-            if passenger_count > 0:
-                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
-            else:
-                return redirect('checkout')
-    else:
-        form = PreCheckout()
-    return render(request, "itineris/pre-checkout.html",
-                  {'travel': travel, 'passengers': passenger_count, 'form': form})
-
-
 def travel_result(request):
     travels = Travel.objects.all()
 
@@ -152,10 +133,6 @@ def delete_driver(request, driver_id):
     driver.active = False
     driver.save()
     return redirect('your_drivers')  # Redirect to the view displaying the table
-
-
-def your_payments(request):
-    return render(request, "itineris/your_payments.html")
 
 
 def your_travels(request):
@@ -204,9 +181,97 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')  # Redirect to the view displaying the table
 
 
+# TODO: cambiar esta mugre
+def pre_checkout(request, travel_id, passengers):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    passenger_count = int(passengers)
+
+    # Inicializa la lista con los ID de los pasajeros
+    travelers = request.session.get('travelers', [])
+
+    if request.method == "POST":
+        form = PreCheckout(request.POST)
+        if form.is_valid():
+            new_traveler = form.save(commit=False)
+            new_traveler.travel = travel
+            new_traveler.save()
+            travelers.append(new_traveler.id)
+            request.session['travelers'] = travelers    # This ain't the way
+            passenger_count -= 1
+            if passenger_count > 0:
+                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
+            else:
+                return redirect('checkout')
+    else:
+        form = PreCheckout()
+    return render(request, "itineris/pre-checkout.html",
+                  {'travel': travel, 'passengers': passenger_count, 'form': form})
+
+
 def checkout(request):
     travelers = request.session.get('travelers')
     if not travelers:
         return HttpResponseBadRequest("No se han creado viajeros.")
     travelers_obj = Traveler.objects.filter(id__in=travelers)
-    return render(request, "itineris/checkout.html", {'travelers': travelers_obj})
+
+    payment_success_url = request.build_absolute_uri(reverse('payment_success'))
+    payment_failure_url = request.build_absolute_uri(reverse('payment_failure'))
+    notifications_url = request.build_absolute_uri(reverse('notifications'))
+
+    travel_id = travelers_obj.values_list('travel_id', flat=True).first()
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    sdk = mercadopago.SDK('APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037')
+    preference_data = {
+        "items": [
+            {
+                "title": "Pasaje: Itineris",
+                "unit_price": travel.fee,
+                "quantity": travelers_obj.count()
+            }
+        ],
+        "purpose": "onboarding_credits",
+        "statement_descriptor": "Itineris",
+        "back_urls": {
+            "success": notifications_url,
+            "pending": notifications_url,
+            "failure": notifications_url,
+        },
+    }
+
+    preference_response = sdk.preference().create(preference_data)
+    preference_id = preference_response["response"]["id"]
+
+    return render(request, "itineris/checkout.html", {'travelers': travelers_obj, 'preference_id': preference_id})
+
+
+@csrf_exempt
+def notifications(request):
+    notification_data = request.GET.get("status", None)
+    print(notification_data)
+    if notification_data == 'approved':
+        payment_id = request.GET.get("payment_id", None)
+
+        sdk = mercadopago.SDK("APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037")
+        payment_info = sdk.payment().get(payment_id)
+
+        status = payment_info["response"]["status"]
+
+        if status == 'approved':
+            print("Pago aprobado")
+            # TODO: Agregar lógica para cuando se acepte el pago
+            # reiniciar variables de sesion tambien
+            return redirect('payment_success')
+        else:
+            print("Pago pendiente")
+            # reiniciar variables de sesion tambien
+            return redirect('payment_failure')
+
+    return HttpResponse('OK', status=200)
+
+
+def payment_success(request):
+    return render(request, "itineris/payment_success.html")
+
+
+def payment_failure(request):
+    return render(request, "itineris/payment_failure.html")
