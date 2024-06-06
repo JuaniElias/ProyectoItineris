@@ -39,6 +39,6 @@ def sign_up_business(request):
     else:
         form = RegistrationFormCompany()
 
-    return render(request, 'authenticate/sign-up-business.html', {
+    return render(request, 'authenticate/sign_up_business.html', {
         'form': form,
     })

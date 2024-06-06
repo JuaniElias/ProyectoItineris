@@ -40,7 +40,7 @@ def index(request):
 
 
 def work_with_us(request):
-    return render(request, "itineris/work-with-us.html")
+    return render(request, "itineris/work_with_us.html")
 
 
 def about(request):
@@ -196,15 +196,15 @@ def pre_checkout(request, travel_id, passengers):
             new_traveler.travel = travel
             new_traveler.save()
             travelers.append(new_traveler.id)
-            request.session['travelers'] = travelers    # This ain't the way
+            request.session['travelers'] = travelers  # This ain't the way
             passenger_count -= 1
             if passenger_count > 0:
                 return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
             else:
-                return redirect('checkout')
+                return render(request, "itineris/checkout.html", {'travel_id': travel_id})
     else:
         form = PreCheckout()
-    return render(request, "itineris/pre-checkout.html",
+    return render(request, "itineris/pre_checkout.html",
                   {'travel': travel, 'passengers': passenger_count, 'form': form})
 
 
@@ -239,7 +239,8 @@ def checkout(request):
     preference_response = sdk.preference().create(preference_data)
     preference_id = preference_response["response"]["id"]
 
-    return render(request, "itineris/checkout.html", {'travelers': travelers_obj, 'preference_id': preference_id})
+    return render(request, "itineris/checkout.html",
+                  {'travelers': travelers_obj, 'preference_id': preference_id})
 
 
 @csrf_exempt
@@ -256,6 +257,7 @@ def payment_success(request):
 
         # Por las dudas chequeamos que el pago fue aprobado nuevamente
         if status == 'approved':
+            # travel_id = request.session.get('travel_id', None)
             # TODO: Agregar lógica para cuando se acepte el pago, reiniciar variables de sesion tambien
             return redirect('payment_success')
         else:

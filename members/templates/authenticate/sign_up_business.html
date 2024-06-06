@@ -14,7 +14,7 @@
     <div class="shadow p-4 mb-5 bg-body rounded">
         <h1>Crear una cuenta de empresa</h1>
 
-        <form action="{% url 'sign-up-business' %}" method=POST>
+        <form action="{% url 'sign_up_business' %}" method=POST>
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Continuar" class="btn btn-secondary">
