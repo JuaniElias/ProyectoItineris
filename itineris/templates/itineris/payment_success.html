@@ -1,13 +1,14 @@
 {% extends 'itineris/base.html' %}
+{% load static %}
 
 <title>Pago confirmado</title>
 {% block content %}
-    <br>
-<div class="container">
+<div class="container-fluid vh-100 pt-4" style="background-color: #fdf8e2; margin-top: -24px;">
     <div class="row">
-        <div class="col">
-            <h1> ¡Tu pago fue confirmado con éxito!</h1>
-            <p>Gracias por tu compra</p>
+        <div class="col text-center">
+            <h1 class="fw-bolder">¡Tu pago fue confirmado con éxito!</h1>
+            <p class="fs-4">Gracias por tu compra</p>
+            <img src="{% static 'itineris/images/payment_success_bg.jpeg' %}" alt="Success image">
         </div>
     </div>
 </div>
