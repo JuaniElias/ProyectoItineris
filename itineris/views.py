@@ -214,9 +214,8 @@ def checkout(request):
         return HttpResponseBadRequest("No se han creado viajeros.")
     travelers_obj = Traveler.objects.filter(id__in=travelers)
 
+    checkout_url = request.build_absolute_uri(reverse('checkout'))
     payment_success_url = request.build_absolute_uri(reverse('payment_success'))
-    payment_failure_url = request.build_absolute_uri(reverse('payment_failure'))
-    notifications_url = request.build_absolute_uri(reverse('notifications'))
 
     travel_id = travelers_obj.values_list('travel_id', flat=True).first()
     travel = get_object_or_404(Travel, travel_id=travel_id)
@@ -232,9 +231,8 @@ def checkout(request):
         "purpose": "onboarding_credits",
         "statement_descriptor": "Itineris",
         "back_urls": {
-            "success": notifications_url,
-            "pending": notifications_url,
-            "failure": notifications_url,
+            "success": payment_success_url,
+            "failure": checkout_url,
         },
     }
 
@@ -245,10 +243,10 @@ def checkout(request):
 
 
 @csrf_exempt
-def notifications(request):
-    notification_data = request.GET.get("status", None)
-    print(notification_data)
-    if notification_data == 'approved':
+def payment_success(request):
+    payment_status = request.GET.get("status", None)
+    print(payment_status)
+    if payment_status == 'approved':
         payment_id = request.GET.get("payment_id", None)
 
         sdk = mercadopago.SDK("APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037")
@@ -256,22 +254,11 @@ def notifications(request):
 
         status = payment_info["response"]["status"]
 
+        # Por las dudas chequeamos que el pago fue aprobado nuevamente
         if status == 'approved':
-            print("Pago aprobado")
-            # TODO: Agregar lógica para cuando se acepte el pago
-            # reiniciar variables de sesion tambien
+            # TODO: Agregar lógica para cuando se acepte el pago, reiniciar variables de sesion tambien
             return redirect('payment_success')
         else:
-            print("Pago pendiente")
-            # reiniciar variables de sesion tambien
-            return redirect('payment_failure')
+            return redirect('checkout')
 
-    return HttpResponse('OK', status=200)
-
-
-def payment_success(request):
     return render(request, "itineris/payment_success.html")
-
-
-def payment_failure(request):
-    return render(request, "itineris/payment_failure.html")
