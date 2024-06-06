@@ -1,15 +1,13 @@
-import json
-import os
 from datetime import datetime
 
-from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
+import mercadopago
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
-import mercadopago
 
 
 # Create your views here.
@@ -181,7 +179,9 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')  # Redirect to the view displaying the table
 
 
-# TODO: cambiar esta mugre
+# TODO: cambiar la lógica de travelers, en cambio de hacer un append, tenemos que poder sobrescribir el traveler que
+#  se ingresa cuando se vuelve atrás en el navegador. ¿Cambiar que travelers está en session? No me convence.
+
 def pre_checkout(request, travel_id, passengers):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     passenger_count = int(passengers)
@@ -201,7 +201,7 @@ def pre_checkout(request, travel_id, passengers):
             if passenger_count > 0:
                 return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
             else:
-                return render(request, "itineris/checkout.html", {'travel_id': travel_id})
+                return redirect('checkout')
     else:
         form = PreCheckout()
     return render(request, "itineris/pre_checkout.html",
@@ -257,8 +257,9 @@ def payment_success(request):
 
         # Por las dudas chequeamos que el pago fue aprobado nuevamente
         if status == 'approved':
-            # travel_id = request.session.get('travel_id', None)
-            # TODO: Agregar lógica para cuando se acepte el pago, reiniciar variables de sesion tambien
+            # TODO: Agregar lógica para cuando se acepte el pago, actualizar estado de pago del viaje y de los
+            #  pasajeros. Podríamos traer travel o travel_id desde session si la agregamos en una view previa.
+
             return redirect('payment_success')
         else:
             return redirect('checkout')
