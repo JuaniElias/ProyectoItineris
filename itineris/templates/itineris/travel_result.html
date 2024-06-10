@@ -27,7 +27,7 @@
                                 <p>{{ travel.estimated_datetime_arrival }}</p>
                             </div>
                             <div class="col-md-3">
-                                <a href="{% url 'pre_checkout' travel.travel_id passengers%}">
+                                <a href="{% url 'save_travel_id' travel.travel_id %}">
                                     <button type="button" class="btn btn-primary">${{ travel.fee|floatformat }}</button>
                                 </a>
                             </div>

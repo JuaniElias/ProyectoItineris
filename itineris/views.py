@@ -14,6 +14,7 @@ import mercadopago
 
 # Create your views here.
 def index(request):
+    request.session['travelers'] = []
     if request.method == "POST":
         form = SearchTravel(request.POST)
         if form.is_valid():
@@ -182,34 +183,40 @@ def delete_vehicle(request, plate_number):
 
 
 # TODO: cambiar esta mugre
-def pre_checkout(request, travel_id, passengers):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    passenger_count = int(passengers)
+def pre_checkout(request):
+    travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
+    passenger_count = int(request.session.get('passengers'))
 
     # Inicializa la lista con los ID de los pasajeros
     travelers = request.session.get('travelers', [])
 
-    if request.method == "POST":
-        form = PreCheckout(request.POST)
-        if form.is_valid():
-            new_traveler = form.save(commit=False)
-            new_traveler.travel = travel
-            new_traveler.save()
-            travelers.append(new_traveler.id)
-            request.session['travelers'] = travelers    # This ain't the way
-            passenger_count -= 1
-            if passenger_count > 0:
-                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
-            else:
-                return redirect('checkout')
+    if len(travelers) < passenger_count:
+        if request.method == "POST":
+            form = PreCheckout(request.POST)
+            if form.is_valid():
+                new_traveler = form.save(commit=False)
+                new_traveler.travel = travel
+                new_traveler.save()
+                travelers.append(new_traveler.id)
+                request.session['travelers'] = travelers  # This ain't the way
+
+                return redirect('pre_checkout')
+        else:
+            form = PreCheckout()
     else:
-        form = PreCheckout()
+        return redirect('checkout')
     return render(request, "itineris/pre-checkout.html",
                   {'travel': travel, 'passengers': passenger_count, 'form': form})
 
 
+def save_travel_id(request, travel_id):
+    request.session['travel_id'] = travel_id
+    return redirect('pre_checkout')
+
+
 def checkout(request):
     travelers = request.session.get('travelers')
+    request.session['travelers'] = []
     if not travelers:
         return HttpResponseBadRequest("No se han creado viajeros.")
     travelers_obj = Traveler.objects.filter(id__in=travelers)
@@ -218,8 +225,8 @@ def checkout(request):
     payment_failure_url = request.build_absolute_uri(reverse('payment_failure'))
     notifications_url = request.build_absolute_uri(reverse('notifications'))
 
-    travel_id = travelers_obj.values_list('travel_id', flat=True).first()
-    travel = get_object_or_404(Travel, travel_id=travel_id)
+    # travel_id = travelers_obj.values_list('travel_id', flat=True).first()
+    travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
     sdk = mercadopago.SDK('APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037')
     preference_data = {
         "items": [
