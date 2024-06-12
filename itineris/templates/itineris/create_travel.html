@@ -84,10 +84,14 @@
         
         // Pone en gris todas las fechas y horas menores a la salida 
         datetime_departure.addEventListener("change", function () {
-          let selectedDeparture = new Date(datetime_departure.value);
-          let minDate = new Date(selectedDeparture.getTime() + (60 * 60 * 1000));
+            let selectedDeparture = new Date(datetime_departure.value);
+            const now = new Date();
+            const timezoneOffsetInMinutes = now.getTimezoneOffset();
+            const timezoneOffsetInHours = -timezoneOffsetInMinutes / 60;
+
+            let minDate = new Date(selectedDeparture.getTime() + (60 * 60 * 1000) + timezoneOffsetInHours);
           
-          datetime_arrival.min = minDate.toISOString().slice(0, 16);
+            datetime_arrival.min = minDate.toISOString().slice(0, 16);
         });
     });
 </script>

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import mercadopago
+from django.db.models import Model
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -27,6 +28,7 @@ def index(request):
                                                   city_destination=city_destination,
                                                   datetime_departure__date=date_departure,
                                                   seats_left__gte=passengers,
+                                                  status="Agendado"
                                                   )
 
             return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers': passengers})
@@ -181,9 +183,6 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')
 
 
-# TODO: cambiar la lógica de travelers, en cambio de hacer un append, tenemos que poder sobrescribir el traveler que
-#  se ingresa cuando se vuelve atrás en el navegador. ¿Cambiar que travelers está en session? No me convence.
-
 def pre_checkout(request):
     travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
     passenger_count = int(request.session.get('passengers'))
@@ -226,7 +225,6 @@ def checkout(request):
     checkout_url = request.build_absolute_uri(reverse('checkout'))
     payment_success_url = request.build_absolute_uri(reverse('payment_success'))
 
-    # travel_id = travelers_obj.values_list('travel_id', flat=True).first()
     travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
     sdk = mercadopago.SDK('APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037')
     preference_data = {
@@ -266,8 +264,15 @@ def payment_success(request):
 
         # Por las dudas chequeamos que el pago fue aprobado nuevamente
         if status == 'approved':
-            # TODO: Agregar lógica para cuando se acepte el pago, actualizar estado de pago del viaje y de los
-            #  pasajeros. Podríamos traer travel o travel_id desde session si la agregamos en una view previa.
+            traveler_ids = request.session.get('travelers')
+            travelers = Traveler.objects.filter(id__in=traveler_ids)
+            for traveler in travelers:
+                traveler.status = 'Confirmado'
+                traveler.save()
+
+            travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
+            travel.seats_left -= travelers.count()
+            travel.save()
 
             return redirect('payment_success')
         else:

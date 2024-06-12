@@ -88,7 +88,7 @@ class Traveler(models.Model):
     address_origin = models.CharField(max_length=50)
     address_destination = models.CharField(max_length=50)
     feedback = models.TextField(max_length=200, null=True)
-    status = models.CharField(max_length=50, default="En Proceso")
+    status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Agendado | Finalizado
 
 
 class Province(models.Model):
