@@ -14,18 +14,14 @@
                     <p>Destino: {{ travel.city_destination }}</p>
                 </div>
             </div>
-            <p>Pasajero: {{passengers}}</p>
-            <p>Importe total: ${{ travel.fee }}</p>
-            <div class="row-modal">
-                <a href=""><button type="submit" class="hero-btn">Volver</button></a>
-                
-            </div>
+            <p>Pasajero: {{ request.session.travelers|length|add:"1" }}</p>
+            <p>Importe por persona: ${{ travel.fee }}</p>
         </div>
     </div>
     <div class="row">
         <div class="col">
                 <div class="card m-4 p-3">
-                    <form action="{% url 'pre_checkout' travel.travel_id passengers %}" method=POST>
+                    <form action="{% url 'pre_checkout' %}" method=POST>
                         {% csrf_token %}
                         <table>
                             {{ form.as_table }}
@@ -36,4 +32,15 @@
         </div>
     </div>
 </div>
+    <script>
+    window.addEventListener( "pageshow", function ( event ) {
+        const historyTraversal = event.persisted ||
+            (typeof window.performance != "undefined" &&
+                window.performance.getEntriesByType("navigation")[0].type === "back_forward");
+        if ( historyTraversal ) {
+    // Handle page restore.
+    window.location.reload();
+      }
+    });
+    </script>
 {% endblock %}

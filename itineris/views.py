@@ -10,8 +10,8 @@ from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTrav
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
 
 
-# Create your views here.
 def index(request):
+    request.session['travelers'] = []
     if request.method == "POST":
         form = SearchTravel(request.POST)
         if form.is_valid():
@@ -20,7 +20,9 @@ def index(request):
             date_departure = form.cleaned_data['datetime_departure']
             passengers = form.cleaned_data['passengers']
 
-            # Buscar vuelos que coincidan con los criterios
+            request.session['passengers'] = passengers
+
+            # Buscar viajes que coincidan con los criterios
             travels = Travel.objects.all().filter(city_origin=city_origin,
                                                   city_destination=city_destination,
                                                   datetime_departure__date=date_departure,
@@ -130,7 +132,7 @@ def delete_driver(request, driver_id):
     driver = get_object_or_404(Driver, driver_id=driver_id)
     driver.active = False
     driver.save()
-    return redirect('your_drivers')  # Redirect to the view displaying the table
+    return redirect('your_drivers')
 
 
 def your_travels(request):
@@ -150,7 +152,7 @@ def delete_travel(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travel.status = 'Cancelado'
     travel.save()
-    return redirect('your_travels')  # Redirect to the view displaying the table
+    return redirect('your_travels')
 
 
 def your_vehicles(request):
@@ -176,40 +178,47 @@ def delete_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
     vehicle.active = False
     vehicle.save()
-    return redirect('your_vehicles')  # Redirect to the view displaying the table
+    return redirect('your_vehicles')
 
 
 # TODO: cambiar la lógica de travelers, en cambio de hacer un append, tenemos que poder sobrescribir el traveler que
 #  se ingresa cuando se vuelve atrás en el navegador. ¿Cambiar que travelers está en session? No me convence.
 
-def pre_checkout(request, travel_id, passengers):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    passenger_count = int(passengers)
+def pre_checkout(request):
+    travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
+    passenger_count = int(request.session.get('passengers'))
 
     # Inicializa la lista con los ID de los pasajeros
     travelers = request.session.get('travelers', [])
 
-    if request.method == "POST":
-        form = PreCheckout(request.POST)
-        if form.is_valid():
-            new_traveler = form.save(commit=False)
-            new_traveler.travel = travel
-            new_traveler.save()
-            travelers.append(new_traveler.id)
-            request.session['travelers'] = travelers  # This ain't the way
-            passenger_count -= 1
-            if passenger_count > 0:
-                return redirect('pre_checkout', travel_id=travel_id, passengers=passenger_count)
-            else:
-                return redirect('checkout')
+    if len(travelers) < passenger_count:
+        if request.method == "POST":
+            form = PreCheckout(request.POST)
+            if form.is_valid():
+                new_traveler = form.save(commit=False)
+                new_traveler.travel = travel
+                new_traveler.save()
+                travelers.append(new_traveler.id)
+                request.session['travelers'] = travelers  # This ain't the way
+
+                return redirect('pre_checkout')
+        else:
+            form = PreCheckout()
     else:
-        form = PreCheckout()
+        return redirect('checkout')
     return render(request, "itineris/pre_checkout.html",
                   {'travel': travel, 'passengers': passenger_count, 'form': form})
 
 
+def save_travel_id(request, travel_id):
+    request.session['travel_id'] = travel_id
+
+    return redirect('pre_checkout')
+
+
 def checkout(request):
     travelers = request.session.get('travelers')
+    request.session['travelers'] = []
     if not travelers:
         return HttpResponseBadRequest("No se han creado viajeros.")
     travelers_obj = Traveler.objects.filter(id__in=travelers)
@@ -217,8 +226,8 @@ def checkout(request):
     checkout_url = request.build_absolute_uri(reverse('checkout'))
     payment_success_url = request.build_absolute_uri(reverse('payment_success'))
 
-    travel_id = travelers_obj.values_list('travel_id', flat=True).first()
-    travel = get_object_or_404(Travel, travel_id=travel_id)
+    # travel_id = travelers_obj.values_list('travel_id', flat=True).first()
+    travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
     sdk = mercadopago.SDK('APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037')
     preference_data = {
         "items": [
