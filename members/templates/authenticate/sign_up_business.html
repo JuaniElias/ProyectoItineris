@@ -5,16 +5,18 @@
 <br>
 <div class="container">
     {% if form.errors %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        La contraseña no cumple las condiciones listadas.
+        {% for error in form.errors %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            Hay un error en el campo "{{ error }}"
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% endfor %}
     </div>
-{% endif %}
+    {% endif %}
 
     <div class="shadow p-4 mb-5 bg-body rounded">
         <h1>Crear una cuenta de empresa</h1>
 
-        <form action="{% url 'sign_up_business' %}" method=POST>
+        <form action="{% url 'sign_up_business' %}" method=POST enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Continuar" class="btn btn-secondary">

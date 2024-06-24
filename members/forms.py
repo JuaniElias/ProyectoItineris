@@ -13,7 +13,7 @@ class RegistrationFormCompany(UserCreationForm):
     company_name = forms.CharField(label='Nombre de empresa', max_length=100)
     phone = forms.CharField(label='Teléfono')
     address = forms.CharField(label='Dirección')
-    license = forms.FileField(label='Licencia CNRT', required=False)
+    license = forms.FileField(label='Licencia CNRT')
 
     class Meta:
         model = Company

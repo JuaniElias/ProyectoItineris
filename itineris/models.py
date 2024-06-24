@@ -10,7 +10,7 @@ class Company(AbstractUser):
     company_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
-    license = models.FileField(default=None)
+    license = models.FileField(upload_to='licenses')
     is_verified = models.BooleanField(default=False)
 
 

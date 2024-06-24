@@ -28,7 +28,7 @@ def logout_user(request):
 
 def sign_up_business(request):
     if request.method == "POST":
-        form = RegistrationFormCompany(request.POST)
+        form = RegistrationFormCompany(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']

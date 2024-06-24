@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import mercadopago
+from django.contrib import messages
 from django.db.models import Model
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -56,11 +57,15 @@ def create_travel(request):
     if request.method == "POST":
         form = CreateTravel(company.id, request.POST)
         if form.is_valid():
-            new_travel = form.save(commit=False)
-            new_travel.company_id = company.id
-            new_travel.duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
-            new_travel.save()
-            return redirect('create_travel')
+            if company.is_verified:
+                new_travel = form.save(commit=False)
+                new_travel.company_id = company.id
+                new_travel.duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
+                new_travel.save()
+                return redirect('create_travel')
+            else:
+                messages.success(request, 'No se puede crear el viaje, la compañía no está verificada.')
+
     else:
         form = CreateTravel(company.id)
 
@@ -83,7 +88,6 @@ def get_available_options(request):
         available_drivers = Driver.objects.filter(company_id=request.user.id)
 
         for travel in scheduled_travels:
-            print(type(travel.estimated_datetime_arrival.astimezone()))
             if (vehicle_departure <= travel.estimated_datetime_arrival.astimezone() and
                     travel.datetime_departure.astimezone() <= vehicle_arrival):
                 vehicle_exclude.append(travel.vehicle.plate_number)
@@ -112,15 +116,20 @@ def travel_detail(request, travel_id):
 
 
 def your_drivers(request):
+    company_id = request.user.id
+    company = get_object_or_404(Company, id=company_id)
     drivers = Driver.objects.filter(company_id=request.user.id, active=True)
 
     if request.method == "POST":
         form = CreateDriver(request.POST)
         if form.is_valid():
-            new_driver = form.save(commit=False)
-            new_driver.company_id = request.user.id
-            new_driver.save()
-            return redirect('your_drivers')
+            if company.is_verified:
+                new_driver = form.save(commit=False)
+                new_driver.company_id = request.user.id
+                new_driver.save()
+                return redirect('your_drivers')
+            else:
+                messages.success(request, 'No se puede cargar el conductor, la compañía no está verificada.')
     else:
         form = CreateDriver()
 
@@ -158,15 +167,20 @@ def delete_travel(request, travel_id):
 
 
 def your_vehicles(request):
+    company_id = request.user.id
+    company = get_object_or_404(Company, id=company_id)
     vehicles = Vehicle.objects.filter(company_id=request.user.id, active=True)
 
     if request.method == "POST":
         form = CreateVehicle(request.POST)
         if form.is_valid():
-            new_vehicle = form.save(commit=False)
-            new_vehicle.company_id = request.user.id
-            new_vehicle.save()
-            return redirect('your_vehicles')
+            if company.is_verified:
+                new_vehicle = form.save(commit=False)
+                new_vehicle.company_id = request.user.id
+                new_vehicle.save()
+                return redirect('your_vehicles')
+            else:
+                messages.error(request, "No se puede cargar el vehículo, la compañía no está verificada.")
     else:
         form = CreateVehicle()
 
