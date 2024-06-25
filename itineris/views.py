@@ -8,8 +8,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
+from ProyectoItineris import settings
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
+from utils.utils import send_email
 
 
 def index(request):
@@ -282,6 +284,23 @@ def payment_success(request):
             travelers = Traveler.objects.filter(id__in=traveler_ids)
             for traveler in travelers:
                 traveler.status = 'Confirmado'
+
+                to_email = traveler.email
+                subject = f'Pasaje Itineris - {traveler.travel.city_origin} a {traveler.travel.city_destination}'
+                message = (f'¡Te brindamos los datos de tu pasaje!\n'
+                           f'Información de tu pasaje:\n'
+                           f'Origen: {traveler.address_origin}, {traveler.travel.city_origin}\n'
+                           f'Destino: {traveler.address_destination}, {traveler.travel.city_destination}\n'
+                           f'Fecha de salida: {traveler.travel.datetime_departure}\n'
+                           f'Fecha estimada de llegada: {traveler.travel.estimated_datetime_arrival}\n'
+                           f'Tarifa: {traveler.travel.fee}\n')
+
+                try:
+                    send_email(to_email, subject, message, file=None)
+                    messages.success(request,
+                                     'Email enviado correctamente.')
+                except Exception as e:
+                    messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
                 traveler.save()
 
             travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))

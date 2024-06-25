@@ -1,7 +1,12 @@
+import os
+
+from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.conf import settings
 from members.forms import RegistrationFormCompany
+from utils.utils import send_email
 
 
 def login_user(request):
@@ -30,6 +35,22 @@ def sign_up_business(request):
     if request.method == "POST":
         form = RegistrationFormCompany(request.POST, request.FILES)
         if form.is_valid():
+            # Se envia un mail a los admin para notificar que se creo una nueva Company para validar su licencia DNRPA
+            to_email = settings.EMAIL_HOST_USER
+            subject = 'Nueva empresa requiere verificación'
+            message = (f'La empresa {form.cleaned_data["company_name"]} quiere registrarse en Itineris\n'
+                       f'Información de Contacto\n'
+                       f'Email: {form.cleaned_data["email"]}\n'
+                       f'Teléfono: {form.cleaned_data["phone"]}\n')
+            file = request.FILES.get('license')
+
+            try:
+                send_email(to_email, subject, message, file)
+                messages.success(request,
+                                 'Email enviado correctamente.')
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
+
             form.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
