@@ -233,7 +233,7 @@ def save_travel_id(request, travel_id):
 
 def checkout(request):
     travelers = request.session.get('travelers')
-    request.session['travelers'] = []
+    # request.session['travelers'] = []  # Limpia los travelers de la session cuando entra a checkout y no está muy bien
     if not travelers:
         return HttpResponseBadRequest("No se han creado viajeros.")
     travelers_obj = Traveler.objects.filter(id__in=travelers)
@@ -291,14 +291,11 @@ def payment_success(request):
                            f'Información de tu pasaje:\n'
                            f'Origen: {traveler.address_origin}, {traveler.travel.city_origin}\n'
                            f'Destino: {traveler.address_destination}, {traveler.travel.city_destination}\n'
-                           f'Fecha de salida: {traveler.travel.datetime_departure}\n'
-                           f'Fecha estimada de llegada: {traveler.travel.estimated_datetime_arrival}\n'
+                           f'Fecha y hora de salida: {traveler.travel.datetime_departure}\n'
+                           f'Fecha y hora estimada de llegada: {traveler.travel.estimated_datetime_arrival}\n'
                            f'Tarifa: {traveler.travel.fee}\n')
-
                 try:
                     send_email(to_email, subject, message, file=None)
-                    messages.success(request,
-                                     'Email enviado correctamente.')
                 except Exception as e:
                     messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
                 traveler.save()
