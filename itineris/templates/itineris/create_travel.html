@@ -23,11 +23,23 @@
 </body>
 
 <script>
+    function getCurrentDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
     document.addEventListener('DOMContentLoaded', function() {
         const datetime_departure = document.querySelector('#datetime_departure');
         const datetime_arrival = document.querySelector('#datetime_arrival');
         const vehicle_select = document.querySelector('#id_vehicle');
         const driver_select = document.querySelector('#id_driver');
+        
+        datetime_departure.setAttribute('min', getCurrentDateTime())
 
         function updateVehicleOptions() {
             const selected_departure = datetime_departure.value;
