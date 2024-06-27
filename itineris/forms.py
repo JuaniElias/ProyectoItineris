@@ -139,12 +139,15 @@ class PreCheckout(forms.ModelForm):
     dni = forms.CharField(label='DNI', max_length=8, required=True)
     email = forms.EmailField(label='Email', max_length=100, required=True)
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
-    address_origin = forms.CharField(label='Dirección origen', max_length=50, required=True)
-    address_destination = forms.CharField(label='Dirección destino', max_length=50, required=True)
+    addr_ori = forms.CharField(label='Dirección origen', max_length=50, required=True)
+    addr_ori_num = forms.CharField(label='Número dirección origen', max_length=50, required=True)
+    addr_dest = forms.CharField(label='Dirección destino', max_length=50, required=True)
+    addr_dest_num = forms.CharField(label='Número dirección destino', max_length=5, required=True)
 
     class Meta:
         model = Traveler
-        fields = ('first_name', 'last_name', 'dni', 'email', 'phone', 'address_origin', 'address_destination')
+        fields = ('first_name', 'last_name', 'dni', 'email', 'phone', 'addr_ori', 'addr_ori_num'
+                  , 'addr_dest', 'addr_dest_num')
 
     def __init__(self, *args, **kwargs):
         super(PreCheckout, self).__init__(*args, **kwargs)
@@ -153,5 +156,7 @@ class PreCheckout(forms.ModelForm):
         self.fields['dni'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
-        self.fields['address_origin'].widget.attrs['class'] = 'form-control'
-        self.fields['address_destination'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_ori'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_ori_num'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_dest'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_dest_num'].widget.attrs['class'] = 'form-control'

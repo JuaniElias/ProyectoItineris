@@ -289,8 +289,8 @@ def payment_success(request):
                 subject = f'Pasaje Itineris - {traveler.travel.city_origin} a {traveler.travel.city_destination}'
                 message = (f'¡Te brindamos los datos de tu pasaje!\n'
                            f'Información de tu pasaje:\n'
-                           f'Origen: {traveler.address_origin}, {traveler.travel.city_origin}\n'
-                           f'Destino: {traveler.address_destination}, {traveler.travel.city_destination}\n'
+                           f'Origen: {traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.travel.city_origin}\n'
+                           f'Destino: {traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}\n'
                            f'Fecha y hora de salida: {traveler.travel.datetime_departure}\n'
                            f'Fecha y hora estimada de llegada: {traveler.travel.estimated_datetime_arrival}\n'
                            f'Tarifa: {traveler.travel.fee}\n')

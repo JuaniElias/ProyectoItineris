@@ -85,8 +85,10 @@ class Traveler(models.Model):
     dni = models.CharField(max_length=8)
     email = models.EmailField()
     phone = models.CharField(max_length=30)
-    address_origin = models.CharField(max_length=50)
-    address_destination = models.CharField(max_length=50)
+    addr_ori = models.CharField(max_length=50)
+    addr_ori_num = models.CharField(max_length=5)
+    addr_dest = models.CharField(max_length=50)
+    addr_dest_num = models.CharField(max_length=5)
     feedback = models.TextField(max_length=200, null=True)
     status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Agendado | Finalizado
 
