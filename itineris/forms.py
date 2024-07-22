@@ -31,6 +31,8 @@ class CityWidget(s2forms.ModelSelect2Widget):
 
 
 class CreateTravel(forms.ModelForm):
+    city_origin = forms.CharField(label='Ciudad de origen', required=True)
+    city_destination = forms.CharField(label='Ciudad de destino', required=True)
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
                                              widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
                                                                                        'id': 'datetime_departure'}))
@@ -38,9 +40,12 @@ class CreateTravel(forms.ModelForm):
                                                      widget=forms.widgets.DateTimeInput(
                                                          attrs={'type': 'datetime-local',
                                                                 'id': 'datetime_arrival'}))
+    addr_origin = forms.CharField(label='Dirección desde donde salís', required=True)
+    addr_origin_num = forms.CharField(label='Número de la dirección', required=True)
     fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
+    # TODO: Driver y Vehicle salen en inglés en el forms
 
     def clean(self):
         cleaned_data = super().clean()
@@ -55,8 +60,8 @@ class CreateTravel(forms.ModelForm):
 
     class Meta:
         model = Travel
-        fields = ('city_origin', 'city_destination', 'datetime_departure', 'estimated_datetime_arrival', 'fee',
-                  'driver', 'vehicle',)
+        fields = ('city_origin', 'city_destination', 'datetime_departure', 'estimated_datetime_arrival', 'addr_origin',
+                  'addr_origin_num', 'fee', 'driver', 'vehicle',)
         widgets = {
             "city_origin": CityWidget,
             "city_destination": CityWidget,
@@ -64,8 +69,12 @@ class CreateTravel(forms.ModelForm):
 
     def __init__(self, company_id, *args, **kwargs):
         super(CreateTravel, self).__init__(*args, **kwargs)
+        self.fields['city_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['city_destination'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_origin_num'].widget.attrs['class'] = 'form-control'
         self.fields['fee'].widget.attrs['class'] = 'form-control'
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id))
         self.fields['driver'].widget.attrs['class'] = 'form-control'

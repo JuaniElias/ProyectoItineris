@@ -19,6 +19,8 @@ class Travel(models.Model):
     company = models.ForeignKey("Company", on_delete=models.DO_NOTHING)
     driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING)
     vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
+    addr_origin = models.CharField(max_length=100)
+    addr_origin_num = models.CharField(max_length=10)
     city_origin = models.ForeignKey("City", on_delete=models.DO_NOTHING, related_name="city_origin")
     city_destination = models.ForeignKey("City", on_delete=models.DO_NOTHING, related_name="city_destination")
     datetime_departure = models.DateTimeField()
@@ -85,10 +87,10 @@ class Traveler(models.Model):
     dni = models.CharField(max_length=8)
     email = models.EmailField()
     phone = models.CharField(max_length=30)
-    addr_ori = models.CharField(max_length=50)
-    addr_ori_num = models.CharField(max_length=5)
-    addr_dest = models.CharField(max_length=50)
-    addr_dest_num = models.CharField(max_length=5)
+    addr_ori = models.CharField(max_length=100)
+    addr_ori_num = models.CharField(max_length=10)
+    addr_dest = models.CharField(max_length=100)
+    addr_dest_num = models.CharField(max_length=10)
     feedback = models.TextField(max_length=200, null=True)
     status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Agendado | Finalizado
 
