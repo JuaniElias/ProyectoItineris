@@ -31,8 +31,6 @@ class CityWidget(s2forms.ModelSelect2Widget):
 
 
 class CreateTravel(forms.ModelForm):
-    city_origin = forms.CharField(label='Ciudad de origen', required=True)
-    city_destination = forms.CharField(label='Ciudad de destino', required=True)
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
                                              widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
                                                                                        'id': 'datetime_departure'}))

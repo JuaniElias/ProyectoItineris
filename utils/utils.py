@@ -33,7 +33,8 @@ def get_next_destination(origin: str, distance_matrix: pd.DataFrame):
     :param distance_matrix:  is a squared matrix with the distance/time between different locations. Column names have the Origin,
     while rows have the destinations. This parameter is then returned without the destination selected.
     """
-
+    # distance_matrix['Poyredon 1020']
+    #
     id_min = distance_matrix[distance_matrix[origin] > 0][origin].idxmin()
     destination = distance_matrix.loc[id_min, 'destination']
     distance_matrix = distance_matrix[distance_matrix['destination'] != destination]
@@ -51,7 +52,6 @@ def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
     :param distance_matrix: is a squared matrix with the distance/time between different locations. Column names have the Origin,
     while rows have the destinations.
     """
-
     best_consequent = [start_point]
     locations = distance_matrix.iloc[:, 1:].columns.to_list()
     locations = [x for x in locations if x != start_point]
@@ -68,25 +68,30 @@ def get_distance_matrix(locations: list, gmaps):
     """
 
     """
-    result = gmaps.distance_matrix(mode='driving', origins=locations, destinations=locations, region='AR',
-                                   units='metric')
+    rows_matrix = []
+
+    for item in locations:
+        # se hacen llamados individuales para no sobrepasar el límite de la API
+        result = gmaps.distance_matrix(mode='driving', origins=item, destinations=locations, region='AR',
+                                       units='metric')
+        rows_matrix.append(result)
 
     raw_data = []
-    for i, origin in enumerate(locations):
-        for j, destination in enumerate(locations):
-            data = {
-                'origin': origin,
-                'destination': destination,
-                'distance': result['rows'][i]['elements'][j]['distance']['value'],
-                'duration': result['rows'][i]['elements'][j]['duration']['value'],
-                'status': result['rows'][i]['elements'][j]['status']
-            }
-
-            # Agregar el diccionario a la lista
-            raw_data.append(data)
+    for result in rows_matrix:
+        for i, origin in enumerate(result['origin_addresses']):
+            for j, destination in enumerate(result['destination_addresses']):
+                data = {
+                    'origin': origin,
+                    'destination': destination,
+                    'distance': result['rows'][i]['elements'][j]['distance']['value'],
+                    'duration': result['rows'][i]['elements'][j]['duration']['value'],
+                    'status': result['rows'][i]['elements'][j]['status']
+                }
+                # Agregar el diccionario a la lista
+                raw_data.append(data)
 
     df = pd.json_normalize(raw_data)
-
+    df.origin = pd.Categorical(df.origin, categories=df.origin.unique(), ordered=True)
     # ACA DEBERÍAMOS CHEQUEAR QUE TODOS LOS VALORES DEL DF TENGAN EL STATUS = 'OK'
 
     return df.pivot_table(index='destination', columns='origin', values='duration').reset_index()
@@ -98,7 +103,7 @@ def get_url_route(best_route: list, gmaps):
 
     :param best_route: is a list with all the locations in order to generate the route.
 
-    :param gmaps: is the google maps client. A ESTO DEBERÍAMOS HACERLO TIPO VARIABLE GLOBAL DESPUES
+    :param gmaps: is the Google Maps client. A ESTO DEBERÍAMOS HACERLO TIPO VARIABLE GLOBAL DESPUES
     """
     start = best_route[0]
     end = best_route[-1]
@@ -121,22 +126,22 @@ def get_url_route(best_route: list, gmaps):
 def calculate_full_route(travel_id):
     gmaps = googlemaps.Client(key='')
     # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
-    start_point = 'Pablo Stampa 2510, Chajari'
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    start_point = travel.addr_origin + ' ' + travel.addr_origin_num + ', ' + str(travel.city_origin)
     # esta lista debería venir de una query a la base de datos trayendo todos los destinos para un viaje
     pickup_addresses = [start_point]
     drop_off_addresses = []
-    travel = get_object_or_404(Travel, id=travel_id)
+
     travelers = Traveler.objects.filter(travel_id=travel_id)
 
     for traveler in travelers:
-        address_ori = f'{traveler.addr_ori} {traveler.addr_ori_num}, {Travel.city_origin}'
+        address_ori = f'{traveler.addr_ori} {traveler.addr_ori_num}, {travel.city_origin}'
         pickup_addresses.append(address_ori)
-        address_dest = f'{traveler.addr_dest} {traveler.addr_dest_num}, {Travel.city_destination}'
+        address_dest = f'{traveler.addr_dest} {traveler.addr_dest_num}, {travel.city_destination}'
         drop_off_addresses.append(address_dest)
 
-    # esto puede ir como no, dependiendo de la solución que tomemos.
-
     distance_matrix_pickup = get_distance_matrix(pickup_addresses, gmaps)
+    start_point = distance_matrix_pickup.columns.to_list()[1]
 
     # Remove the start point as a posible destination because it is, indeed, the start point
     distance_matrix_pickup = distance_matrix_pickup[distance_matrix_pickup['destination'] != start_point]
@@ -144,12 +149,18 @@ def calculate_full_route(travel_id):
     best_route_pickup = get_best_route(start_point, distance_matrix_pickup)
 
     drop_off_start = best_route_pickup[-1]
-    drop_off_addresses.append(drop_off_start)
+    drop_off_addresses = [drop_off_start] + drop_off_addresses
+
     distance_matrix_drop_off = get_distance_matrix(drop_off_addresses, gmaps)
-    distance_matrix_drop_off = distance_matrix_drop_off[distance_matrix_drop_off['destination'] != start_point]
+    drop_off_start = distance_matrix_drop_off.columns.to_list()[1]
+
+    # Remove the start point as a posible destination because it is, indeed, the start point
+    distance_matrix_drop_off = distance_matrix_drop_off[distance_matrix_drop_off['destination'] != drop_off_start]
+
     best_route_drop_off = get_best_route(drop_off_start, distance_matrix_drop_off)
 
     final_route = best_route_pickup[:-1] + best_route_drop_off
     url = get_url_route(final_route, gmaps)
 
-    return url
+    travel.url = url
+    travel.save()

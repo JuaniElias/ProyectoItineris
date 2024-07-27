@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from ProyectoItineris import settings
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
-from utils.utils import send_email
+from utils.utils import send_email, calculate_full_route
 
 
 def index(request):
@@ -309,3 +309,8 @@ def payment_success(request):
             return redirect('checkout')
 
     return render(request, "itineris/payment_success.html")
+
+
+def generate_route(request, travel_id):
+    calculate_full_route(travel_id)
+    return None

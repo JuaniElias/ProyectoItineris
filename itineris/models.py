@@ -31,6 +31,7 @@ class Travel(models.Model):
     payment_status = models.CharField(max_length=20, default="Pendiente")
     seats_left = models.IntegerField(default=0)
     status = models.CharField(max_length=50, default="Agendado")
+    url = models.CharField(max_length=5000)
 
     def save(self, *args, **kwargs):
         # Check if the object is being created for the first time
@@ -91,7 +92,7 @@ class Traveler(models.Model):
     addr_ori_num = models.CharField(max_length=10)
     addr_dest = models.CharField(max_length=100)
     addr_dest_num = models.CharField(max_length=10)
-    feedback = models.TextField(max_length=200, null=True)
+    feedback = models.TextField(max_length=200, null=True, default='-')
     status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Agendado | Finalizado
 
 

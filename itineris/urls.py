@@ -1,4 +1,6 @@
 from django.urls import include, path
+
+import utils.utils
 from . import views
 
 urlpatterns = [
@@ -21,4 +23,5 @@ urlpatterns = [
     path('checkout', views.checkout, name='checkout'),
     path('travel_history', views.travel_history, name='travel_history'),
     path('payment_success', views.payment_success, name='payment_success'),
+    path('generate_route/<str:travel_id>/', views.generate_route, name='generate_route'),
 ]

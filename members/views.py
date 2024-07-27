@@ -1,6 +1,3 @@
-import os
-
-from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages

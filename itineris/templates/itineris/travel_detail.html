@@ -15,6 +15,10 @@
                         <p>Origen: {{ travel.city_origin }}</p>
                         <p>Destino: {{ travel.city_destination }}</p>
                     </div>
+                    <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
+                        <button type="submit" class="btn btn-primary">Generar mapa de ruta</button>
+                    </form>
+                    <a href="{{ travel.url }}">Ruta</a>
                     <table class="content-table">
                         <thead>
                             <tr>
@@ -37,8 +41,8 @@
                                     <td>{{ traveler.dni }}</td>
                                     <td>{{ traveler.email }}</td>
                                     <td>{{ traveler.phone }}</td>
-                                    <td>{{ traveler.addr_ori }}' '{{ traveler.addr_ori_num }}</td>
-                                    <td>{{ traveler.addr_dest }}' '{{ traveler.addr_dest_num }}</td>
+                                    <td>{{ traveler.addr_ori }} {{ traveler.addr_ori_num }}</td>
+                                    <td>{{ traveler.addr_dest }} {{ traveler.addr_dest_num }}</td>
                                     <td>{{ traveler.feedback }}</td>
                                 </tr>
                             {% endfor %}
