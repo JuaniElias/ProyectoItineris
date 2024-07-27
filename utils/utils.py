@@ -100,27 +100,11 @@ def get_distance_matrix(locations: list, gmaps):
 def get_url_route(best_route: list, gmaps):
     """
     This function returns the URL to the route generated.
-
     :param best_route: is a list with all the locations in order to generate the route.
-
-    :param gmaps: is the Google Maps client. A ESTO DEBERÍAMOS HACERLO TIPO VARIABLE GLOBAL DESPUES
     """
-    start = best_route[0]
-    end = best_route[-1]
-    waypoints = best_route[1:len(best_route) - 1]
+    url_waypoints = "/".join(quote(wp, safe='') for wp in best_route)
 
-    route = gmaps.directions(origin=start, destination=end, waypoints=waypoints, mode="driving", alternatives=False,
-                             units="metric", region="AR", optimize_waypoints=False)
-
-    overview_polyline = route[0]['overview_polyline']['points']
-
-    # fix locations to create the route URL
-    url_start = quote(start, safe='')
-    url_end = quote(end, safe='')
-    url_waypoints = "|".join(quote(wp, safe='') for wp in waypoints)
-
-    return f"https://www.google.com/maps/dir/?api=1&origin={url_start}&destination={url_end}&waypoints={url_waypoints
-    }&travelmode=driving&dir_action=navigate&waypoints={overview_polyline}"
+    return f'https://www.google.com/maps/dir/{url_waypoints}'
 
 
 def calculate_full_route(travel_id):
@@ -160,7 +144,7 @@ def calculate_full_route(travel_id):
     best_route_drop_off = get_best_route(drop_off_start, distance_matrix_drop_off)
 
     final_route = best_route_pickup[:-1] + best_route_drop_off
-    url = get_url_route(final_route, gmaps)
+    url = get_url_route(final_route)
 
     travel.url = url
     travel.save()
