@@ -312,5 +312,5 @@ def payment_success(request):
 
 
 def generate_route(request, travel_id):
-    calculate_full_route(travel_id)
-    return None
+    # calculate_full_route(travel_id)
+    return travel_detail(request, travel_id)
