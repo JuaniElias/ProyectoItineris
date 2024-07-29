@@ -97,7 +97,7 @@ def get_distance_matrix(locations: list, gmaps):
     return df.pivot_table(index='destination', columns='origin', values='duration').reset_index()
 
 
-def get_url_route(best_route: list, gmaps):
+def get_url_route(best_route: list):
     """
     This function returns the URL to the route generated.
     :param best_route: is a list with all the locations in order to generate the route.
