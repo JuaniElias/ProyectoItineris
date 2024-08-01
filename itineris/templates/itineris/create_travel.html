@@ -10,13 +10,21 @@
         <div>
             <h1 class="text">Crear Viaje</h1>
             <div class="row">
-                <div class="travel-col">
-                    <form action="{% url 'create_travel' %}" method=POST>
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <input type="submit" value="Crear" class="btn btn-primary">
-                    </form>
-                </div>
+                <form action="{% url 'create_travel' %}" method=POST>
+                    <div class="row">
+                        <div class="col-3 travel-col">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <label for="period_checkbox">¿Es un viaje periódico?</label>
+                            <input type="checkbox" id="period_checkbox" name="period_checkbox">
+                            <br><br>
+                            <input type="submit" value="Crear" class="btn btn-primary">
+                        </div>
+                        <div class="col-3 travel-col invisible" id="period_col">
+                            {{ period_form.as_p }}
+                        </div>
+                   </div>
+                </form>
             </div>
         </div>
     </section>
@@ -33,11 +41,20 @@
         
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
+    function getCurrentDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
     document.addEventListener('DOMContentLoaded', function() {
         const datetime_departure = document.querySelector('#datetime_departure');
         const datetime_arrival = document.querySelector('#datetime_arrival');
         const vehicle_select = document.querySelector('#id_vehicle');
         const driver_select = document.querySelector('#id_driver');
+        const period_end_date = document.querySelector('#period_end_date')
         
         const min_travel_duration = 10  //Duracón minima de un viaje en minutos
         
@@ -45,8 +62,7 @@
 
         function updateVehicleOptions() {
             const selected_departure = datetime_departure.value;
-            console.log(selected_departure)
-            
+
             const selected_arrival = datetime_arrival.value;
             // Realiza una solicitud AJAX para obtener el queryset actualizado basado en los horarios de salida y llegada
             if (selected_departure && selected_arrival){
@@ -96,7 +112,7 @@
         // Agrega un listener al cambio en el campo de fecha y hora de llegada
         datetime_arrival.addEventListener('change', updateVehicleOptions);
         
-        // Pone en gris todas las fechas y horas menores a la de salida 
+        // Pone en gris todas las fechas y horas menores a la de salida
         datetime_departure.addEventListener("change", function () {
             const departureDate = new Date(datetime_departure.value);
 
@@ -104,10 +120,26 @@
             const timezoneOffset = date_plus_minutes.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
             const adjustedDate = new Date(date_plus_minutes.getTime() - timezoneOffset);
 
+
             console.log(date_plus_minutes.toISOString().slice(0, 16))
             datetime_arrival.setAttribute('min', adjustedDate.toISOString().slice(0, 16))
         });
+
+        period_end_date.setAttribute('min', getCurrentDate())
+
+        const checkbox = document.getElementById('period_checkbox');
+        const targetElement = document.getElementById('period_col');
+
+        checkbox.addEventListener('change', function() {
+        if (!this.checked) {
+            targetElement.classList.add('invisible');
+        } else {
+            targetElement.classList.remove('invisible');
+        }
+        });
+
     });
+
 </script>
 
 {% endblock %}

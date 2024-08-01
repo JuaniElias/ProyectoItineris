@@ -31,6 +31,7 @@ class Travel(models.Model):
     payment_status = models.CharField(max_length=20, default="Pendiente")
     seats_left = models.IntegerField(default=0)
     status = models.CharField(max_length=50, default="Agendado")
+    period = models.ForeignKey("Period", on_delete=models.CASCADE, default=None, null=True, editable=True)
     url = models.CharField(max_length=5000)
 
     def save(self, *args, **kwargs):
@@ -39,6 +40,20 @@ class Travel(models.Model):
             # Initialize seats_left with the capacity of the linked vehicle
             self.seats_left = self.vehicle.capacity
         super().save(*args, **kwargs)
+
+
+class Period(models.Model):
+    period_id = models.AutoField(primary_key=True)
+    weekdays = models.ManyToManyField("Weekday", related_name="weekdays")
+    end_date = models.DateField()
+
+
+class Weekday(models.Model):
+    weekday_id = models.AutoField(primary_key=True)
+    weekday = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.weekday
 
 
 class Driver(models.Model):

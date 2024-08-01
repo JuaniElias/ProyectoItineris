@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from ProyectoItineris import settings
-from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout
+from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
 from utils.utils import send_email, calculate_full_route
 
@@ -58,21 +58,33 @@ def create_travel(request):
 
     if request.method == "POST":
         form = CreateTravel(company.id, request.POST)
+        period_form = PeriodTravel(request.POST)
+
+        toggle_checkbox = request.POST.get('period_checkbox')
         if form.is_valid():
             if company.is_verified:
                 new_travel = form.save(commit=False)
                 new_travel.company_id = company.id
                 new_travel.duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
+                if toggle_checkbox and period_form.is_valid():
+                    # new_period = period_form.save()
+                    period_form.save()
+                    # TODO: Crear los viajes periódicos
+                else:
+                    messages.success(request,
+                                     'Seleccione días de la semana a repetir el viaje.')
+
                 new_travel.save()
                 return redirect('create_travel')
             else:
                 messages.success(request, 'No se puede crear el viaje, la compañía no está verificada.')
-
     else:
         form = CreateTravel(company.id)
+        period_form = PeriodTravel()
 
     return render(request, "itineris/create_travel.html", {
         'form': form,
+        'period_form': period_form
     })
 
 

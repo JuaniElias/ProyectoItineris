@@ -1,7 +1,9 @@
+import datetime
+
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import Company, Vehicle, Driver, Travel, Traveler
+from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -30,6 +32,37 @@ class CityWidget(s2forms.ModelSelect2Widget):
     ]
 
 
+class PeriodTravel(forms.ModelForm):
+    weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(), widget=s2forms.ModelSelect2MultipleWidget(
+            model=Weekday,
+            search_fields=['weekday__icontains'],
+            attrs={'data-minimum-input-length': 0}
+        ),
+        required=False
+    )
+    end_date = forms.DateField(label='Fin del periodo', widget=forms.widgets.DateInput(
+                                                         attrs={'type': 'date',
+                                                                'id': 'period_end_date'}), required=False)
+
+    class Meta:
+        model = Period
+        fields = ('weekdays', 'end_date',)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        end_date = cleaned_data.get('end_date')
+
+        if datetime.date.today() > end_date:
+            raise forms.ValidationError('La fecha de debe ser mayor a la actual.')
+
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super(PeriodTravel, self).__init__(*args, **kwargs)
+        self.fields['weekdays'].widget.attrs['class'] = 'form-control'
+        self.fields['end_date'].widget.attrs['class'] = 'form-control'
+
+
 class CreateTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
                                              widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
@@ -43,6 +76,7 @@ class CreateTravel(forms.ModelForm):
     fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
+
     # TODO: Driver y Vehicle salen en inglés en el forms
 
     def clean(self):
@@ -74,10 +108,12 @@ class CreateTravel(forms.ModelForm):
         self.fields['addr_origin'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin_num'].widget.attrs['class'] = 'form-control'
         self.fields['fee'].widget.attrs['class'] = 'form-control'
-        self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id))
+        self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
+                                                                                      active=1))
         self.fields['driver'].widget.attrs['class'] = 'form-control'
         self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id,
-                                                                                        status='Disponible'))
+                                                                                        status='Disponible',
+                                                                                        active=1))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
 
 
