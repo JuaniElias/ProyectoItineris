@@ -32,7 +32,7 @@ class Travel(models.Model):
     seats_left = models.IntegerField(default=0)
     status = models.CharField(max_length=50, default="Agendado")
     period = models.ForeignKey("Period", on_delete=models.CASCADE, default=None, null=True, editable=True)
-    url = models.CharField(max_length=5000)
+    url = models.CharField(max_length=5000, default=None, editable=True, null=True)
 
     def save(self, *args, **kwargs):
         # Check if the object is being created for the first time
@@ -45,7 +45,7 @@ class Travel(models.Model):
 class Period(models.Model):
     period_id = models.AutoField(primary_key=True)
     weekdays = models.ManyToManyField("Weekday", related_name="weekdays")
-    end_date = models.DateField()
+    end_date = models.DateField(default=None, null=True)
 
 
 class Weekday(models.Model):

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import mercadopago
+import pandas as pd
 from django.contrib import messages
 from django.db.models import Model
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -12,6 +13,7 @@ from ProyectoItineris import settings
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
 from utils.utils import send_email, calculate_full_route
+from django.utils import timezone
 
 
 def index(request):
@@ -65,16 +67,69 @@ def create_travel(request):
             if company.is_verified:
                 new_travel = form.save(commit=False)
                 new_travel.company_id = company.id
+                duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
                 new_travel.duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
+
                 if toggle_checkbox and period_form.is_valid():
-                    # new_period = period_form.save()
-                    period_form.save()
-                    # TODO: Crear los viajes periódicos
+                    start_date = (new_travel.datetime_departure + pd.Timedelta(days=1)).date()
+
+                    period_ = period_form.save()
+
+                    end_date = period_.end_date
+                    if end_date is None:
+                        end_date = start_date + pd.Timedelta(days=365)
+                    period_.end_date = end_date
+
+                    period_.save()
+
+                    new_travel.period = period_
+
+                    period_weekdays = [weekday.weekday_id for weekday in period_.weekdays.all()]
+
+                    print(period_weekdays)
+
+                    date_range = pd.date_range(start=start_date, end=end_date)
+
+                    date_to_use = [date for date in date_range if date.weekday() + 1 in period_weekdays]
+
+                    departure_time = new_travel.datetime_departure.time()
+                    arrival_time = new_travel.estimated_datetime_arrival.time()
+
+                    for date in date_to_use:
+                        date_dep = pd.to_datetime(datetime.combine(date, departure_time))
+                        date_arr = date_dep + duration
+
+                        travel = Travel.objects.create(
+                            company=company,
+                            driver=new_travel.driver,
+                            vehicle=new_travel.vehicle,
+                            addr_origin=new_travel.addr_origin,
+                            addr_origin_num=new_travel.addr_origin_num,
+                            city_origin=new_travel.city_origin,
+                            city_destination=new_travel.city_destination,
+                            datetime_departure=timezone.make_aware(
+                                date_dep,
+                                timezone.get_current_timezone()
+                            ),
+                            estimated_datetime_arrival=timezone.make_aware(
+                                date_arr,
+                                timezone.get_current_timezone()
+                            ),
+                            duration=new_travel.duration,
+                            fee=new_travel.fee,
+                            payment_status="Pendiente",
+                            status="Agendado",
+                            period=period_,
+                        )
+                        travel.save()
+
+                    new_travel.period = period_
+                    new_travel.save()
+                # TODO: Crear los viajes periódicos
                 else:
                     messages.success(request,
                                      'Seleccione días de la semana a repetir el viaje.')
 
-                new_travel.save()
                 return redirect('create_travel')
             else:
                 messages.success(request, 'No se puede crear el viaje, la compañía no está verificada.')

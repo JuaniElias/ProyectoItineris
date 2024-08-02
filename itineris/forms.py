@@ -1,5 +1,6 @@
 import datetime
 
+import pandas as pd
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
@@ -34,15 +35,15 @@ class CityWidget(s2forms.ModelSelect2Widget):
 
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(), widget=s2forms.ModelSelect2MultipleWidget(
-            model=Weekday,
-            search_fields=['weekday__icontains'],
-            attrs={'data-minimum-input-length': 0}
-        ),
-        required=False
-    )
+        model=Weekday,
+        search_fields=['weekday__icontains'],
+        attrs={'data-minimum-input-length': 0}
+    ),
+                                              required=False
+                                              )
     end_date = forms.DateField(label='Fin del periodo', widget=forms.widgets.DateInput(
-                                                         attrs={'type': 'date',
-                                                                'id': 'period_end_date'}), required=False)
+        attrs={'type': 'date',
+               'id': 'period_end_date'}), required=False)
 
     class Meta:
         model = Period
@@ -51,6 +52,9 @@ class PeriodTravel(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         end_date = cleaned_data.get('end_date')
+
+        if end_date is None:
+            cleaned_data['end_date'] = datetime.date.today() + pd.Timedelta(days=365)
 
         if datetime.date.today() > end_date:
             raise forms.ValidationError('La fecha de debe ser mayor a la actual.')
