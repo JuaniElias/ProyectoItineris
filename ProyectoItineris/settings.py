@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django_select2',
     'itineris',
     'members',
+    'mathfilters',
 ]
 
 AUTH_USER_MODEL = "itineris.Company"
