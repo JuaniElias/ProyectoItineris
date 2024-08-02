@@ -33,7 +33,7 @@
                                 <select id="vehicleFilter" class="form-control">
                                     <option value="Todos">Todos</option>
                                     {% for vehicle in vehicles %}
-                                        <option value="{{ vehicle.id }}">{{ vehicle }}</option>
+                                        <option value="{{ vehicle.id }}">{{ vehicle.plate_number }}</option>
                                     {% endfor %}
                                 </select>
                             </label>
@@ -73,7 +73,7 @@
                                     <td>{{ travel.city_origin }}</td>
                                     <td>{{ travel.city_destination }}</td>
                                     <td>{{ travel.driver }} </td>
-                                    <td>{{ travel.vehicle }}</td>
+                                    <td>{{ travel.vehicle.plate_number }}</td>
                                     <td>{{ travel.status }}</td>
                                     <td>{{ travel.payment_status }}</td>
 
@@ -98,6 +98,8 @@
     const statusFilter = document.querySelector('#statusFilter');
 
     const table = new DataTable('#travel-history-table', {
+        moment: {format: 'D MMM YYYY HH:MM',
+                locale:'es-MX'},
         language: {
             url: '/static/itineris/localization/es-ES.json',
         },

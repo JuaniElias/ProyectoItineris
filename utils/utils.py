@@ -33,8 +33,6 @@ def get_next_destination(origin: str, distance_matrix: pd.DataFrame):
     :param distance_matrix:  is a squared matrix with the distance/time between different locations. Column names have the Origin,
     while rows have the destinations. This parameter is then returned without the destination selected.
     """
-    # distance_matrix['Poyredon 1020']
-    #
     id_min = distance_matrix[distance_matrix[origin] > 0][origin].idxmin()
     destination = distance_matrix.loc[id_min, 'destination']
     distance_matrix = distance_matrix[distance_matrix['destination'] != destination]

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 import mercadopago
 import pandas as pd
@@ -35,8 +35,35 @@ def index(request):
                                                   seats_left__gte=passengers,
                                                   status="Agendado"
                                                   )
+            travels.order_by('datetime_departure')
 
-            return render(request, 'itineris/travel_result.html', {'travels': travels, 'passengers': passengers})
+            if not travels:
+                maximum_date = date.today() + pd.Timedelta(days=60)
+                travels = Travel.objects.all().filter(city_origin=city_origin,
+                                                      city_destination=city_destination,
+                                                      seats_left__gte=passengers,
+                                                      datetime_departure__date__lte=maximum_date,
+                                                      status="Agendado"
+                                                      )
+                travels.order_by('datetime_departure')
+                if travels.count() > 10:
+                    travels = travels[:10]
+                messages.success(request, "No tenemos para el mismo dia que ingresaste")
+
+            if not travels:
+                travels = Travel.objects.all().filter(city_origin=city_origin,
+                                                      seats_left__gte=passengers,
+                                                      datetime_departure__date=date_departure,
+                                                      status="Agendado"
+                                                      )
+                travels.order_by('datetime_departure')
+                messages.success(request, "No tenemos para la ciudad que ingresaste")
+
+            if not travels:
+                redirect()
+
+            return render(request, 'itineris/travel_result.html', {'travels': travels,
+                                                                   'passengers': passengers})
     else:
         form = SearchTravel()
 
@@ -210,8 +237,11 @@ def your_drivers(request):
 
 def delete_driver(request, driver_id):
     driver = get_object_or_404(Driver, driver_id=driver_id)
-    driver.active = False
-    driver.save()
+    if driver.travel_set.filter(status='Agendado'):
+        messages.success(request, "El chofer tiene viajes asignados. Edite los viajes antes de borrar el conductor.")
+    else:
+        driver.active = False
+        driver.save()
     return redirect('your_drivers')
 
 
@@ -222,6 +252,7 @@ def your_travels(request):
 
 def travel_history(request):
     travels = Travel.objects.filter(company_id=request.user.id)
+    travels = travels.order_by('datetime_departure')
     vehicles = Vehicle.objects.filter(company_id=request.user.id)
     drivers = Driver.objects.filter(company_id=request.user.id)
     return render(request, "itineris/travel_history.html",
@@ -261,8 +292,11 @@ def your_vehicles(request):
 
 def delete_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
-    vehicle.active = False
-    vehicle.save()
+    if vehicle.travel_set.filter(status='Agendado'):
+        messages.success(request, "El vehículo tiene viajes asignados. Edite los viajes antes de borrar el vehículo.")
+    else:
+        vehicle.active = False
+        vehicle.save()
     return redirect('your_vehicles')
 
 
@@ -360,6 +394,9 @@ def payment_success(request):
                            f'Destino: {traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}\n'
                            f'Fecha y hora de salida: {traveler.travel.datetime_departure}\n'
                            f'Fecha y hora estimada de llegada: {traveler.travel.estimated_datetime_arrival}\n'
+                           f'Empresa: {traveler.travel.company.company_name}\n'
+                           f'El vehículo que te pasa a buscar: {traveler.travel.vehicle}\n'
+                           f'Chofer: {traveler.travel.driver}\n'
                            f'Tarifa: {traveler.travel.fee}\n')
                 try:
                     send_email(to_email, subject, message, file=None)

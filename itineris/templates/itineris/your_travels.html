@@ -17,23 +17,6 @@
                         <p>Fecha hasta</p>
                         <input type="date">
                     </div>
-                    <div class="col">
-                        <p>Estado</p>
-                        <select class="form-control" tabindex="4">
-                            <option value="Todos"       >Todos</option>
-                            <option value="Completado"  >Completado</option>
-                            <option value="Cancelado"   >Cancelado</option>
-                            <option value="En proceso"  >En proceso</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <p>Ordenar por:</p>
-                        <select class="form-control" tabindex="3">
-                            <option value="1"   >Fecha</option>
-                            <option value="3"   >Monto</option>
-                            <option value="4"   >Estado</option>
-                        </select>
-                    </div>
                 </div>
                 <br>
                 <table class="content-table">
@@ -46,19 +29,25 @@
                             <th class="fee"         >Tarifa</th>
                             <th class="more-info"   ></th>
                             <th class="cancel"      ></th>
+                            <th class="cancel"      ></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for travel in travels %}
                             <tr>
                                 <td>{{ travel.datetime_departure }}</td>
-                                <td>{{ travel.city_origin }}</td>
+                                <td>{{ travel.city_origin }}</td>           
                                 <td>{{ travel.city_destination }}</td>
                                 <td>{{ travel.vehicle.capacity }}</td>
                                 <td>${{ travel.fee }}</td>
                                 <td>
                                     <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
                                         <i class="bi bi-info-circle"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
+                                        <i class="bi bi-pencil-square"></i>
                                     </a>
                                 </td>
                                 <td> 
