@@ -1,5 +1,7 @@
 {% extends 'itineris/base.html' %}
 
+{% load mathfilters %}
+
 {% block content %}
 
 <section class="your-business">
@@ -38,7 +40,7 @@
                                 <td>{{ travel.datetime_departure }}</td>
                                 <td>{{ travel.city_origin }}</td>           
                                 <td>{{ travel.city_destination }}</td>
-                                <td>{{ travel.vehicle.capacity }}</td>
+                                <td>{{ travel.vehicle.capacity|sub:travel.seats_left}}/{{ travel.vehicle.capacity }}</td>
                                 <td>${{ travel.fee }}</td>
                                 <td>
                                     <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
