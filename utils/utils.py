@@ -10,13 +10,15 @@ from django.shortcuts import get_object_or_404
 from itineris.models import Traveler, Travel
 
 
-def send_email(to_email, subject, message, file):
+def send_email(to_email, subject, message, file, html=False):
     email = EmailMessage(
         subject,
         message,
         settings.DEFAULT_FROM_EMAIL,
         [to_email],
     )
+    if html:
+        email.content_subtype = "html"
     if file:
         email.attach(file.name, file.read(), file.content_type)
 

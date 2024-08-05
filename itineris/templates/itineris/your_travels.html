@@ -10,18 +10,7 @@
         
         <div class="col-lg-10 table-container">
             <div class="row-travel">
-                <div class="row">
-                    <div class="col">
-                        <p>Fecha desde</p>
-                        <input type="date">
-                    </div>
-                    <div class="col">
-                        <p>Fecha hasta</p>
-                        <input type="date">
-                    </div>
-                </div>
-                <br>
-                <table class="content-table">
+                <table id="your-travels-table" class="content-table">
                     <thead>
                         <tr>
                             <th class="date"        >Fecha y Hora salida</th>
@@ -37,7 +26,7 @@
                     <tbody>
                         {% for travel in travels %}
                             <tr>
-                                <td>{{ travel.datetime_departure }}</td>
+                                <td>{{ travel.datetime_departure|date:"Y-m-d H:i" }}</td>
                                 <td>{{ travel.city_origin }}</td>           
                                 <td>{{ travel.city_destination }}</td>
                                 <td>{{ travel.vehicle.capacity|sub:travel.seats_left}}/{{ travel.vehicle.capacity }}</td>
@@ -49,12 +38,12 @@
                                 </td>
                                 <td>
                                     <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
-                                        <i class="bi bi-pencil-square"></i>
+                                        <i class="bi bi-pencil-square text-grey"></i>
                                     </a>
                                 </td>
                                 <td> 
                                     <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
-                                        <i class="btn bi bi-trash3"></i>
+                                        <i class="btn bi bi-trash3 text-danger"></i>
                                     </a>
                                 </td>
                             {% endfor %}
@@ -64,4 +53,14 @@
         </div>
     </div>
 </section>
+<script>
+    const table = new DataTable('#your-travels-table', {
+        moment: {format: 'YYYY-MM-DD HH:MM',
+                locale:'es-MX'},
+        language: {
+            url: '/static/itineris/localization/es-ES.json',
+        },
+    });
+</script>
 {% endblock %}
+

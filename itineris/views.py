@@ -38,6 +38,8 @@ def index(request):
             travels.order_by('datetime_departure')
 
             if not travels:
+                msg_text = (f'No hemos encontrado viajes para la fecha ingresada, te dejamos una lista de viajes'
+                            f' para otras fechas de salida.')
                 maximum_date = date.today() + pd.Timedelta(days=60)
                 travels = Travel.objects.all().filter(city_origin=city_origin,
                                                       city_destination=city_destination,
@@ -48,19 +50,21 @@ def index(request):
                 travels.order_by('datetime_departure')
                 if travels.count() > 10:
                     travels = travels[:10]
-                messages.success(request, "No tenemos para el mismo dia que ingresaste")
 
-            if not travels:
-                travels = Travel.objects.all().filter(city_origin=city_origin,
-                                                      seats_left__gte=passengers,
-                                                      datetime_departure__date=date_departure,
-                                                      status="Agendado"
-                                                      )
-                travels.order_by('datetime_departure')
-                messages.success(request, "No tenemos para la ciudad que ingresaste")
+                if not travels:
+                    msg_text = (f'No hemos encontrado viajes para la ciudad ingresada, te dejamos una lista de viajes '
+                                f'a otras ciudades.')
+                    travels = Travel.objects.all().filter(city_origin=city_origin,
+                                                          seats_left__gte=passengers,
+                                                          datetime_departure__date=date_departure,
+                                                          status="Agendado"
+                                                          )
+                    travels.order_by('datetime_departure')
 
-            if not travels:
-                redirect()
+                    if not travels:
+                        return redirect('travel_result_failed')
+
+                messages.success(request, message=msg_text)
 
             return render(request, 'itineris/travel_result.html', {'travels': travels,
                                                                    'passengers': passengers})
@@ -205,9 +209,13 @@ def travel_result(request):
     return render(request, "itineris/travel_result.html", {'travels': travels})
 
 
+def travel_result_failed(request):
+    return render(request, "itineris/travel_result_failed.html")
+
+
 def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    travelers = Traveler.objects.filter(travel_id=travel_id)
+    travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
     return render(request, "itineris/travel_detail.html", {'travel': travel, 'travelers': travelers})
 
 
@@ -266,6 +274,40 @@ def delete_travel(request, travel_id):
     return redirect('your_travels')
 
 
+def mark_travel_ended(request, travel_id):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travel.real_datetime_arrival = datetime.now()
+    travel.status = 'Finalizado'
+    travel.save()
+    travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
+
+    for traveler in travelers:
+        to_email = traveler.email
+        subject = f'Itineris | Viaje finalizado!'
+        message = (f'¡Gracias por elegirnos!\n'
+                   f'Se ha completado el viaje de '
+                   f'{traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.travel.city_origin} a '
+                   f'{traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}\n'
+                   f'Día de salida: {traveler.travel.datetime_departure}\n'
+                   f'Finalizado el: {traveler.travel.estimated_datetime_arrival}\n'
+                   f'Empresa: {traveler.travel.company.company_name}\n'
+                   f'Vehículo: {traveler.travel.vehicle}\n'
+                   f'Chofer: {traveler.travel.driver}\n \n \n'
+                   f'Si quieres dejar una reseña de viaje puedes hacerlo <a href="localhost:8000">aquí</a>.'
+                   )
+        try:
+            send_email(to_email, subject, message, file=None, html=True)
+        except Exception as e:
+            messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
+
+    return travel_detail(request, travel_id)
+
+
+def generate_route(request, travel_id):
+    calculate_full_route(travel_id)
+    return travel_detail(request, travel_id)
+
+
 def your_vehicles(request):
     company_id = request.user.id
     company = get_object_or_404(Company, id=company_id)
@@ -300,6 +342,12 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')
 
 
+def save_travel_id(request, travel_id):
+    request.session['travel_id'] = travel_id
+
+    return redirect('pre_checkout')
+
+
 def pre_checkout(request):
     travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
     passenger_count = int(request.session.get('passengers'))
@@ -324,12 +372,6 @@ def pre_checkout(request):
         return redirect('checkout')
     return render(request, "itineris/pre_checkout.html",
                   {'travel': travel, 'passengers': passenger_count, 'form': form})
-
-
-def save_travel_id(request, travel_id):
-    request.session['travel_id'] = travel_id
-
-    return redirect('pre_checkout')
 
 
 def checkout(request):
@@ -413,8 +455,3 @@ def payment_success(request):
             return redirect('checkout')
 
     return render(request, "itineris/payment_success.html")
-
-
-def generate_route(request, travel_id):
-    calculate_full_route(travel_id)
-    return travel_detail(request, travel_id)

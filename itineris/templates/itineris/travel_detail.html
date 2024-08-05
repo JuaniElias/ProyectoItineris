@@ -1,5 +1,7 @@
 {% extends 'itineris/base.html' %}
 
+{% load mathfilters %}
+
 {% block content %}
 
 <section class="your-business">
@@ -10,14 +12,37 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="travelModalLabel">Detalle del viaje</h5>
                     </div>
+                <br>
                     <div class="modal-body">
-                        <p>Fecha y hora de salida: {{ travel.datetime_departure }}</p>
+                        <p>Salida: {{ travel.datetime_departure }}</p>
+                        <p>Llegada estimada: {{ travel.estimated_datetime_arrival }}</p>
+                        {% if travel.real_datetime_arrival %}
+                            <p>Llegada: {{ travel.real_datetime_arrival}}</p>
+                            <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
+                                <button type="submit" class="btn btn-primary">Marcar viaje como completado</button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
+                                <button type="submit" class="btn btn-primary">Marcar viaje como completado</button>
+                            </form>
+                        {% endif %}
+
+                        <p>Estado: {{ travel.status }}</p>
                         <p>Origen: {{ travel.city_origin }}</p>
                         <p>Destino: {{ travel.city_destination }}</p>
+
+                        <p>Conductor: {{ travel.driver }}</p>
+
+                        {% with amount=travel.vehicle.capacity|sub:travel.seats_left %}
+                        <p>Vehículo: {{ travel.vehicle }}</p>
+                        <p>Capacidad: {{ amount }}/{{ travel.vehicle.capacity }}</p>
+                        <p>Ingresos brutos: ${{ travel.fee|mul:amount }}</p>
+                        {% endwith %}
                     </div>
                     <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
                         <button type="submit" class="btn btn-primary">Generar mapa de ruta</button>
                     </form>
+
                     <a href="{{ travel.url }}">Ruta</a>
                     <table class="content-table">
                         <thead>
