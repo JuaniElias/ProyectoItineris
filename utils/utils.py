@@ -11,7 +11,7 @@ from itineris.models import Traveler, Travel
 
 import base64
 
-encriptedkey = 'itinerisencriptedkey'
+encryptedkey = 'itinerisencryptedkey'
 
 
 def send_email(to_email, subject, message, file, html=False):

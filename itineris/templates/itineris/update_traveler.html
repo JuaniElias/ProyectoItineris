@@ -1,0 +1,20 @@
+{% extends 'itineris/base.html' %}
+
+{% block content %}
+    <div class="card m-4 p-3">
+        <form action="{% url 'update_traveler' encrypted_traveler_id %}" method=POST>
+            {% csrf_token %}
+            
+            <p>Nombre: {{ traveler.last_name }}, {{ traveler.first_name }} </p>
+            <p>DNI: {{ traveler.dni }}</p>
+            <p>Email: {{ traveler.email }}</p>
+            <p>Ciudad de salida: {{ traveler.travel.city_origin }}</p>
+            <p>Ciudad de destino: {{ traveler.travel.city_destination }}</p>
+            
+            {{ form.as_table }}
+            <br>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+
+{% endblock %}

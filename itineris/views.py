@@ -10,9 +10,10 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from ProyectoItineris import settings
-from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel
+from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
+    UpdateTraveler
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
-from utils.utils import send_email, calculate_full_route, decrypt_number, encriptedkey
+from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey
 from django.utils import timezone
 
 
@@ -484,7 +485,7 @@ def payment_success(request):
 
 
 def feedback(request, encrypted_traveler_id):
-    traveler_id = decrypt_number(encrypted_traveler_id, key=encriptedkey)
+    traveler_id = decrypt_number(encrypted_traveler_id, key=encryptedkey)
     traveler = Traveler.objects.get(id=traveler_id)
 
     return render(request, "itineris/feedback.html", {'traveler': traveler})
@@ -499,3 +500,23 @@ def update_feedback(request):
     return redirect("index")
 
 
+def update_traveler(request, encrypted_traveler_id):
+    traveler_id = decrypt_number(encrypted_traveler_id, key=encryptedkey)
+    traveler = Traveler.objects.get(id=traveler_id)
+    # Solo permitir editar los datos antes de que haya comenzado el viaje.
+    if traveler.travel.status == "Agendado":
+        if request.method == 'POST':
+            form = UpdateTraveler(request.POST, instance=traveler)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Tus datos se modificaron exitosamente.")
+                return redirect('index')
+        else:
+            form = UpdateTraveler(instance=traveler)
+    # Viajes ya finalizados, en proceso o cancelados.
+    else:
+        messages.success(request, "No se pueden editar los datos en este momento.")
+        return redirect('index')
+
+    return render(request, "itineris/update_traveler.html", {'form': form, 'traveler': traveler, 
+                                                             'encrypted_traveler_id': encrypted_traveler_id})

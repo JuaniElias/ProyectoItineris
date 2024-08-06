@@ -207,3 +207,23 @@ class PreCheckout(forms.ModelForm):
         self.fields['addr_ori_num'].widget.attrs['class'] = 'form-control'
         self.fields['addr_dest'].widget.attrs['class'] = 'form-control'
         self.fields['addr_dest_num'].widget.attrs['class'] = 'form-control'
+
+
+class UpdateTraveler(forms.ModelForm):
+    phone = forms.CharField(label='Teléfono', max_length=30, required=True)
+    addr_ori = forms.CharField(label='Dirección origen', max_length=50, required=True)
+    addr_ori_num = forms.CharField(label='Número dirección origen', max_length=50, required=True)
+    addr_dest = forms.CharField(label='Dirección destino', max_length=50, required=True)
+    addr_dest_num = forms.CharField(label='Número dirección destino', max_length=5, required=True)
+
+    class Meta:
+        model = Traveler
+        fields = ('phone', 'addr_ori', 'addr_ori_num', 'addr_dest', 'addr_dest_num')
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateTraveler, self).__init__(*args, **kwargs)
+        self.fields['phone'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_ori'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_ori_num'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_dest'].widget.attrs['class'] = 'form-control'
+        self.fields['addr_dest_num'].widget.attrs['class'] = 'form-control'
