@@ -13,7 +13,7 @@ from ProyectoItineris import settings
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
     UpdateTraveler
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
-from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey
+from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number
 from django.utils import timezone
 
 
@@ -454,21 +454,26 @@ def payment_success(request):
             travelers = Traveler.objects.filter(id__in=traveler_ids)
             for traveler in travelers:
                 traveler.status = 'Confirmado'
+                encrypted_traveler_id = encrypt_number(traveler.id, key=encryptedkey)
 
                 to_email = traveler.email
                 subject = f'Pasaje Itineris - {traveler.travel.city_origin} a {traveler.travel.city_destination}'
-                message = (f'¡Te brindamos los datos de tu pasaje!\n'
+                message = (f'¡Te brindamos los datos de tu pasaje!<br>'
                            f'Información de tu pasaje:\n'
-                           f'Origen: {traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.travel.city_origin}\n'
-                           f'Destino: {traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}\n'
-                           f'Fecha y hora de salida: {traveler.travel.datetime_departure}\n'
-                           f'Fecha y hora estimada de llegada: {traveler.travel.estimated_datetime_arrival}\n'
-                           f'Empresa: {traveler.travel.company.company_name}\n'
-                           f'El vehículo que te pasa a buscar: {traveler.travel.vehicle}\n'
-                           f'Chofer: {traveler.travel.driver}\n'
-                           f'Tarifa: {traveler.travel.fee}\n')
+                           f'Origen: {traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.travel.city_origin}<br>'
+                           f'Destino: {traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}<br>'
+                           f'Fecha y hora de salida: {traveler.travel.datetime_departure}<br>'
+                           f'Fecha y hora estimada de llegada: {traveler.travel.estimated_datetime_arrival}<br>'
+                           f'Empresa: {traveler.travel.company.company_name}<br>'
+                           f'El vehículo que te pasa a buscar: {traveler.travel.vehicle}<br>'
+                           f'Chofer: {traveler.travel.driver}<br>'
+                           f'Tarifa: {traveler.travel.fee}<br><br>'
+                           
+                           f'Si querés editar tus datos antes de viajar podes ingresar al siguiente '
+                           f'<a href="localhost:8000/update_traveler/{encrypted_traveler_id}/">link</a>.'
+                           )
                 try:
-                    send_email(to_email, subject, message, file=None)
+                    send_email(to_email, subject, message, file=None, html=True)
                 except Exception as e:
                     messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
                 traveler.save()
