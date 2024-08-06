@@ -193,8 +193,8 @@ class PreCheckout(forms.ModelForm):
 
     class Meta:
         model = Traveler
-        fields = ('first_name', 'last_name', 'dni', 'email', 'phone', 'addr_ori', 'addr_ori_num'
-                  , 'addr_dest', 'addr_dest_num')
+        fields = ('first_name', 'last_name', 'dni', 'email', 'phone', 'addr_ori', 'addr_ori_num',
+                  'addr_dest', 'addr_dest_num')
 
     def __init__(self, *args, **kwargs):
         super(PreCheckout, self).__init__(*args, **kwargs)

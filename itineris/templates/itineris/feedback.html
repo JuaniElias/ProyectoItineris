@@ -2,13 +2,16 @@
 
 {% block content %}
     <div class="container text-center">
-        <form>
+    
+        <form action="{% url 'update_feedback' %}" method=POST>
+            {% csrf_token %}
             <div class="mb-3">
-                <label for="inputFeedback" class="form-label">Dejanos una reseña</label>
-                <input type="text" class="form-control" id="inputFeedback" aria-describedby="feedbackHelp">
+                <label for="feedback" class="form-label">Dejanos una reseña</label>
+                <input hidden="hidden" id="traveler_id" name="traveler_id" value="{{ traveler.id }}">
+                <input type="text" class="form-control" id="feedback" name="feedback" aria-describedby="feedbackHelp">
                 <div id="feedbackHelp" class="form-text">Resalta si tuviste una buena experiencia o si tuviste algún inconveniente.</div>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Enviar</button>
         </form>
     </div>
 {% endblock %}

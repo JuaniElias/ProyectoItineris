@@ -27,4 +27,5 @@ urlpatterns = [
     path("payment_success", views.payment_success, name="payment_success"),
     path("generate_route/<str:travel_id>/", views.generate_route, name="generate_route"),
     path("feedback/<str:encrypted_traveler_id>/", views.feedback, name="feedback"),
+    path("update_feedback/", views.update_feedback, name="update_feedback"),
 ]

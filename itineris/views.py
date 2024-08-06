@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from ProyectoItineris import settings
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
-from utils.utils import send_email, calculate_full_route
+from utils.utils import send_email, calculate_full_route, decrypt_number, encriptedkey
 from django.utils import timezone
 
 
@@ -483,5 +483,19 @@ def payment_success(request):
     return render(request, "itineris/payment_success.html")
 
 
-def feedback():
-    return redirect('feedback')
+def feedback(request, encrypted_traveler_id):
+    traveler_id = decrypt_number(encrypted_traveler_id, key=encriptedkey)
+    traveler = Traveler.objects.get(id=traveler_id)
+
+    return render(request, "itineris/feedback.html", {'traveler': traveler})
+
+
+def update_feedback(request):
+    if request.method == 'POST':
+        traveler_feedback = request.POST.get('feedback')
+        traveler = Traveler.objects.get(id=request.POST.get('traveler_id'))
+        traveler.feedback = traveler_feedback
+        traveler.save()
+    return redirect("index")
+
+
