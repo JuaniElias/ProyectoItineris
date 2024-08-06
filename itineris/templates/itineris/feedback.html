@@ -1,0 +1,14 @@
+{% extends 'itineris/base.html' %}
+
+{% block content %}
+    <div class="container text-center">
+        <form>
+            <div class="mb-3">
+                <label for="inputFeedback" class="form-label">Dejanos una reseña</label>
+                <input type="text" class="form-control" id="inputFeedback" aria-describedby="feedbackHelp">
+                <div id="feedbackHelp" class="form-text">Resalta si tuviste una buena experiencia o si tuviste algún inconveniente.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}

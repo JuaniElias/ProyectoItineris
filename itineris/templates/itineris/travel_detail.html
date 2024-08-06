@@ -12,16 +12,13 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="travelModalLabel">Detalle del viaje</h5>
                     </div>
-                <br>
+                    <br>
                     <div class="modal-body">
                         <p>Salida: {{ travel.datetime_departure }}</p>
                         <p>Llegada estimada: {{ travel.estimated_datetime_arrival }}</p>
                         {% if travel.real_datetime_arrival %}
                             <p>Llegada: {{ travel.real_datetime_arrival}}</p>
-                            <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
-                                <button type="submit" class="btn btn-primary">Marcar viaje como completado</button>
-                            </form>
-                        {% else %}
+                        {% elif travel.status == 'En proceso' %}
                             <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
                                 <button type="submit" class="btn btn-primary">Marcar viaje como completado</button>
                             </form>
@@ -39,11 +36,18 @@
                         <p>Ingresos brutos: ${{ travel.fee|mul:amount }}</p>
                         {% endwith %}
                     </div>
-                    <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
-                        <button type="submit" class="btn btn-primary">Generar mapa de ruta</button>
-                    </form>
+                    {% if travel.seats_left < travel.vehicle.capacity %}
+                        <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-primary mb-2">Generar mapa de ruta</button>
+                        </form>
+                        <a href="{{ travel.url }}">Ruta</a>
+                    {% endif %}
+                    {% if travel.status == 'Agendado' %}
+                        <form action="{% url 'start_trip'  travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-primary">Dar inicio al viaje</button>
+                        </form>
+                    {% endif %}
 
-                    <a href="{{ travel.url }}">Ruta</a>
                     <table class="content-table">
                         <thead>
                             <tr>

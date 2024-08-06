@@ -284,16 +284,42 @@ def mark_travel_ended(request, travel_id):
     for traveler in travelers:
         to_email = traveler.email
         subject = f'Itineris | Viaje finalizado!'
-        message = (f'¡Gracias por elegirnos!\n'
+        message = (f'¡Gracias por elegirnos!<br>'
                    f'Se ha completado el viaje de '
                    f'{traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.travel.city_origin} a '
-                   f'{traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}\n'
-                   f'Día de salida: {traveler.travel.datetime_departure}\n'
-                   f'Finalizado el: {traveler.travel.estimated_datetime_arrival}\n'
-                   f'Empresa: {traveler.travel.company.company_name}\n'
-                   f'Vehículo: {traveler.travel.vehicle}\n'
-                   f'Chofer: {traveler.travel.driver}\n \n \n'
+                   f'{traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}<br>'
+                   f'Día de salida: {traveler.travel.datetime_departure}<br>'
+                   f'Finalizado el: {traveler.travel.estimated_datetime_arrival}<br>'
+                   f'Empresa: {traveler.travel.company.company_name}<br>'
+                   f'Vehículo: {traveler.travel.vehicle}<br>'
+                   f'Chofer: {traveler.travel.driver}<br> <br> <br>'
                    f'Si quieres dejar una reseña de viaje puedes hacerlo <a href="localhost:8000">aquí</a>.'
+                   )
+        try:
+            send_email(to_email, subject, message, file=None, html=True)
+        except Exception as e:
+            messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
+
+    return travel_detail(request, travel_id)
+
+
+# TODO: Hacer una funcion para mandar el email en vez de repetir el codigo
+def start_trip(request, travel_id):
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travel.status = 'En proceso'
+    travel.save()
+    travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
+
+    for traveler in travelers:
+        to_email = traveler.email
+        subject = f'Itineris | El chofer {travel.driver} inició tu viaje!'
+        message = (f'Se ha iniciado el viaje de {travel.city_origin} a {travel.city_destination}<br>'
+                   f'El chofer ({travel.driver}) se estará comunicando contigo por teléfono.<br>'
+                   f'Este es su número de teléfono en caso de que lo necesites! {travel.driver.phone_number} <br>'
+                   f'Empresa: {travel.company.company_name}<br>'
+                   f'Vehículo: {travel.vehicle}<br>'
+                   f'Recuerda chequear que el vehículo sea el correcto. Te brindamos la ruta que el conductor estará '
+                   f'siguiendo <a href="{travel.url}">aquí</a>'
                    )
         try:
             send_email(to_email, subject, message, file=None, html=True)
@@ -455,3 +481,7 @@ def payment_success(request):
             return redirect('checkout')
 
     return render(request, "itineris/payment_success.html")
+
+
+def feedback():
+    return redirect('feedback')

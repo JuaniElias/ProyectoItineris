@@ -1,6 +1,5 @@
 from django.urls import include, path
 
-import utils.utils
 from . import views
 
 urlpatterns = [
@@ -19,6 +18,7 @@ urlpatterns = [
     path("your_travels", views.your_travels, name="your_travels"),
     path("travel_detail/<str:travel_id>/", views.travel_detail, name="travel_detail"),
     path("mark_travel_ended/<str:travel_id>/", views.mark_travel_ended, name="mark_travel_ended"),
+    path("start_trip/<str:travel_id>/", views.start_trip, name="start_trip"),
     path("delete_travel/<str:travel_id>/", views.delete_travel, name="delete_travel"),
     path("your_vehicles", views.your_vehicles, name="your_vehicles"),
     path("delete_vehicle/<str:plate_number>/", views.delete_vehicle, name="delete_vehicle"),
@@ -26,4 +26,5 @@ urlpatterns = [
     path("travel_history", views.travel_history, name="travel_history"),
     path("payment_success", views.payment_success, name="payment_success"),
     path("generate_route/<str:travel_id>/", views.generate_route, name="generate_route"),
+    path("feedback/<str:encrypted_traveler_id>/", views.feedback, name="feedback"),
 ]

@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 
 from itineris.models import Traveler, Travel
 
+import base64
+
 
 def send_email(to_email, subject, message, file, html=False):
     email = EmailMessage(
@@ -23,6 +25,32 @@ def send_email(to_email, subject, message, file, html=False):
         email.attach(file.name, file.read(), file.content_type)
 
     email.send()
+
+
+def xor_encrypt_decrypt(input_string, key):
+    # Aplicar XOR a cada carácter en el string con el carácter correspondiente en la clave
+    return ''.join(chr(ord(c) ^ ord(k)) for c, k in zip(input_string, key))
+
+
+def encrypt_number(number, key):
+    # Convertir el número a string
+    number_str = str(number)
+    # Asegurarse de que la clave tenga la misma longitud que el número
+    key = (key * (len(number_str) // len(key) + 1))[:len(number_str)]
+    # Encriptar usando XOR
+    encrypted_str = xor_encrypt_decrypt(number_str, key)
+    # Codificar el resultado en base64 para hacerlo apto para URL
+    return base64.urlsafe_b64encode(encrypted_str.encode()).decode()
+
+
+def decrypt_number(encoded_str, key):
+    # Decodificar desde base64
+    encrypted_str = base64.urlsafe_b64decode(encoded_str).decode()
+    # Asegurarse de que la clave tenga la misma longitud que el texto cifrado
+    key = (key * (len(encrypted_str) // len(key) + 1))[:len(encrypted_str)]
+    # Desencriptar usando XOR
+    decrypted_str = xor_encrypt_decrypt(encrypted_str, key)
+    return int(decrypted_str)
 
 
 def get_next_destination(origin: str, distance_matrix: pd.DataFrame):
