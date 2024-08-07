@@ -2,6 +2,7 @@ from datetime import datetime, date
 
 import mercadopago
 import pandas as pd
+import pytz
 from django.contrib import messages
 from django.db.models import Model
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -468,7 +469,7 @@ def payment_success(request):
                            f'El vehículo que te pasa a buscar: {traveler.travel.vehicle}<br>'
                            f'Chofer: {traveler.travel.driver}<br>'
                            f'Tarifa: {traveler.travel.fee}<br><br>'
-                           
+
                            f'Si querés editar tus datos antes de viajar podes ingresar al siguiente '
                            f'<a href="localhost:8000/update_traveler/{encrypted_traveler_id}/">link</a>.'
                            )
@@ -508,6 +509,13 @@ def update_feedback(request):
 def update_traveler(request, encrypted_traveler_id):
     traveler_id = decrypt_number(encrypted_traveler_id, key=encryptedkey)
     traveler = Traveler.objects.get(id=traveler_id)
+    # Chequea si puede cancelar el viaje el pasajero antes de 48 horas
+    can_cancel = True
+    # Dos días antes se puede cancelar el viaje
+    date_to_check = traveler.travel.datetime_departure - pd.Timedelta(days=2)
+
+    if datetime.now(pytz.utc) <= date_to_check:
+        can_cancel = False
     # Solo permitir editar los datos antes de que haya comenzado el viaje.
     if traveler.travel.status == "Agendado":
         if request.method == 'POST':
@@ -523,5 +531,16 @@ def update_traveler(request, encrypted_traveler_id):
         messages.success(request, "No se pueden editar los datos en este momento.")
         return redirect('index')
 
-    return render(request, "itineris/update_traveler.html", {'form': form, 'traveler': traveler, 
-                                                             'encrypted_traveler_id': encrypted_traveler_id})
+    return render(request, "itineris/update_traveler.html", {'form': form, 'traveler': traveler,
+                                                             'encrypted_traveler_id': encrypted_traveler_id,
+                                                             'can_cancel': can_cancel})
+
+
+def cancel_traveler_ticket(request, encrypted_traveler_id):
+    traveler_id = decrypt_number(encrypted_traveler_id, key=encryptedkey)
+    traveler = get_object_or_404(Traveler, id=traveler_id)
+    traveler.status = 'Cancelado'
+    traveler.save()
+    messages.success(request, "Tu viaje fue cancelado exitosamente.")
+
+    return redirect('index')
