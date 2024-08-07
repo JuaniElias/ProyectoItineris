@@ -544,3 +544,46 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
     messages.success(request, "Tu viaje fue cancelado exitosamente.")
 
     return redirect('index')
+
+
+def update_travel(request, travel_id):
+    travel = Travel.objects.get(travel_id=travel_id)
+    # Chequea si puede cancelar el viaje el pasajero antes de 48 horas
+    can_cancel = True
+    # Dos días antes se puede cancelar el viaje
+    date_to_check = travel.datetime_departure - pd.Timedelta(days=2)
+
+    if datetime.now(pytz.utc) <= date_to_check:
+        can_cancel = False
+    # Solo permitir editar los datos antes de que haya comenzado el viaje.
+    if travel.status == "Agendado":
+        if request.method == 'POST':
+            form = UpdateTraveler(request.POST, instance=travel)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "El viaje fue modificado exitosamente.")
+                
+                # Mandar mail a los pasajeros que se cambiaron datos del viaje
+                
+                return redirect('index')
+        else:
+            form = UpdateTraveler(instance=travel)
+    # Viajes ya finalizados, en proceso o cancelados.
+    else:
+        messages.success(request, "No se pueden editar los datos en este momento.")
+        return redirect('index')
+
+    return render(request, "itineris/update_traveler.html", {'form': form, 'travel': travel,
+                                                             'encrypted_traveler_id': travel_id,
+                                                             'can_cancel': can_cancel})
+
+
+def cancel_travel(request, travel_id):
+    traveler = get_object_or_404(Traveler, id=travel_id)
+    traveler.status = 'Cancelado'
+    traveler.save()
+    
+    # Mandar mail a los pasajeros que se canceló el viaje
+    messages.success(request, "Tu viaje fue cancelado exitosamente.")
+
+    return redirect('index')
