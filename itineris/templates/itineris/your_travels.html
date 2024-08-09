@@ -19,8 +19,7 @@
                             <th class="capacity"    >Capacidad</th>
                             <th class="fee"         >Tarifa</th>
                             <th class="more-info"   ></th>
-                            <th class="cancel"      ></th>
-                            <th class="cancel"      ></th>
+                            <th class="update"      ></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,13 +36,8 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
+                                    <a href="{% url 'update_travel' travel.travel_id %}">
                                         <i class="bi bi-pencil-square text-grey"></i>
-                                    </a>
-                                </td>
-                                <td> 
-                                    <a href="{% url 'delete_travel' travel.travel_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este viaje?')">
-                                        <i class="btn bi bi-trash3 text-danger"></i>
                                     </a>
                                 </td>
                             {% endfor %}

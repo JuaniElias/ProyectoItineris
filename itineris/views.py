@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ProyectoItineris import settings
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
-    UpdateTraveler
+    UpdateTraveler, UpdateTravel
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler
 from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number
 from django.utils import timezone
@@ -217,7 +217,7 @@ def travel_result_failed(request):
 
 def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
+    travelers = Traveler.objects.filter(travel_id=travel_id, payment_status='Confirmado')
     return render(request, "itineris/travel_detail.html", {'travel': travel, 'travelers': travelers})
 
 
@@ -267,13 +267,6 @@ def travel_history(request):
     drivers = Driver.objects.filter(company_id=request.user.id)
     return render(request, "itineris/travel_history.html",
                   {'travels': travels, 'vehicles': vehicles, 'drivers': drivers})
-
-
-def delete_travel(request, travel_id):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    travel.status = 'Cancelado'
-    travel.save()
-    return redirect('your_travels')
 
 
 def mark_travel_ended(request, travel_id):
@@ -439,7 +432,7 @@ def checkout(request):
 
 @csrf_exempt
 def payment_success(request):
-    payment_status = request.GET.get("status", None)
+    payment_status = request.GET.get("payment_status", None)
     print(payment_status)
     if payment_status == 'approved':
         payment_id = request.GET.get("payment_id", None)
@@ -454,7 +447,7 @@ def payment_success(request):
             traveler_ids = request.session.get('travelers')
             travelers = Traveler.objects.filter(id__in=traveler_ids)
             for traveler in travelers:
-                traveler.status = 'Confirmado'
+                traveler.payment_status = 'Confirmado'
                 encrypted_traveler_id = encrypt_number(traveler.id, key=encryptedkey)
 
                 to_email = traveler.email
@@ -539,7 +532,7 @@ def update_traveler(request, encrypted_traveler_id):
 def cancel_traveler_ticket(request, encrypted_traveler_id):
     traveler_id = decrypt_number(encrypted_traveler_id, key=encryptedkey)
     traveler = get_object_or_404(Traveler, id=traveler_id)
-    traveler.status = 'Cancelado'
+    traveler.payment_status = 'Cancelado'
     traveler.save()
     messages.success(request, "Tu viaje fue cancelado exitosamente.")
 
@@ -553,37 +546,58 @@ def update_travel(request, travel_id):
     # Dos días antes se puede cancelar el viaje
     date_to_check = travel.datetime_departure - pd.Timedelta(days=2)
 
-    if datetime.now(pytz.utc) <= date_to_check:
+    print(datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')))
+    print(date_to_check)
+    if datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')) >= date_to_check:
         can_cancel = False
     # Solo permitir editar los datos antes de que haya comenzado el viaje.
     if travel.status == "Agendado":
         if request.method == 'POST':
-            form = UpdateTraveler(request.POST, instance=travel)
+            form = UpdateTravel(travel_id, request.POST, instance=travel)
             if form.is_valid():
                 form.save()
                 messages.success(request, "El viaje fue modificado exitosamente.")
-                
+
                 # Mandar mail a los pasajeros que se cambiaron datos del viaje
-                
-                return redirect('index')
+
+                return redirect('your_travels')
         else:
-            form = UpdateTraveler(instance=travel)
-    # Viajes ya finalizados, en proceso o cancelados.
+            form = UpdateTravel(travel_id=travel_id, instance=travel)
     else:
         messages.success(request, "No se pueden editar los datos en este momento.")
-        return redirect('index')
+        return redirect('your_travels')
 
-    return render(request, "itineris/update_traveler.html", {'form': form, 'travel': travel,
-                                                             'encrypted_traveler_id': travel_id,
-                                                             'can_cancel': can_cancel})
+    return render(request, "itineris/update_travel.html", {'form': form, 'travel': travel,
+                                                           'travel_id': travel_id,
+                                                           'can_cancel': can_cancel})
 
 
 def cancel_travel(request, travel_id):
-    traveler = get_object_or_404(Traveler, id=travel_id)
-    traveler.status = 'Cancelado'
-    traveler.save()
-    
-    # Mandar mail a los pasajeros que se canceló el viaje
-    messages.success(request, "Tu viaje fue cancelado exitosamente.")
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    if travel.company.id == request.user.id:
+        travel.status = 'Cancelado'
+        travel.save()
 
-    return redirect('index')
+        travelers = Traveler.objects.filter(travel_id=travel_id, payment_status='Confirmado')
+
+        for traveler in travelers:
+            to_email = traveler.email
+            subject = f'Itineris | Viaje cancelado'
+            message = (f'La empresa {travel.company} ha cancelado su viaje de '
+                       f'{travel.city_origin} a {travel.city_destination}<br>'
+                       f'Día de salida: {traveler.travel.datetime_departure}<br>'
+                       f'En los próximos días verás reflejado la devolución de tu dinero.<br>'
+                       f'Lamentamos las molestias.<br>'
+                       f'Podes contactarte con nosotros con el siguiente mail: <a>itineris.pf@gmail.com</a>'
+
+                       )
+            try:
+                send_email(to_email, subject, message, file=None, html=True)
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
+
+        messages.success(request, "Tu viaje fue cancelado exitosamente.")
+    else:
+        return "No tienes acceso para borrar este viaje"
+
+    return redirect('your_travels')

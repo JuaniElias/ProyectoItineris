@@ -30,7 +30,7 @@ class Travel(models.Model):
     fee = models.IntegerField()
     payment_status = models.CharField(max_length=20, default="Pendiente")
     seats_left = models.IntegerField(default=0)
-    status = models.CharField(max_length=50, default="Agendado")
+    status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
     period = models.ForeignKey("Period", on_delete=models.CASCADE, default=None, null=True, editable=True)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
 
@@ -108,7 +108,7 @@ class Traveler(models.Model):
     addr_dest = models.CharField(max_length=100)
     addr_dest_num = models.CharField(max_length=10)
     feedback = models.TextField(max_length=200, null=True, default='-')
-    status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Agendado | Finalizado
+    payment_status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Confirmado | Finalizado | Cancelado
 
 
 class Province(models.Model):

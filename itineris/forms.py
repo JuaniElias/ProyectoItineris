@@ -227,32 +227,33 @@ class UpdateTraveler(forms.ModelForm):
         self.fields['addr_ori_num'].widget.attrs['class'] = 'form-control'
         self.fields['addr_dest'].widget.attrs['class'] = 'form-control'
         self.fields['addr_dest_num'].widget.attrs['class'] = 'form-control'
-        
-        
+
+
 class UpdateTravel(forms.ModelForm):
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
-    addr_origin_num = forms.CharField(label='Dirección de salida', max_length=50, required=True)
-    addr_origin = forms.CharField(label='Número', max_length=50, required=True)
+    addr_origin = forms.CharField(label='Dirección de salida', max_length=100, required=True)
+    addr_origin_num = forms.CharField(label='Número', max_length=10, required=True)
 
     class Meta:
         model = Travel
-        fields = ('driver', 'vehicle', 'addr_origin_num', 'addr_origin')
+        fields = ('driver', 'vehicle', 'addr_origin', 'addr_origin_num')
 
-    def __init__(self, company_id, travel_id, *args, **kwargs):
+    def __init__(self, travel_id, *args, **kwargs):
         super(UpdateTravel, self).__init__(*args, **kwargs)
-        
+
         # get Travel to get min_capacity to filter the vehicles
         travel = Travel.objects.get(travel_id=travel_id)
+        company_id = travel.company_id
         min_capacity = travel.vehicle.capacity - travel.seats_left
-        
+
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
                                                                                       active=1))
         self.fields['driver'].widget.attrs['class'] = 'form-control'
         self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id,
                                                                                         status='Disponible',
                                                                                         capacity__gte=min_capacity,
-                                                                                        active=1))
+                                                                                        ))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin_num'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin'].widget.attrs['class'] = 'form-control'

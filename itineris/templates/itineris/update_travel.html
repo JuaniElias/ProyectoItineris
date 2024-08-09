@@ -1,23 +1,25 @@
 {% extends 'itineris/base.html' %}
 
 {% block content %}
-    <div class="card m-4 p-3">
-        <form action="{% url 'update_travel' travel_id %}" method=POST>
-            {% csrf_token %}
+    <section class="your-business">
+        <div class="card m-4 p-3">
+            <form action="{% url 'update_travel' travel_id %}" method=POST>
+                {% csrf_token %}
 
-            <p>Ciudad de salida: {{ travel.city_origin }}</p>
-            <p>Ciudad de destino: {{ travel.city_destination }}</p>
+                <p>Ciudad de salida: {{ travel.city_origin }}</p>
+                <p>Ciudad de destino: {{ travel.city_destination }}</p>
 
-            {{ form.as_table }}
-            <br>
-            <button type="submit" class="btn btn-primary p-2 fs-3 mb-2">Guardar</button>
-        </form>
-        {% if can_cancel%}
-            <a class="btn btn-danger" href="{% url 'cancel_traveler_ticket' encrypted_traveler_id %}"
-               onclick="return confirm('¿Estás seguro de que deseas cancelar el viaje?')">Cancelar viaje 
-                <i class="btn bi bi-trash3 text-light"></i>
-            </a>
-        {% endif %}
-    </div>
+                {{ form.as_table }}
+                <br>
+                <button type="submit" class="btn btn-primary p-2 fs-3 mb-2">Guardar</button>
+            </form>
+            {% if can_cancel%}
+                <a class="btn btn-danger w-25" href="{% url 'cancel_travel' travel_id %}"
+                   onclick="return confirm('¿Estás seguro de que deseas cancelar el viaje?')">Cancelar viaje
+                    <i class="btn bi bi-trash3 text-light"></i>
+                </a>
+            {% endif %}
+        </div>
+    </section>
 
 {% endblock %}

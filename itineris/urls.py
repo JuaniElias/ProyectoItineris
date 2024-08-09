@@ -19,7 +19,6 @@ urlpatterns = [
     path("travel_detail/<str:travel_id>/", views.travel_detail, name="travel_detail"),
     path("mark_travel_ended/<str:travel_id>/", views.mark_travel_ended, name="mark_travel_ended"),
     path("start_trip/<str:travel_id>/", views.start_trip, name="start_trip"),
-    path("delete_travel/<str:travel_id>/", views.delete_travel, name="delete_travel"),
     path("your_vehicles", views.your_vehicles, name="your_vehicles"),
     path("delete_vehicle/<str:plate_number>/", views.delete_vehicle, name="delete_vehicle"),
     path("checkout", views.checkout, name="checkout"),
@@ -29,7 +28,8 @@ urlpatterns = [
     path("feedback/<str:encrypted_traveler_id>/", views.feedback, name="feedback"),
     path("update_feedback/", views.update_feedback, name="update_feedback"),
     path("update_traveler/<str:encrypted_traveler_id>/", views.update_traveler, name="update_traveler"),
-    path("cancel_traveler_ticket/<str:encrypted_traveler_id>/", views.cancel_traveler_ticket, name="cancel_traveler_ticket"),
+    path("cancel_traveler_ticket/<str:encrypted_traveler_id>/", views.cancel_traveler_ticket,
+         name="cancel_traveler_ticket"),
     path("update_travel/<str:travel_id>/", views.update_travel, name="update_travel"),
     path("cancel_travel/<str:travel_id>/", views.cancel_travel, name="cancel_travel"),
 ]
