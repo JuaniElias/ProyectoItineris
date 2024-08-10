@@ -33,6 +33,12 @@ class CityWidget(s2forms.ModelSelect2Widget):
     ]
 
 
+class NationalityWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        "name__icontains",
+    ]
+
+
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(), widget=s2forms.ModelSelect2MultipleWidget(
         model=Weekday,
@@ -80,8 +86,6 @@ class CreateTravel(forms.ModelForm):
     fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
-
-    # TODO: Driver y Vehicle salen en inglés en el forms
 
     def clean(self):
         cleaned_data = super().clean()
@@ -181,9 +185,22 @@ class SearchTravel(forms.ModelForm):
 
 
 class PreCheckout(forms.ModelForm):
+    DOCUMENT_CHOICES = [
+        ('DNI', 'DNI'),
+        ('PASAPORTE', 'Pasaporte'),
+        ('OTRO', 'Otro'),
+    ]
+    SEX_CHOICES = [
+        ('M', 'M'),
+        ('F', 'F'),
+    ]
     first_name = forms.CharField(label='Nombre', max_length=50, required=True)
     last_name = forms.CharField(label='Apellido', max_length=50, required=True)
+    dni_type = forms.ChoiceField(choices=DOCUMENT_CHOICES, label='Tipo de Documento', required=True)
+    dni_description = forms.CharField(label='Descripción de Documento', max_length=20, required=False)
     dni = forms.CharField(label='DNI', max_length=8, required=True)
+    minor = forms.BooleanField(label='Es menor de edad?')
+    sex = forms.ChoiceField(choices=SEX_CHOICES, label='Sexo', required=True)
     email = forms.EmailField(label='Email', max_length=100, required=True)
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
     addr_ori = forms.CharField(label='Dirección origen', max_length=50, required=True)
@@ -193,14 +210,24 @@ class PreCheckout(forms.ModelForm):
 
     class Meta:
         model = Traveler
-        fields = ('first_name', 'last_name', 'dni', 'email', 'phone', 'addr_ori', 'addr_ori_num',
-                  'addr_dest', 'addr_dest_num')
+        fields = ('first_name', 'last_name',
+                  'dni_type', 'dni_description', 'dni',
+                  'minor', 'sex', 'nationality', 'email', 'phone',
+                  'addr_ori', 'addr_ori_num', 'addr_dest', 'addr_dest_num')
+        widgets = {
+            "nationality": NationalityWidget,
+        }
 
     def __init__(self, *args, **kwargs):
         super(PreCheckout, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
+        self.fields['dni_type'].widget.attrs['class'] = 'form-control'
+        self.fields['dni_description'].widget.attrs['class'] = 'form-control'
         self.fields['dni'].widget.attrs['class'] = 'form-control'
+        self.fields['minor'].widget.attrs['class'] = 'form-control'
+        self.fields['sex'].widget.attrs['class'] = 'form-control'
+        self.fields['nationality'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['addr_ori'].widget.attrs['class'] = 'form-control'

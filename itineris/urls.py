@@ -32,4 +32,5 @@ urlpatterns = [
          name="cancel_traveler_ticket"),
     path("update_travel/<str:travel_id>/", views.update_travel, name="update_travel"),
     path("cancel_travel/<str:travel_id>/", views.cancel_travel, name="cancel_travel"),
+    path("export_travelers_to_csv/<str:travel_id>/", views.export_travelers_to_csv, name="export_travelers_to_csv"),
 ]

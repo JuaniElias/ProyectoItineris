@@ -47,6 +47,9 @@
                             <button type="submit" class="btn btn-primary">Dar inicio al viaje</button>
                         </form>
                     {% endif %}
+                    <form action="{% url 'export_travelers_to_csv' travel.travel_id %}" method="get">
+                        <button type="submit" class="btn btn-success">Exportar datos a CSV</button>
+                    </form>
 
                     <table class="content-table">
                         <thead>

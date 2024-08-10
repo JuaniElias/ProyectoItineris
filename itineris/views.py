@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, date
 
 import mercadopago
@@ -5,7 +6,7 @@ import pandas as pd
 import pytz
 from django.contrib import messages
 from django.db.models import Model
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -118,11 +119,7 @@ def create_travel(request):
                     new_travel.period = period_
 
                     period_weekdays = [weekday.weekday_id for weekday in period_.weekdays.all()]
-
-                    print(period_weekdays)
-
                     date_range = pd.date_range(start=start_date, end=end_date)
-
                     date_to_use = [date for date in date_range if date.weekday() + 1 in period_weekdays]
 
                     departure_time = new_travel.datetime_departure.time()
@@ -433,7 +430,6 @@ def checkout(request):
 @csrf_exempt
 def payment_success(request):
     payment_status = request.GET.get("payment_status", None)
-    print(payment_status)
     if payment_status == 'approved':
         payment_id = request.GET.get("payment_id", None)
 
@@ -541,16 +537,14 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
 
 def update_travel(request, travel_id):
     travel = Travel.objects.get(travel_id=travel_id)
-    # Chequea si puede cancelar el viaje el pasajero antes de 48 horas
+
     can_cancel = True
     # Dos días antes se puede cancelar el viaje
     date_to_check = travel.datetime_departure - pd.Timedelta(days=2)
 
-    print(datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')))
-    print(date_to_check)
     if datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')) >= date_to_check:
         can_cancel = False
-    # Solo permitir editar los datos antes de que haya comenzado el viaje.
+
     if travel.status == "Agendado":
         if request.method == 'POST':
             form = UpdateTravel(travel_id, request.POST, instance=travel)
@@ -558,7 +552,7 @@ def update_travel(request, travel_id):
                 form.save()
                 messages.success(request, "El viaje fue modificado exitosamente.")
 
-                # Mandar mail a los pasajeros que se cambiaron datos del viaje
+                # TODO: Mandar mail a los pasajeros si cambia solamente Driver o Vehicle /no mandar si cambia la dirección de origen
 
                 return redirect('your_travels')
         else:
@@ -601,3 +595,39 @@ def cancel_travel(request, travel_id):
         return "No tienes acceso para borrar este viaje"
 
     return redirect('your_travels')
+
+
+def export_travelers_to_csv(request, travel_id):
+    # Crear la respuesta HTTP con el tipo de contenido adecuado para CSV
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    date_ = travel.datetime_departure.strftime("%Y-%m-%d")
+    city_origin = travel.city_origin.city_name
+    city_destination = travel.city_destination.city_name
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{city_origin}_a_{city_destination}_{date_}.csv"'
+
+    # Crear un escritor de CSV
+    writer = csv.writer(response)
+
+    # Escribir el encabezado del CSV
+    writer.writerow(
+        ['apellido', 'nombre', 'tipo_documento', 'descripcion_documento', 'numero_documento', 'sexo', 'menor'
+            , 'nacionalidad', 'tripulante', 'ocupa_butaca'])
+
+    # Obtener los datos de la base de datos y escribirlos en el archivo CSV
+    travelers = travel.traveler_set
+    for traveler in travelers:
+        writer.writerow([
+            traveler.last_name,
+            traveler.first_name,
+            traveler.dni_type,
+            traveler.dni_description,
+            traveler.dni,
+            traveler.sex,
+            traveler.minor,
+            traveler.nationality.iso_code,
+            0,
+            1,
+        ])
+
+    return response

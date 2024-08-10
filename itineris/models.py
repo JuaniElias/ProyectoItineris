@@ -100,15 +100,22 @@ class Traveler(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    dni_type = models.CharField(max_length=9)
+    dni_description = models.CharField(max_length=9, default=None, null=True)
     dni = models.CharField(max_length=8)
     email = models.EmailField()
+    sex = models.CharField(max_length=1)
+    minor = models.BooleanField()
+    nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
+    # Poner default a la hora de hacer la carga
     phone = models.CharField(max_length=30)
     addr_ori = models.CharField(max_length=100)
     addr_ori_num = models.CharField(max_length=10)
     addr_dest = models.CharField(max_length=100)
     addr_dest_num = models.CharField(max_length=10)
     feedback = models.TextField(max_length=200, null=True, default='-')
-    payment_status = models.CharField(max_length=50, default="En Proceso")  # En Proceso | Confirmado | Finalizado | Cancelado
+    payment_status = models.CharField(max_length=50,
+                                      default="En Proceso")  # En Proceso | Confirmado | Finalizado | Cancelado
 
 
 class Province(models.Model):
@@ -118,3 +125,9 @@ class Province(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Nationality(models.Model):
+    country_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    iso_code = models.CharField(max_length=2)
