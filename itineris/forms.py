@@ -39,40 +39,6 @@ class NationalityWidget(s2forms.ModelSelect2Widget):
     ]
 
 
-class PeriodTravel(forms.ModelForm):
-    weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(), widget=s2forms.ModelSelect2MultipleWidget(
-        model=Weekday,
-        search_fields=['weekday__icontains'],
-        attrs={'data-minimum-input-length': 0}
-    ),
-                                              required=False
-                                              )
-    end_date = forms.DateField(label='Fin del periodo', widget=forms.widgets.DateInput(
-        attrs={'type': 'date',
-               'id': 'period_end_date'}), required=False)
-
-    class Meta:
-        model = Period
-        fields = ('weekdays', 'end_date',)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        end_date = cleaned_data.get('end_date')
-
-        if end_date is None:
-            cleaned_data['end_date'] = datetime.date.today() + pd.Timedelta(days=365)
-
-        if datetime.date.today() > end_date:
-            raise forms.ValidationError('La fecha de debe ser mayor a la actual.')
-
-        return cleaned_data
-
-    def __init__(self, *args, **kwargs):
-        super(PeriodTravel, self).__init__(*args, **kwargs)
-        self.fields['weekdays'].widget.attrs['class'] = 'form-control'
-        self.fields['end_date'].widget.attrs['class'] = 'form-control'
-
-
 class CreateTravel(forms.ModelForm):
     datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
                                              widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
@@ -123,6 +89,37 @@ class CreateTravel(forms.ModelForm):
                                                                                         status='Disponible',
                                                                                         active=1))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
+
+
+class PeriodTravel(forms.ModelForm):
+    weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
+                                              widget=s2forms.ModelSelect2MultipleWidget(
+        model=Weekday, search_fields=['weekday__icontains'], attrs={'data-minimum-input-length': 0}),
+                                              required=False)
+
+    end_date = forms.DateField(label='Fin del periodo', widget=forms.widgets.DateInput(
+        attrs={'type': 'date', 'id': 'period_end_date'}), required=False)
+
+    class Meta:
+        model = Period
+        fields = ('weekdays', 'end_date',)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        end_date = cleaned_data.get('end_date')
+
+        if end_date is None:
+            cleaned_data['end_date'] = datetime.date.today() + pd.Timedelta(days=365)
+
+        if datetime.date.today() > end_date:
+            raise forms.ValidationError('La fecha de debe ser mayor a la actual.')
+
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super(PeriodTravel, self).__init__(*args, **kwargs)
+        self.fields['weekdays'].widget.attrs['class'] = 'form-control'
+        self.fields['end_date'].widget.attrs['class'] = 'form-control'
 
 
 class CreateVehicle(forms.ModelForm):

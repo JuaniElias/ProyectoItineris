@@ -35,9 +35,7 @@ class Travel(models.Model):
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Check if the object is being created for the first time
         if not self.pk:
-            # Initialize seats_left with the capacity of the linked vehicle
             self.seats_left = self.vehicle.capacity
         super().save(*args, **kwargs)
 
@@ -63,7 +61,7 @@ class Driver(models.Model):
     last_name = models.CharField(max_length=100)
     license_number = models.CharField(max_length=30)
     email = models.EmailField()
-    phone_number = models.IntegerField()
+    phone_number = models.CharField(max_length=30)
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -107,8 +105,10 @@ class Traveler(models.Model):
     sex = models.CharField(max_length=1)
     minor = models.BooleanField()
     nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
-    # Poner default a la hora de hacer la carga
+    # TODO: Poner default a la hora de hacer la carga
     phone = models.CharField(max_length=30)
+    # FIXME: Si terminamos aplicando la Places API de Google vamos a seguir guardando de esta manera las direcciones?
+    #  Es decir, separar la dirección de la altura.
     addr_ori = models.CharField(max_length=100)
     addr_ori_num = models.CharField(max_length=10)
     addr_dest = models.CharField(max_length=100)
