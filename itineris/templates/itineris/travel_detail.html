@@ -44,12 +44,16 @@
                     {% endif %}
                     {% if travel.status == 'Agendado' %}
                         <form action="{% url 'start_trip'  travel.travel_id %}" method="get">
-                            <button type="submit" class="btn btn-primary">Dar inicio al viaje</button>
+                            <button type="submit" class="btn btn-primary mb-2">Dar inicio al viaje</button>
                         </form>
                     {% endif %}
-                    <form action="{% url 'export_travelers_to_csv' travel.travel_id %}" method="get">
-                        <button type="submit" class="btn btn-success">Exportar datos a CSV</button>
-                    </form>
+                    <div class="d-flex w-100 justify-content-between">
+                        <form action="{% url 'export_travelers_to_csv' travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-success">Exportar datos a CSV</button>
+                        </form>
+                        {# Imprimir hoja de ruta #}
+                        <button onclick="window.print()" class="btn btn-info">Imprimir hoja de ruta</button>
+                    </div>
 
                     <table class="content-table">
                         <thead>
