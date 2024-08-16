@@ -94,6 +94,8 @@ def create_travel(request):
         form = CreateTravel(company.id, request.POST)
         period_form = PeriodTravel(request.POST)
 
+        # TODO: Hacer period al final de todo del create.
+
         toggle_checkbox = request.POST.get('period_checkbox')
         if form.is_valid():
             if company.is_verified:

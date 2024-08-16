@@ -40,48 +40,21 @@ class NationalityWidget(s2forms.ModelSelect2Widget):
 
 
 class CreateTravel(forms.ModelForm):
-    datetime_departure = forms.DateTimeField(label='Fecha y Hora de salida', required=True,
-                                             widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local',
-                                                                                       'id': 'datetime_departure'}))
-    estimated_datetime_arrival = forms.DateTimeField(label='Fecha y Hora de llegada', required=True,
-                                                     widget=forms.widgets.DateTimeInput(
-                                                         attrs={'type': 'datetime-local',
-                                                                'id': 'datetime_arrival'}))
     addr_origin = forms.CharField(label='Dirección desde donde salís', required=True)
     addr_origin_num = forms.CharField(label='Número de la dirección', required=True)
-    fee = forms.FloatField(label='Tarifa', required=True, validators=[validate_positive])
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        datetime_departure = cleaned_data.get('datetime_departure')
-        estimated_datetime_arrival = cleaned_data.get('estimated_datetime_arrival')
-
-        if datetime_departure and estimated_datetime_arrival:
-            if datetime_departure >= estimated_datetime_arrival:
-                raise forms.ValidationError('La fecha de llegada debe ser mayor que la fecha de salida.')
-
-        return cleaned_data
 
     class Meta:
         model = Travel
-        fields = ('city_origin', 'city_destination', 'datetime_departure', 'estimated_datetime_arrival', 'addr_origin',
-                  'addr_origin_num', 'fee', 'driver', 'vehicle',)
-        widgets = {
-            "city_origin": CityWidget,
-            "city_destination": CityWidget,
-        }
+        fields = ('addr_origin','addr_origin_num', 'driver', 'vehicle',)
 
     def __init__(self, company_id, *args, **kwargs):
         super(CreateTravel, self).__init__(*args, **kwargs)
-        self.fields['city_origin'].widget.attrs['class'] = 'form-control'
-        self.fields['city_destination'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
-        self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin_num'].widget.attrs['class'] = 'form-control'
-        self.fields['fee'].widget.attrs['class'] = 'form-control'
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
                                                                                       active=1))
         self.fields['driver'].widget.attrs['class'] = 'form-control'
@@ -169,7 +142,7 @@ class SearchTravel(forms.ModelForm):
 
     class Meta:
         model = Travel
-        fields = ('city_origin', 'city_destination', 'datetime_departure', 'passengers')
+        fields = ('datetime_departure', 'passengers')
         widgets = {
             "city_origin": CityWidget,
             "city_destination": CityWidget,

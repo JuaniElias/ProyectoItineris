@@ -10,51 +10,13 @@
         
         <div class="col-lg-10 table-container">
             <div class="row-travel">
-                <table id="your-travels-table" class="content-table">
-                    <thead>
-                        <tr>
-                            <th class="date"        >Fecha y Hora salida</th>
-                            <th class="origin"      >Origen</th>
-                            <th class="destination" >Destino</th>
-                            <th class="capacity"    >Pasajeros</th>
-                            <th class="fee"         >Tarifa</th>
-                            <th class="more-info"   ></th>
-                            <th class="update"      ></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for travel in travels %}
-                            <tr>
-                                <td>{{ travel.datetime_departure|date:"Y-m-d H:i" }}</td>
-                                <td>{{ travel.city_origin }}</td>           
-                                <td>{{ travel.city_destination }}</td>
-                                <td>{{ travel.vehicle.capacity|sub:travel.seats_left}}/{{ travel.vehicle.capacity }}</td>
-                                <td>${{ travel.fee }}</td>
-                                <td>
-                                    <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
-                                        <i class="bi bi-info-circle"></i>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href="{% url 'update_travel' travel.travel_id %}">
-                                        <i class="bi bi-pencil-square text-grey"></i>
-                                    </a>
-                                </td>
-                            {% endfor %}
-                    </tbody>
-                </table>
+
             </div>
         </div>
     </div>
 </section>
 <script>
-    const table = new DataTable('#your-travels-table', {
-        moment: {format: 'YYYY-MM-DD HH:MM',
-                locale:'es-MX'},
-        language: {
-            url: '/static/itineris/localization/es-ES.json',
-        },
-    });
+
 </script>
 {% endblock %}
 

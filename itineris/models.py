@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -21,23 +19,31 @@ class Travel(models.Model):
     vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
     addr_origin = models.CharField(max_length=100)
     addr_origin_num = models.CharField(max_length=10)
-    city_origin = models.ForeignKey("City", on_delete=models.DO_NOTHING, related_name="city_origin")
-    city_destination = models.ForeignKey("City", on_delete=models.DO_NOTHING, related_name="city_destination")
-    datetime_departure = models.DateTimeField()
-    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
-    estimated_datetime_arrival = models.DateTimeField()
-    duration = models.DurationField(default=timedelta(hours=1))  # En microsegundos
-    fee = models.IntegerField()
-    payment_status = models.CharField(max_length=20, default="Pendiente")
-    seats_left = models.IntegerField(default=0)
-    status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
-    period = models.ForeignKey("Period", on_delete=models.CASCADE, default=None, null=True, editable=True)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
+    payment_status = models.CharField(max_length=20, default="Pendiente") # Pendiente | Pago
+    period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
+
+
+class Segment(models.Model):
+    waypoint_origin = models.ForeignKey("Waypoint", on_delete=models.DO_NOTHING, related_name='waypoint_origin')
+    waypoint_destination = models.ForeignKey("Waypoint", on_delete=models.DO_NOTHING, related_name='waypoint_destination')
+    duration = models.DurationField()  # En microsegundos
+    fee = models.IntegerField(default=0, null=True)
+    seats_occupied = models.IntegerField(default=0)
+    status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.seats_left = self.vehicle.capacity
+            self.duration = self.waypoint_destination.estimated_datetime_arrival - self.waypoint_origin.estimated_datetime_arrival
         super().save(*args, **kwargs)
+
+
+class Waypoint(models.Model):
+    travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
+    cities = models.ForeignKey("City", on_delete=models.DO_NOTHING)
+    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
+    estimated_datetime_arrival = models.DateTimeField()
+    node_number = models.IntegerField()
 
 
 class Period(models.Model):
