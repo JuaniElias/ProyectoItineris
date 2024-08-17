@@ -4,7 +4,7 @@ import pandas as pd
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday
+from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday, Segment
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -45,10 +45,9 @@ class CreateTravel(forms.ModelForm):
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
 
-
     class Meta:
         model = Travel
-        fields = ('addr_origin','addr_origin_num', 'driver', 'vehicle',)
+        fields = ('addr_origin', 'addr_origin_num', 'driver', 'vehicle',)
 
     def __init__(self, company_id, *args, **kwargs):
         super(CreateTravel, self).__init__(*args, **kwargs)
@@ -67,7 +66,8 @@ class CreateTravel(forms.ModelForm):
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
                                               widget=s2forms.ModelSelect2MultipleWidget(
-        model=Weekday, search_fields=['weekday__icontains'], attrs={'data-minimum-input-length': 0}),
+                                                  model=Weekday, search_fields=['weekday__icontains'],
+                                                  attrs={'data-minimum-input-length': 0}),
                                               required=False)
 
     end_date = forms.DateField(label='Fin del periodo', widget=forms.widgets.DateInput(
@@ -136,12 +136,12 @@ class CreateDriver(forms.ModelForm):
 
 
 class SearchTravel(forms.ModelForm):
-    datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True
-                                             , widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True,
+                                             widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     passengers = forms.IntegerField(label='Pasajeros', min_value=1)
 
     class Meta:
-        model = Travel
+        model = Segment
         fields = ('datetime_departure', 'passengers')
         widgets = {
             "city_origin": CityWidget,

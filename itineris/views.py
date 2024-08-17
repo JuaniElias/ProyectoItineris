@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
     UpdateTraveler, UpdateTravel
-from itineris.models import Company, Vehicle, Driver, Travel, Traveler
+from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment
 from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number
 from django.utils import timezone
 
@@ -29,45 +29,50 @@ def index(request):
 
             request.session['passengers'] = passengers
 
-            # Buscar viajes que coincidan con los criterios
-            travels = Travel.objects.all().filter(city_origin=city_origin,
-                                                  city_destination=city_destination,
-                                                  datetime_departure__date=date_departure,
-                                                  seats_left__gte=passengers,
-                                                  status="Agendado"
-                                                  )
-            travels.order_by('datetime_departure')
+            # Busca viajes que coincidan con los criterios
+            # TODO: En seats_occupied hay que hacer la mugre de sumar los pasajeros con trayectos que se intersectan
+            #  TODO: Capaz passengers + (sumatoria de pasajeros de los otros viajes)?
+            #  TODO: Capaz que no podemos usar el filter y necesitamos hacer una query más grosa,
+            #    porque no sabría como traer lo de arriba
+            # travel.segment_set.seats_occupied + la restricción de que pase por el waypoint
+            segments = Segment.objects.all().filter(waypoint_origin__city=city_origin,
+                                                    waypoint_destination__city=city_destination,
+                                                    waypoint_origin__estimated_datetime_arrival__date=date_departure,
+                                                    seats_occupied__lte=passengers,
+                                                    travel__status='Agendado'
+                                                    )
+            segments.order_by('waypoint_origin__estimated_datetime_arrival')
 
-            if not travels:
+            if not segments:
                 msg_text = (f'No hemos encontrado viajes para la fecha ingresada, te dejamos una lista de viajes'
                             f' para otras fechas de salida.')
                 maximum_date = date.today() + pd.Timedelta(days=60)
-                travels = Travel.objects.all().filter(city_origin=city_origin,
-                                                      city_destination=city_destination,
-                                                      seats_left__gte=passengers,
-                                                      datetime_departure__date__lte=maximum_date,
-                                                      status="Agendado"
-                                                      )
-                travels.order_by('datetime_departure')
-                if travels.count() > 10:
-                    travels = travels[:10]
+                segments = Segment.objects.all().filter(waypoint_origin__city=city_origin,
+                                                        waypoint_destination__city=city_destination,
+                                                        seats_occupied__lte=passengers,
+                                                        waypoint_origin__estimated_datetime_arrival__date__lte=maximum_date,
+                                                        travel__status="Agendado"
+                                                        )
+                segments.order_by('waypoint_origin__estimated_datetime_arrival')
+                if segments.count() > 10:
+                    segments = segments[:10]
 
-                if not travels:
+                if not segments:
                     msg_text = (f'No hemos encontrado viajes para la ciudad ingresada, te dejamos una lista de viajes '
                                 f'a otras ciudades.')
-                    travels = Travel.objects.all().filter(city_origin=city_origin,
-                                                          seats_left__gte=passengers,
-                                                          datetime_departure__date=date_departure,
-                                                          status="Agendado"
-                                                          )
-                    travels.order_by('datetime_departure')
+                    segments = Segment.objects.all().filter(waypoint_origin__city=city_origin,
+                                                            seats_occupied__lte=passengers,
+                                                            waypoint_origin__estimated_datetime_arrival__date=date_departure,
+                                                            travel__status="Agendado"
+                                                            )
+                    segments.order_by('waypoint_origin__estimated_datetime_arrival')
 
-                    if not travels:
+                    if not segments:
                         return redirect('travel_result_failed')
 
                 messages.success(request, message=msg_text)
 
-            return render(request, 'itineris/travel_result.html', {'travels': travels,
+            return render(request, 'itineris/travel_result.html', {'segments': segments,
                                                                    'passengers': passengers})
     else:
         form = SearchTravel()
@@ -203,9 +208,8 @@ def get_available_options(request):
 
 
 def travel_result(request):
-    travels = Travel.objects.all()
-
-    return render(request, "itineris/travel_result.html", {'travels': travels})
+    segments = Segment.objects.all()
+    return render(request, "itineris/travel_result.html", {'segments': segments})
 
 
 def travel_result_failed(request):
@@ -252,6 +256,7 @@ def delete_driver(request, driver_id):
     return redirect('your_drivers')
 
 
+# Acá creo que seguiríamos usando travels
 def your_travels(request):
     travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
     return render(request, "itineris/your_travels.html", {'travels': travels, })

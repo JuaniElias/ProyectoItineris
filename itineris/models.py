@@ -20,17 +20,21 @@ class Travel(models.Model):
     addr_origin = models.CharField(max_length=100)
     addr_origin_num = models.CharField(max_length=10)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
-    payment_status = models.CharField(max_length=20, default="Pendiente") # Pendiente | Pago
+    payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
+    status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
 
 
+# No sé si nos pusimos de acuerdo con esto, pero siento que a Segment le falta un travel_id, no me cierra que sólo esté
+# relacionada con Waypoint
 class Segment(models.Model):
+    travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
     waypoint_origin = models.ForeignKey("Waypoint", on_delete=models.DO_NOTHING, related_name='waypoint_origin')
-    waypoint_destination = models.ForeignKey("Waypoint", on_delete=models.DO_NOTHING, related_name='waypoint_destination')
+    waypoint_destination = models.ForeignKey("Waypoint", on_delete=models.DO_NOTHING,
+                                             related_name='waypoint_destination')
     duration = models.DurationField()  # En microsegundos
     fee = models.IntegerField(default=0, null=True)
     seats_occupied = models.IntegerField(default=0)
-    status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -40,10 +44,15 @@ class Segment(models.Model):
 
 class Waypoint(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
-    cities = models.ForeignKey("City", on_delete=models.DO_NOTHING)
-    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
+    city = models.ForeignKey("City", on_delete=models.DO_NOTHING)
     estimated_datetime_arrival = models.DateTimeField()
+    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
     node_number = models.IntegerField()
+
+    # Poniendo real_datetime_arrival en waypoint estaríamos asumiendo que el usuario va a tocar el botón de 'terminé
+    # trayecto para actualizar el valor. Creo que deberíamos ponerlo en Travel como para decir, terminaste el viaje a
+    # tal hora y chau
+    # O la opción nucelar, no ponerlo
 
 
 class Period(models.Model):
