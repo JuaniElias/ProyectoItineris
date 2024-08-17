@@ -278,6 +278,8 @@ def mark_travel_ended(request, travel_id):
     travel.save()
     travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
 
+    # Esto me hace pensar que Traveler tiene que ir agarrado a Segment en vez de Travel, porque como hacer para buscar
+    # el trayecto que hizo el tipito?
     for traveler in travelers:
         to_email = traveler.email
         subject = f'Itineris | Viaje finalizado!'
@@ -307,6 +309,9 @@ def start_trip(request, travel_id):
     travel.save()
     travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
 
+    # Para buscar el city_origin y city_destination sería mejor hacerlo desde traveler, asumiendo que está asociado
+    # a Segment.
+    # por ej: traveler.segment.waypoint_origin.city
     for traveler in travelers:
         to_email = traveler.email
         subject = f'Itineris | El chofer {travel.driver} inició tu viaje!'
