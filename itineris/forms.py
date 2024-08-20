@@ -3,8 +3,10 @@ import datetime
 import pandas as pd
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
+from django.forms import modelformset_factory
+from django.http import request
 
-from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday, Segment
+from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday, Segment, City, Waypoint
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -27,31 +29,42 @@ class CompanyChangeForm(UserChangeForm):
         fields = ('username', 'email')
 
 
-class CityWidget(s2forms.ModelSelect2Widget):
-    search_fields = [
-        "city_name__icontains",
-    ]
-
-
 class NationalityWidget(s2forms.ModelSelect2Widget):
     search_fields = [
         "name__icontains",
     ]
 
 
-class CreateTravel(forms.ModelForm):
+class CreateTravel(forms.Form):
+    city_origin = forms.ModelChoiceField(queryset=City.objects.all(),
+                                         label='Ciudad de salida',
+                                         widget=s2forms.ModelSelect2Widget(
+                                             model=City, search_fields=['city_name__icontains'],
+                                         )
+                                         )
+    city_destination = forms.ModelChoiceField(queryset=City.objects.all(),
+                                              label='Ciudad de destino',
+                                              widget=s2forms.ModelSelect2Widget(model=City,
+                                                                                search_fields=['city_name__icontains'],
+                                                                                )
+                                              )
+    datetime_departure = forms.DateTimeField(label='Fecha y hora de salida',
+                                             widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
+                                             required=True)
+    datetime_arrival = forms.DateTimeField(label='Fecha y hora estimada de llegada',
+                                           widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
+                                           required=True)
     addr_origin = forms.CharField(label='Dirección desde donde salís', required=True)
     addr_origin_num = forms.CharField(label='Número de la dirección', required=True)
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
 
-    class Meta:
-        model = Travel
-        fields = ('addr_origin', 'addr_origin_num', 'driver', 'vehicle',)
-
     def __init__(self, company_id, *args, **kwargs):
         super(CreateTravel, self).__init__(*args, **kwargs)
+        self.fields['city_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['city_destination'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
+        self.fields['datetime_arrival'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin'].widget.attrs['class'] = 'form-control'
         self.fields['addr_origin_num'].widget.attrs['class'] = 'form-control'
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
@@ -62,6 +75,28 @@ class CreateTravel(forms.ModelForm):
                                                                                         active=1))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
 
+
+class CreateWaypoint(forms.ModelForm):
+    city = forms.ModelChoiceField(queryset=City.objects.all(),
+                                              label='Ciudad de destino',
+                                              widget=s2forms.ModelSelect2Widget(model=City,
+                                                                                search_fields=['city_name__icontains'],
+                                                                                )
+                                              )
+    estimated_datetime_arrival = forms.DateTimeField(label='Fecha y hora de salida',
+                                             widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
+                                             )
+
+    class Meta:
+        model = Waypoint
+        fields = ['city', 'estimated_datetime_arrival']
+
+    def __init__(self, *args, **kwargs):
+        super(CreateWaypoint, self).__init__(*args, **kwargs)
+        self.fields['city'].widget.attrs['class'] = 'form-control'
+        self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
+
+CreateWaypointFormSet = modelformset_factory(Waypoint, form=CreateWaypoint, extra=1)
 
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
@@ -135,21 +170,29 @@ class CreateDriver(forms.ModelForm):
         self.fields['phone_number'].widget.attrs['class'] = 'form-control'
 
 
-class SearchTravel(forms.ModelForm):
+class SearchTravel(forms.Form):
+    city_origin = forms.ModelChoiceField(queryset=City.objects.all(),
+                                         label='Ciudad de salida',
+                                         widget=s2forms.ModelSelect2Widget(
+                                             model=City, search_fields=['city_name__icontains'],
+                                         )
+                                         )
+    city_destination = forms.ModelChoiceField(queryset=City.objects.all(),
+                                              label='Ciudad de destino',
+                                              widget=s2forms.ModelSelect2Widget(
+                                                  model=City, search_fields=['city_name__icontains'],
+                                              )
+                                              )
     datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True,
                                              widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     passengers = forms.IntegerField(label='Pasajeros', min_value=1)
 
-    class Meta:
-        model = Segment
-        fields = ('datetime_departure', 'passengers')
-        widgets = {
-            "city_origin": CityWidget,
-            "city_destination": CityWidget,
-        }
+
 
     def __init__(self, *args, **kwargs):
         super(SearchTravel, self).__init__(*args, **kwargs)
+        self.fields['city_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['city_destination'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['passengers'].widget.attrs['class'] = 'form-control'
 

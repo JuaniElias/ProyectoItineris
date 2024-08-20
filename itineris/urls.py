@@ -4,10 +4,10 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("select2/", include("django_select2.urls")),
     path("work_with_us", views.work_with_us, name="work_with_us"),
     path("about_us", views.about, name="about_us"),
     path("create_travel", views.create_travel, name="create_travel"),
+    path("create_waypoints", views.create_waypoints, name="create_waypoints"),
     path("get_available_options", views.get_available_options, name="get_available_options"),
     path("travel_result", views.travel_result, name="travel_result"),
     path("travel_result_failed", views.travel_result_failed, name="travel_result_failed"),

@@ -5,14 +5,16 @@ import mercadopago
 import pandas as pd
 import pytz
 from django.contrib import messages
+from django.db.models import Max
+from django.forms import modelformset_factory
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
-    UpdateTraveler, UpdateTravel
-from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment
+    UpdateTraveler, UpdateTravel, CreateWaypoint, CreateWaypointFormSet
+from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
 from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number
 from django.utils import timezone
 
@@ -21,6 +23,7 @@ def index(request):
     request.session['travelers'] = []
     if request.method == "POST":
         form = SearchTravel(request.POST)
+        print("Entro al form")
         if form.is_valid():
             city_origin = form.cleaned_data['city_origin']
             city_destination = form.cleaned_data['city_destination']
@@ -35,12 +38,17 @@ def index(request):
             #  TODO: Capaz que no podemos usar el filter y necesitamos hacer una query más grosa,
             #    porque no sabría como traer lo de arriba
             # travel.segment_set.seats_occupied + la restricción de que pase por el waypoint
-            segments = Segment.objects.all().filter(waypoint_origin__city=city_origin,
+            segments_raw_queryset = Segment.objects.all().filter(waypoint_origin__city=city_origin,
                                                     waypoint_destination__city=city_destination,
                                                     waypoint_origin__estimated_datetime_arrival__date=date_departure,
-                                                    seats_occupied__lte=passengers,
                                                     travel__status='Agendado'
                                                     )
+            #travel_ids = segments_raw_queryset.values('travel_id').distinct()
+            #travels_queryset = Travel.objects.all().filter(travel_id__in=travel_ids)
+            #all_segments_queryset = Segment.objects.all().filter(travel_id__in=travel_ids)
+
+            segments = segments_raw_queryset
+
             segments.order_by('waypoint_origin__estimated_datetime_arrival')
 
             if not segments:
@@ -92,91 +100,79 @@ def about(request):
 
 
 def create_travel(request):
-    company_id = request.user.id
-    company = get_object_or_404(Company, id=company_id)
+    current_company_id = request.user.id
+    company = get_object_or_404(Company, id=current_company_id)
 
     if request.method == "POST":
         form = CreateTravel(company.id, request.POST)
-        period_form = PeriodTravel(request.POST)
 
         # TODO: Hacer period al final de todo del create.
 
-        toggle_checkbox = request.POST.get('period_checkbox')
         if form.is_valid():
             if company.is_verified:
-                new_travel = form.save(commit=False)
-                new_travel.company_id = company.id
-                duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
-                new_travel.duration = new_travel.estimated_datetime_arrival - new_travel.datetime_departure
+                new_travel = Travel.objects.create(company=company,
+                                    driver=form.cleaned_data['driver'],
+                                    vehicle=form.cleaned_data['vehicle'],
+                                    addr_origin=form.cleaned_data['addr_origin'],
+                                    addr_origin_num=form.cleaned_data['addr_origin_num'])
 
-                # FIXME: Parece estar roto este if,
-                #  siempre pide días de la semana a repetir incluso si no es un viaje periódico
-                if toggle_checkbox and period_form.is_valid():
-                    start_date = (new_travel.datetime_departure + pd.Timedelta(days=1)).date()
+                Waypoint.objects.create(
+                    travel=new_travel,
+                    city=form.cleaned_data['city_origin'],
+                    estimated_datetime_arrival=form.cleaned_data['datetime_departure'],
+                    node_number=0
+                )
 
-                    period_ = period_form.save()
-
-                    end_date = period_.end_date
-                    if end_date is None:
-                        end_date = start_date + pd.Timedelta(days=365)
-                    period_.end_date = end_date
-
-                    period_.save()
-
-                    new_travel.period = period_
-
-                    period_weekdays = [weekday.weekday_id for weekday in period_.weekdays.all()]
-                    date_range = pd.date_range(start=start_date, end=end_date)
-                    date_to_use = [d for d in date_range if d.weekday() + 1 in period_weekdays]
-
-                    departure_time = new_travel.datetime_departure.time()
-
-                    for d in date_to_use:
-                        date_dep = pd.to_datetime(datetime.combine(d, departure_time))
-                        date_arr = date_dep + duration
-
-                        travel = Travel.objects.create(
-                            company=company,
-                            driver=new_travel.driver,
-                            vehicle=new_travel.vehicle,
-                            addr_origin=new_travel.addr_origin,
-                            addr_origin_num=new_travel.addr_origin_num,
-                            city_origin=new_travel.city_origin,
-                            city_destination=new_travel.city_destination,
-                            datetime_departure=timezone.make_aware(
-                                date_dep,
-                                timezone.get_current_timezone()
-                            ),
-                            estimated_datetime_arrival=timezone.make_aware(
-                                date_arr,
-                                timezone.get_current_timezone()
-                            ),
-                            duration=new_travel.duration,
-                            fee=new_travel.fee,
-                            payment_status="Pendiente",
-                            status="Agendado",
-                            period=period_,
-                        )
-                        travel.save()
-
-                    new_travel.period = period_
-                    new_travel.save()
-                else:
-                    messages.success(request,
-                                     'Seleccione días de la semana a repetir el viaje.')
-
-                return redirect('create_travel')
+                Waypoint.objects.create(
+                    travel=new_travel,
+                    city=form.cleaned_data['city_destination'],
+                    estimated_datetime_arrival=form.cleaned_data['datetime_arrival'],
+                    node_number=1
+                )
+                request.session['travel_id'] = new_travel.travel_id
+                return redirect("create_waypoints")
             else:
                 messages.success(request, 'No se puede crear el viaje, la compañía no está verificada.')
     else:
         form = CreateTravel(company.id)
-        period_form = PeriodTravel()
 
     return render(request, "itineris/create_travel.html", {
         'form': form,
-        'period_form': period_form
     })
 
+
+def create_waypoints(request):
+    travel_id = request.session.get('travel_id')
+    waypoints = Waypoint.objects.all().filter(travel_id=travel_id)
+    max_node_number = waypoints.aggregate(max_node=Max('node_number'))['max_node']
+    if request.method == 'POST':
+        instances = waypoints.all().filter(node_number__lt=max_node_number).order_by("node_number")
+        formset = [CreateWaypoint(request.POST, instance=instance) for instance in instances]
+        last_waypoint = CreateWaypoint(request.POST, instance=waypoints.filter(node_number=max_node_number))
+        if all([form.is_valid() for form in formset]):
+            i = 0
+            for form in formset:
+                new_waypoint = form.save(commit=False)
+                new_waypoint.travel_id = travel_id
+                new_waypoint.node_number = i
+                i += 1
+                new_waypoint.save()
+
+            if last_waypoint.is_valid():
+                new_waypoint = last_waypoint.save(commit=False)
+                new_waypoint.node_number = i
+                new_waypoint.save()
+
+            return redirect('create_waypoints')
+    else:
+        instances = waypoints.all().filter(node_number__lt=max_node_number).order_by("node_number")
+        formset = [CreateWaypoint(instance=instance) for instance in instances]
+        last_waypoint = CreateWaypoint(instance=waypoints.last())
+
+    return render(request, "itineris/create_waypoints.html", {
+        "formset": formset,
+        "form": last_waypoint,
+    })
 
 def get_available_options(request):
     if request.GET.get("salida") and request.GET.get("llegada"):

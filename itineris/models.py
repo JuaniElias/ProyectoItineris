@@ -23,6 +23,7 @@ class Travel(models.Model):
     payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
     status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
+    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
 
 
 # No sé si nos pusimos de acuerdo con esto, pero siento que a Segment le falta un travel_id, no me cierra que sólo esté
@@ -40,14 +41,36 @@ class Segment(models.Model):
         if not self.pk:
             self.duration = self.waypoint_destination.estimated_datetime_arrival - self.waypoint_origin.estimated_datetime_arrival
         super().save(*args, **kwargs)
+     # TODO:
+    '''def has_space_available(self, num_seats):
+        # Obtener todos los segmentos asociados al mismo Travel
+        all_segments = Segment.objects.filter(travel=self.travel)
+
+        # Obtener la capacidad total del vehículo asociado a este Travel
+        vehicle_capacity = self.travel.vehicle.capacity
+        
+        for segment in segments_raw_queryset:
+            segment_start = segment.waypoint_origin.node_number
+            segment_end = segment.waypoint_destination.node_number
+
+            s = Segment.objects.all().filter(travel_id=segment.travel.travel_id,
+                                         waypoint_origin__node_number__gte=segment_start,
+                                         waypoint_destination__node_number__lte=segment_end)
+            if s.values('seats_occupied') > passengers:
+                pass
+
+        # Verificar si hay espacio disponible
+        if total_seats_occupied + num_seats <= vehicle_capacity:
+            return True
+        else:
+            return False'''
 
 
 class Waypoint(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
     city = models.ForeignKey("City", on_delete=models.DO_NOTHING)
     estimated_datetime_arrival = models.DateTimeField()
-    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
-    node_number = models.IntegerField()
+    node_number = models.IntegerField(editable=True, null=False)
 
     # Poniendo real_datetime_arrival en waypoint estaríamos asumiendo que el usuario va a tocar el botón de 'terminé
     # trayecto para actualizar el valor. Creo que deberíamos ponerlo en Travel como para decir, terminaste el viaje a
@@ -110,7 +133,7 @@ class City(models.Model):
 
 
 class Traveler(models.Model):
-    travel = models.ForeignKey("Travel", on_delete=models.CASCADE)
+    travel = models.ForeignKey("Segment", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     dni_type = models.CharField(max_length=9)

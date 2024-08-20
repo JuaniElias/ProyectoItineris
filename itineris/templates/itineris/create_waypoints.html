@@ -14,8 +14,17 @@
                     <div class="row">
                         <div class="col-3 travel-col">
                             {% csrf_token %}
-                            {{ form.as_p }}
-                            <br>
+                            {% for form in formset %}
+                                <div>
+                                    {{ form.as_p }}
+                                </div>
+                            {% endfor %}
+                        
+                                <div>
+                                    {{ form.as_p }}
+                                </div>
+                            
+                            <br><br>
                             <input type="submit" value="Crear" class="btn btn-primary">
                         </div>
                    </div>
