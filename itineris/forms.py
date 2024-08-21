@@ -98,22 +98,36 @@ class CreateWaypoint(forms.ModelForm):
 
 
 class EditSegment(forms.ModelForm):
-    waypoint_origin = forms.ModelChoiceField(queryset=City.objects.all(), label='Ciudad de origen')
-    waypoint_destination = forms.ModelChoiceField(queryset=City.objects.all(), label='Ciudad de destino')
+    waypoint_origin = forms.ModelChoiceField(queryset=Waypoint.objects.all(), label='Ciudad de origen')
+    waypoint_destination = forms.ModelChoiceField(queryset=Waypoint.objects.all(), label='Ciudad de destino')
+    origin_display = forms.CharField()
+    destination_display = forms.CharField()
     fee = forms.IntegerField(label='Tarifa', step_size=100)
 
     class Meta:
         model = Segment
-        fields = ['waypoint_origin','waypoint_destination','fee']
+        fields = ['waypoint_origin','waypoint_destination','origin_display','destination_display','fee']
 
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
         self.fields['fee'].widget.attrs['class'] = 'form-control'
         self.fields['fee'].widget.attrs['style'] = 'width:120px'
-        self.fields['waypoint_origin'].widget.attrs['class'] = 'form-control'
-        self.fields['waypoint_destination'].widget.attrs['class'] = 'form-control'
-        self.fields['waypoint_origin'].widget.attrs['disabled'] = True
-        self.fields['waypoint_destination'].widget.attrs['disabled'] = True
+
+        # Se esconden los campos verdaderos de la instancia
+        self.fields['waypoint_origin'].widget = forms.HiddenInput()
+        self.fields['waypoint_destination'].widget = forms.HiddenInput()
+
+        # Mostrar los valores como texto no editable
+        self.fields['origin_display'] = forms.CharField(
+            initial=self.instance.waypoint_origin.city,
+            label='Ciudad de origen',
+            widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+        )
+        self.fields['destination_display'] = forms.CharField(
+            initial=self.instance.waypoint_destination.city,
+            label='Ciudad de destino',
+            widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+        )
 
 EditSegmentFormSet = modelformset_factory(Segment, form=EditSegment, extra=0)
 

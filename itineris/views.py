@@ -219,8 +219,12 @@ def show_segments(request):
     if request.method == 'POST':
         formset = EditSegmentFormSet(request.POST)
         if formset.is_valid():
+            print("Formset.is valid")
             formset.save()
-            return redirect('some_view')
+            return redirect('index')
+        else:
+            print("Formset is not valid: ", formset.errors)
+            print("Formset data:", request.POST)
     else:
         travel_id = request.session.get('travel_id')
         formset = EditSegmentFormSet(queryset=Segment.objects.all().filter(travel_id=travel_id))

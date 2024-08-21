@@ -10,23 +10,22 @@
         <div>
             <h1 class="text">Carga las tarifas de los tramos de tu viaje</h1>
             <div class="row">
-                <div class="col ms-3 d-flex text-center">
+                <form action="{% url "show_segments" %}" method="post">
+                    {{ formset.management_form }}
                     {% csrf_token %}
-                    {% for form in formset %}
-                        <div class="card me-2" style="width: 18rem;">
-                            <div class="card-body">
-                                <form action="{% url "show_segments" %}">
-                                    {{ formset.management_form }}
-                                    {% csrf_token %}
+                    <div class="col ms-3 d-flex text-center">
+                        {% for form in formset %}
+                            <div class="card me-2" style="width: 18rem;">
+                                <div class="card-body">
                                     {{ form.as_p }}
-                                    <button class="btn btn-success">
-                                        Guardar
-                                    </button>
-                                </form>
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                        <button class="btn btn-success">
+                            Guardar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </section>
