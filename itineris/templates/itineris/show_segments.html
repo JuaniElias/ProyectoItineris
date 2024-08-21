@@ -8,73 +8,27 @@
 <body>
     <section class="your-business">
         <div>
-            <h1 class="text">Agrega paradas</h1>
+            <h1 class="text">Carga las tarifas de los tramos de tu viaje</h1>
             <div class="row">
-                <div class="row ms-4">
-                    <div class="col-4 text-center">
-                        {% for waypoint in all_but_last_waypoints %}
-                            <div class="card mb-2">
-                                <div class="row g-0">
-                                    <div class="col-md-10">
-                                        <div class="card-body">
-                                            {% if forloop.first %}
-                                                <h5 class="card-title">Ciudad de origen: {{ waypoint.city }}</h5>
-                                                <p class="card-text">Fecha y hora de salida: {{ waypoint.estimated_datetime_arrival }}.</p>
-                                            {% else %}
-                                                <h5 class="card-title">Parada {{ forloop.counter0 }}: {{ waypoint.city }}</h5>
-                                                <p class="card-text">Fecha y hora de llegada: {{ waypoint.estimated_datetime_arrival }}.</p>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex flex-row-reverse">
-                                        <form action="{% url 'delete_waypoint' waypoint.id%}" method=POST>
-                                            {% csrf_token %}
-                                            <button class="btn btn-danger h-100" data-bs-toggle="modal">
-                                                <i class="bi bi-trash3"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-
-                        <div class="card mb-2">
+                <div class="col ms-3 d-flex text-center">
+                    {% csrf_token %}
+                    {% for form in formset %}
+                        <div class="card me-2" style="width: 18rem;">
                             <div class="card-body">
-                                <form action="{% url 'add_waypoint' %}" method=POST>
+                                <form action="{% url "show_segments" %}">
+                                    {{ formset.management_form }}
                                     {% csrf_token %}
                                     {{ form.as_p }}
-                                    <button class="btn btn-success mb-2" data-bs-toggle="modal">
-                                        <i class="bi bi-plus-circle"> Agregar parada intermedia</i>
+                                    <button class="btn btn-success">
+                                        Guardar
                                     </button>
                                 </form>
                             </div>
                         </div>
-
-                        <div class="card mb-2">
-                            <div class="row g-0">
-                                <div class="col-md-10">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Ciudad de origen: {{ last_waypoint.city }}</h5>
-                                        <p class="card-text">Fecha y hora de salida: {{ last_waypoint.estimated_datetime_arrival }}.</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 d-flex flex-row-reverse">
-                                    <form action="{% url 'delete_waypoint' last_waypoint.id%}" method=POST>
-                                        {% csrf_token %}
-                                            <button class="btn btn-danger h-100" data-bs-toggle="modal">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <a class="btn btn-primary fs-4" href="{% url 'generate_segments' %}"> Siguiente</a>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-
     </section>
 </body>
 

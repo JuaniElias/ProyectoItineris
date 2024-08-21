@@ -22,12 +22,10 @@ class Travel(models.Model):
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
     payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
-    status = models.CharField(max_length=50, default="Agendado")  # En Proceso | Agendado | Finalizado | Cancelado
+    status = models.CharField(max_length=50, default="Borrador")  # En Proceso | Agendado | Finalizado | Cancelado | Borrador
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
 
 
-# No sé si nos pusimos de acuerdo con esto, pero siento que a Segment le falta un travel_id, no me cierra que sólo esté
-# relacionada con Waypoint
 class Segment(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
     waypoint_origin = models.ForeignKey("Waypoint", on_delete=models.DO_NOTHING, related_name='waypoint_origin')
@@ -70,12 +68,7 @@ class Waypoint(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
     city = models.ForeignKey("City", on_delete=models.DO_NOTHING)
     estimated_datetime_arrival = models.DateTimeField()
-    node_number = models.IntegerField(editable=True, null=False)
-
-    # Poniendo real_datetime_arrival en waypoint estaríamos asumiendo que el usuario va a tocar el botón de 'terminé
-    # trayecto para actualizar el valor. Creo que deberíamos ponerlo en Travel como para decir, terminaste el viaje a
-    # tal hora y chau
-    # O la opción nucelar, no ponerlo
+    node_number = models.IntegerField(editable=True, null=True)
 
 
 class Period(models.Model):

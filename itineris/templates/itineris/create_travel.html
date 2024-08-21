@@ -45,11 +45,10 @@
         return `${year}-${month}-${day}`;
     }
     document.addEventListener('DOMContentLoaded', function() {
-        const datetime_departure = document.querySelector('#datetime_departure');
-        const datetime_arrival = document.querySelector('#datetime_arrival');
+        const datetime_departure = document.querySelector('#id_datetime_departure');
+        const datetime_arrival = document.querySelector('#id_datetime_arrival');
         const vehicle_select = document.querySelector('#id_vehicle');
         const driver_select = document.querySelector('#id_driver');
-        const period_end_date = document.querySelector('#period_end_date')
         
         const min_travel_duration = 10  //Duracón minima de un viaje en minutos
         

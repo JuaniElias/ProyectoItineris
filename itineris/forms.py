@@ -96,7 +96,26 @@ class CreateWaypoint(forms.ModelForm):
         self.fields['city'].widget.attrs['class'] = 'form-control'
         self.fields['estimated_datetime_arrival'].widget.attrs['class'] = 'form-control'
 
-CreateWaypointFormSet = modelformset_factory(Waypoint, form=CreateWaypoint, extra=1)
+
+class EditSegment(forms.ModelForm):
+    waypoint_origin = forms.ModelChoiceField(queryset=City.objects.all(), label='Ciudad de origen')
+    waypoint_destination = forms.ModelChoiceField(queryset=City.objects.all(), label='Ciudad de destino')
+    fee = forms.IntegerField(label='Tarifa', step_size=100)
+
+    class Meta:
+        model = Segment
+        fields = ['waypoint_origin','waypoint_destination','fee']
+
+    def __init__(self, *args, **kwargs):
+        super(EditSegment, self).__init__(*args, **kwargs)
+        self.fields['fee'].widget.attrs['class'] = 'form-control'
+        self.fields['fee'].widget.attrs['style'] = 'width:120px'
+        self.fields['waypoint_origin'].widget.attrs['class'] = 'form-control'
+        self.fields['waypoint_destination'].widget.attrs['class'] = 'form-control'
+        self.fields['waypoint_origin'].widget.attrs['disabled'] = True
+        self.fields['waypoint_destination'].widget.attrs['disabled'] = True
+
+EditSegmentFormSet = modelformset_factory(Segment, form=EditSegment, extra=0)
 
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),

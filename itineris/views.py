@@ -1,4 +1,5 @@
 import csv
+import itertools
 from datetime import datetime, date
 
 import mercadopago
@@ -13,7 +14,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
-    UpdateTraveler, UpdateTravel, CreateWaypoint, CreateWaypointFormSet
+    UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
 from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number
 from django.utils import timezone
@@ -130,7 +131,8 @@ def create_travel(request):
                     node_number=1
                 )
                 request.session['travel_id'] = new_travel.travel_id
-                return redirect("create_waypoints")
+                request.session['max_node_number'] = 1
+                return redirect("show_waypoints")
             else:
                 messages.success(request, 'No se puede crear el viaje, la compañía no está verificada.')
     else:
@@ -141,38 +143,90 @@ def create_travel(request):
     })
 
 
-def create_waypoints(request):
+def show_waypoints(request):
     travel_id = request.session.get('travel_id')
-    waypoints = Waypoint.objects.all().filter(travel_id=travel_id)
-    max_node_number = waypoints.aggregate(max_node=Max('node_number'))['max_node']
-    if request.method == 'POST':
-        instances = waypoints.all().filter(node_number__lt=max_node_number).order_by("node_number")
-        formset = [CreateWaypoint(request.POST, instance=instance) for instance in instances]
-        last_waypoint = CreateWaypoint(request.POST, instance=waypoints.filter(node_number=max_node_number))
-        if all([form.is_valid() for form in formset]):
-            i = 0
-            for form in formset:
-                new_waypoint = form.save(commit=False)
-                new_waypoint.travel_id = travel_id
-                new_waypoint.node_number = i
-                i += 1
-                new_waypoint.save()
+    waypoints = Waypoint.objects.all().filter(travel_id=travel_id).order_by("estimated_datetime_arrival")
+    all_but_last_waypoints = waypoints[:waypoints.count() - 1]
+    last_waypoint = waypoints.last()
 
-            if last_waypoint.is_valid():
-                new_waypoint = last_waypoint.save(commit=False)
-                new_waypoint.node_number = i
-                new_waypoint.save()
-
-            return redirect('create_waypoints')
-    else:
-        instances = waypoints.all().filter(node_number__lt=max_node_number).order_by("node_number")
-        formset = [CreateWaypoint(instance=instance) for instance in instances]
-        last_waypoint = CreateWaypoint(instance=waypoints.last())
+    form = CreateWaypoint()
 
     return render(request, "itineris/create_waypoints.html", {
-        "formset": formset,
-        "form": last_waypoint,
+        "all_but_last_waypoints": all_but_last_waypoints,
+        "last_waypoint": last_waypoint,
+        "form": form,
     })
+
+def add_waypoint(request):
+    travel_id = request.session.get('travel_id')
+
+    if request.method == 'POST':
+        form = CreateWaypoint(request.POST)
+        if form.is_valid():
+            new_waypoint = form.save(commit=False)
+            new_waypoint.travel_id = travel_id
+            new_waypoint.node_number = 0
+            new_waypoint.save()
+
+            return redirect('show_waypoints')
+    else:
+        form = CreateWaypoint()
+
+    return render(request, "itineris/create_waypoints.html", {
+        'form': form,
+    })
+
+
+def delete_waypoint(request, waypoint_id):
+    waypoint = get_object_or_404(Waypoint, id=waypoint_id)
+    waypoint.delete()
+    return redirect('show_waypoints')
+
+
+def generate_segments(request):
+    travel_id = request.session.get('travel_id')
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    waypoints = Waypoint.objects.all().filter(travel_id=travel_id).order_by("estimated_datetime_arrival")
+
+    if waypoints.none() or waypoints.count() < 2:
+        messages.success(request, 'Debes ingresar al menos 2 ciudades.')
+        return redirect('show_waypoints')
+
+    i = 0
+    for waypoint in waypoints:
+        waypoint.node_number = i
+        i += 1
+        waypoint.save()
+
+    list_of_segments = list(itertools.combinations(waypoints, 2))
+    print(list_of_segments)
+
+    for segment in list_of_segments:
+        origin, destination = segment
+        print("segment: ",segment)
+        print("origin: ",origin)
+        print("destination: ",destination)
+        duration = destination.estimated_datetime_arrival - origin.estimated_datetime_arrival
+        Segment.objects.create(travel=travel,
+                               waypoint_origin=origin,
+                               waypoint_destination=destination,
+                               duration=duration
+                               )
+    return redirect('show_segments')
+
+
+def show_segments(request):
+    if request.method == 'POST':
+        formset = EditSegmentFormSet(request.POST)
+        if formset.is_valid():
+            formset.save()
+            return redirect('some_view')
+    else:
+        travel_id = request.session.get('travel_id')
+        formset = EditSegmentFormSet(queryset=Segment.objects.all().filter(travel_id=travel_id))
+
+    return render(request, 'itineris/show_segments.html',{"formset": formset})
+
 
 def get_available_options(request):
     if request.GET.get("salida") and request.GET.get("llegada"):
