@@ -14,8 +14,8 @@
                     </div>
                     <br>
                     <div class="modal-body">
-                        <p>Salida: {{ travel.datetime_departure }}</p>
-                        <p>Llegada estimada: {{ travel.estimated_datetime_arrival }}</p>
+                        <p>Salida: {{ waypoints.0.estimated_datetime_arrival }}</p>
+                        <p>Llegada estimada: {{ waypoints.1.estimated_datetime_arrival }}</p>
                         {% if travel.real_datetime_arrival %}
                             <p>Llegada: {{ travel.real_datetime_arrival}}</p>
                         {% elif travel.status == 'En proceso' %}
@@ -25,18 +25,15 @@
                         {% endif %}
 
                         <p>Estado: {{ travel.status }}</p>
-                        <p>Origen: {{ travel.city_origin }}</p>
-                        <p>Destino: {{ travel.city_destination }}</p>
+                        <p>Se anuncia a: {{ waypoints.0.city }} - {{ waypoints.1.city }}</p>
 
                         <p>Conductor: {{ travel.driver }}</p>
-
-                        {% with amount=travel.vehicle.capacity|sub:travel.seats_left %}
+                    
                         <p>Vehículo: {{ travel.vehicle }}</p>
-                        <p>Capacidad: {{ amount }}/{{ travel.vehicle.capacity }}</p>
-                        <p>Ingresos brutos: ${{ travel.fee|mul:amount }}</p>
-                        {% endwith %}
+                        <p>Pasajeros totales: {{ waypoints.2 }}</p>
+                        <p>Ingresos brutos: ${{ waypoints.3 }}</p>
                     </div>
-                    {% if travel.seats_left < travel.vehicle.capacity %}
+                    {% if waypoints.2 > 0 %}
                         <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
                             <button type="submit" class="btn btn-primary mb-2">Generar mapa de ruta</button>
                         </form>
@@ -58,6 +55,7 @@
                     <table class="content-table">
                         <thead>
                             <tr>
+                                <th>Trayecto</th>
                                 <th>Nombre</th>
                                 <th>Apellido</th>
                                 <th>DNI</th>
@@ -72,6 +70,7 @@
                         <tbody>
                             {% for traveler in travelers %}
                                 <tr>
+                                    <td>{{ traveler.segment.waypoint_origin.city.city_name }} - {{ traveler.segment.waypoint_destination.city.city_name }}</td>
                                     <td>{{ traveler.first_name }}</td>
                                     <td>{{ traveler.last_name }}</td>
                                     <td>{{ traveler.dni }}</td>

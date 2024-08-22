@@ -128,7 +128,7 @@ class City(models.Model):
 
 
 class Traveler(models.Model):
-    travel = models.ForeignKey("Segment", on_delete=models.CASCADE)
+    segment = models.ForeignKey("Segment", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     dni_type = models.CharField(max_length=9)

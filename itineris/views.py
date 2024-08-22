@@ -324,8 +324,18 @@ def travel_result_failed(request):
 
 def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    travelers = Traveler.objects.filter(travel_id=travel_id, payment_status='Confirmado')
-    return render(request, "itineris/travel_detail.html", {'travel': travel, 'travelers': travelers})
+    travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
+
+    waypoints = travel.waypoint_set.all().order_by('node_number')
+    first = waypoints.first()
+    last = waypoints.last()
+
+    total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
+    gross_revenue = travelers.aggregate(total=Sum('segment__fee'))['total'] or 0
+
+    waypoints = (first, last, total_passengers, gross_revenue)
+    return render(request, "itineris/travel_detail.html",
+                  {'travelers': travelers, 'waypoints': waypoints, 'travel': travel})
 
 
 def your_drivers(request):
@@ -396,7 +406,7 @@ def mark_travel_ended(request, travel_id):
     travel.real_datetime_arrival = datetime.now()
     travel.status = 'Finalizado'
     travel.save()
-    travelers = Traveler.objects.filter(travel_id=travel_id, status='Confirmado')
+    travelers = Traveler.objects.filter(segment_id=travel_id, status='Confirmado')
 
     # Esto me hace pensar que Traveler tiene que ir agarrado a Segment en vez de Travel, porque como hacer para buscar
     # el trayecto que hizo el tipito?
@@ -407,11 +417,11 @@ def mark_travel_ended(request, travel_id):
                    f'Se ha completado el viaje de '
                    f'{traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.travel.city_origin} a '
                    f'{traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.travel.city_destination}<br>'
-                   f'Día de salida: {traveler.travel.datetime_departure}<br>'
-                   f'Finalizado el: {traveler.travel.estimated_datetime_arrival}<br>'
-                   f'Empresa: {traveler.travel.company.company_name}<br>'
-                   f'Vehículo: {traveler.travel.vehicle}<br>'
-                   f'Chofer: {traveler.travel.driver}<br> <br> <br>'
+                   f'Día de salida: {traveler.segment.datetime_departure}<br>'
+                   f'Finalizado el: {traveler.segment.estimated_datetime_arrival}<br>'
+                   f'Empresa: {traveler.segment.travel.company.company_name}<br>'
+                   f'Vehículo: {traveler.segment.travel.vehicle}<br>'
+                   f'Chofer: {traveler.segment.travel.driver}<br> <br> <br>'
                    f'Si quieres dejar una reseña de viaje puedes hacerlo <a href="localhost:8000">aquí</a>.'
                    )
         try:
