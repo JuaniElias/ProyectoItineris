@@ -1,5 +1,7 @@
+import pandas as pd
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from datetime import date
 
 
 # Create your models here.
@@ -136,9 +138,10 @@ class Traveler(models.Model):
     dni = models.CharField(max_length=8)
     email = models.EmailField()
     sex = models.CharField(max_length=1)
+    date_of_birth = models.DateField()
     minor = models.BooleanField()
-    nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
     # TODO: Poner default a la hora de hacer la carga
+    nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
     phone = models.CharField(max_length=30)
     # FIXME: Si terminamos aplicando la Places API de Google vamos a seguir guardando de esta manera las direcciones?
     #  Es decir, separar la dirección de la altura.
@@ -149,6 +152,12 @@ class Traveler(models.Model):
     feedback = models.TextField(max_length=200, null=True, default='-')
     payment_status = models.CharField(max_length=50,
                                       default="En Proceso")  # En Proceso | Confirmado | Finalizado | Cancelado
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            age = (pd.to_datetime(date.today()) - pd.to_datetime(self.date_of_birth)) // pd.Timedelta(days=365.25)
+            self.minor = True if age < 18 else False
+        super().save(*args, **kwargs)
 
 
 class Province(models.Model):

@@ -144,9 +144,9 @@ def calculate_full_route(travel_id):
     travelers = Traveler.objects.filter(travel_id=travel_id)
 
     for traveler in travelers:
-        address_ori = f'{traveler.addr_ori} {traveler.addr_ori_num}, {travel.city_origin}'
+        address_ori = f'{traveler.addr_ori} {traveler.addr_ori_num}, {traveler.segment.waypoint_origin.city}'
         pickup_addresses.append(address_ori)
-        address_dest = f'{traveler.addr_dest} {traveler.addr_dest_num}, {travel.city_destination}'
+        address_dest = f'{traveler.addr_dest} {traveler.addr_dest_num}, {traveler.segment.waypoint_destination.city}'
         drop_off_addresses.append(address_dest)
 
     distance_matrix_pickup = get_distance_matrix(pickup_addresses, gmaps)
@@ -163,7 +163,7 @@ def calculate_full_route(travel_id):
     distance_matrix_drop_off = get_distance_matrix(drop_off_addresses, gmaps)
     drop_off_start = distance_matrix_drop_off.columns.to_list()[1]
 
-    # Remove the start point as a posible destination because it is, indeed, the start point
+    # Remove the start point as a possible destination because it is, indeed, the start point
     distance_matrix_drop_off = distance_matrix_drop_off[distance_matrix_drop_off['destination'] != drop_off_start]
 
     best_route_drop_off = get_best_route(drop_off_start, distance_matrix_drop_off)
