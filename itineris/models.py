@@ -22,7 +22,8 @@ class Travel(models.Model):
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
     payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
-    status = models.CharField(max_length=50, default="Borrador")  # En Proceso | Agendado | Finalizado | Cancelado | Borrador
+    status = models.CharField(max_length=50,
+                              default="Borrador")  # En Proceso | Agendado | Finalizado | Cancelado | Borrador
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
 
 
@@ -39,7 +40,8 @@ class Segment(models.Model):
         if not self.pk:
             self.duration = self.waypoint_destination.estimated_datetime_arrival - self.waypoint_origin.estimated_datetime_arrival
         super().save(*args, **kwargs)
-     # TODO:
+
+    # TODO:
     '''def has_space_available(self, num_seats):
         # Obtener todos los segmentos asociados al mismo Travel
         all_segments = Segment.objects.filter(travel=self.travel)

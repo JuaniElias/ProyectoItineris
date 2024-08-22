@@ -5,6 +5,7 @@ import mercadopago
 import pandas as pd
 import pytz
 from django.contrib import messages
+from django.db.models import Sum
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -37,10 +38,10 @@ def index(request):
             #    porque no sabría como traer lo de arriba
             # travel.segment_set.seats_occupied + la restricción de que pase por el waypoint
             segments_raw_queryset = Segment.objects.all().filter(waypoint_origin__city=city_origin,
-                                                    waypoint_destination__city=city_destination,
-                                                    waypoint_origin__estimated_datetime_arrival__date=date_departure,
-                                                    travel__status='Agendado'
-                                                    )
+                                                                 waypoint_destination__city=city_destination,
+                                                                 waypoint_origin__estimated_datetime_arrival__date=date_departure,
+                                                                 travel__status='Agendado'
+                                                                 )
             #travel_ids = segments_raw_queryset.values('travel_id').distinct()
             #travels_queryset = Travel.objects.all().filter(travel_id__in=travel_ids)
             #all_segments_queryset = Segment.objects.all().filter(travel_id__in=travel_ids)
@@ -109,16 +110,17 @@ def create_travel(request):
         if form.is_valid():
             if company.is_verified:
                 new_travel = Travel.objects.create(company=company,
-                                    driver=form.cleaned_data['driver'],
-                                    vehicle=form.cleaned_data['vehicle'],
-                                    addr_origin=form.cleaned_data['addr_origin'],
-                                    addr_origin_num=form.cleaned_data['addr_origin_num'])
+                                                   driver=form.cleaned_data['driver'],
+                                                   vehicle=form.cleaned_data['vehicle'],
+                                                   addr_origin=form.cleaned_data['addr_origin'],
+                                                   addr_origin_num=form.cleaned_data['addr_origin_num'])
 
                 if toggle_checkbox and period_form.is_valid():
                     period = period_form.save()
 
                     if period.end_date is None:
-                        start_date = (pd.to_datetime(form.cleaned_data['datetime_departure']) + pd.Timedelta(days=1)).date()
+                        start_date = (pd.to_datetime(form.cleaned_data['datetime_departure']) + pd.Timedelta(
+                            days=1)).date()
                         end_date = start_date + pd.Timedelta(days=365)
                         period.end_date = end_date
                         period.save()
@@ -167,6 +169,7 @@ def show_waypoints(request):
         "last_waypoint": last_waypoint,
         "form": form,
     })
+
 
 def add_waypoint(request):
     travel_id = request.session.get('travel_id')
@@ -226,7 +229,8 @@ def show_segments(request):
         travel_id = request.session.get('travel_id')
         formset = EditSegmentFormSet(queryset=Segment.objects.all().filter(travel_id=travel_id))
 
-    return render(request, 'itineris/show_segments.html',{"formset": formset})
+    return render(request, 'itineris/show_segments.html', {"formset": formset})
+
 
 def end_travel_creation(request):
     travel_id = request.session.get('travel_id')
@@ -236,6 +240,7 @@ def end_travel_creation(request):
 
     if travel.period:
         waypoints = Waypoint.objects.all().filter(travel_id=travel_id).order_by("estimated_datetime_arrival")
+        original_segments = Segment.objects.all().filter(travel_id=travel_id)
 
         start_date = pd.to_datetime(waypoints.first().estimated_datetime_arrival)
         end_date = timezone.make_aware(pd.to_datetime(travel.period.end_date), timezone.get_current_timezone())
@@ -269,13 +274,14 @@ def end_travel_creation(request):
                 Waypoint.objects.create(
                     travel=travel_copy,
                     city=waypoint.city,
-                    estimated_datetime_arrival=timezone.make_aware(datetime_dep,timezone.get_current_timezone()),
+                    estimated_datetime_arrival=timezone.make_aware(datetime_dep, timezone.get_current_timezone()),
                     node_number=waypoint.node_number
                 )
             new_waypoints = Waypoint.objects.all().filter(travel_id=travel_copy.travel_id)
-            create_segments(travel_copy, new_waypoints)
+            create_segments(travel_copy, new_waypoints, original_segments)
 
     return redirect('your_travels')
+
 
 def get_available_options(request):
     # TODO: update
@@ -356,10 +362,24 @@ def delete_driver(request, driver_id):
     return redirect('your_drivers')
 
 
-# Acá creo que seguiríamos usando travels
 def your_travels(request):
-    travels = Travel.objects.filter(company_id=request.user.id, status='Agendado')
-    return render(request, "itineris/your_travels.html", {'travels': travels, })
+
+    travels = Travel.objects.all().filter(company=request.user.id, status='Agendado')
+    wp = []
+    for travel in travels:
+        waypoints = travel.waypoint_set.all().order_by('node_number')
+        first = waypoints.first()
+        last = waypoints.last()
+
+        total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
+
+        fee = Segment.objects.all().filter(waypoint_origin=first, waypoint_destination=last).values('fee')[0]['fee']
+
+        wp.append((first, last, total_passengers, fee))
+
+    wp.sort(key=lambda x: x[0].estimated_datetime_arrival)
+
+    return render(request, "itineris/your_travels.html", {'travels': wp, })
 
 
 def travel_history(request):

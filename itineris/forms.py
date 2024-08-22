@@ -78,14 +78,15 @@ class CreateTravel(forms.Form):
 
 class CreateWaypoint(forms.ModelForm):
     city = forms.ModelChoiceField(queryset=City.objects.all(),
-                                              label='Ciudad de destino',
-                                              widget=s2forms.ModelSelect2Widget(model=City,
-                                                                                search_fields=['city_name__icontains'],
-                                                                                )
-                                              )
+                                  label='Ciudad de destino',
+                                  widget=s2forms.ModelSelect2Widget(model=City,
+                                                                    search_fields=['city_name__icontains'],
+                                                                    )
+                                  )
     estimated_datetime_arrival = forms.DateTimeField(label='Fecha y hora de salida',
-                                             widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
-                                             )
+                                                     widget=forms.widgets.DateTimeInput(
+                                                         attrs={'type': 'datetime-local'}),
+                                                     )
 
     class Meta:
         model = Waypoint
@@ -106,7 +107,7 @@ class EditSegment(forms.ModelForm):
 
     class Meta:
         model = Segment
-        fields = ['waypoint_origin','waypoint_destination','origin_display','destination_display','fee']
+        fields = ['waypoint_origin', 'waypoint_destination', 'origin_display', 'destination_display', 'fee']
 
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
@@ -129,7 +130,9 @@ class EditSegment(forms.ModelForm):
             widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
         )
 
+
 EditSegmentFormSet = modelformset_factory(Segment, form=EditSegment, extra=0)
+
 
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
@@ -207,8 +210,6 @@ class SearchTravel(forms.Form):
     datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True,
                                              widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     passengers = forms.IntegerField(label='Pasajeros', min_value=1)
-
-
 
     def __init__(self, *args, **kwargs):
         super(SearchTravel, self).__init__(*args, **kwargs)
