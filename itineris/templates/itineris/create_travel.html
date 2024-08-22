@@ -15,8 +15,13 @@
                         <div class="col-3 travel-col">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <br>
+                            <label for="period_checkbox">¿Es un viaje periódico?</label>
+                            <input type="checkbox" id="period_checkbox" name="period_checkbox">
+                            <br><br>
                             <input type="submit" value="Crear" class="btn btn-primary">
+                        </div>
+                         <div class="col-3 travel-col h-25 invisible" id="period_col">
+                            {{ period_form.as_p }}
                         </div>
                    </div>
                 </form>
@@ -120,6 +125,18 @@
         });
 
         period_end_date.setAttribute('min', getCurrentDate())
+
+        const checkbox = document.getElementById('period_checkbox');
+        checkbox.value = false
+        const targetElement = document.getElementById('period_col');
+
+        checkbox.addEventListener('change', function() {
+        if (!this.checked) {
+            targetElement.classList.add('invisible');
+        } else {
+            targetElement.classList.remove('invisible');
+        }
+        });
     });
 
 </script>

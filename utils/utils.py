@@ -1,3 +1,5 @@
+import itertools
+
 from django.core.mail import EmailMessage
 from django.conf import settings
 
@@ -7,7 +9,7 @@ from urllib.parse import quote
 
 from django.shortcuts import get_object_or_404
 
-from itineris.models import Traveler, Travel
+from itineris.models import Traveler, Travel, Segment
 
 import base64
 
@@ -171,3 +173,15 @@ def calculate_full_route(travel_id):
 
     travel.url = url
     travel.save()
+
+def create_segments(travel, waypoints):
+    list_of_segments = list(itertools.combinations(waypoints, 2))
+
+    for segment in list_of_segments:
+        origin, destination = segment
+        duration = destination.estimated_datetime_arrival - origin.estimated_datetime_arrival
+        Segment.objects.create(travel=travel,
+                               waypoint_origin=origin,
+                               waypoint_destination=destination,
+                               duration=duration
+                               )

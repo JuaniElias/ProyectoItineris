@@ -145,18 +145,6 @@ class PeriodTravel(forms.ModelForm):
         model = Period
         fields = ('weekdays', 'end_date',)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        end_date = cleaned_data.get('end_date')
-
-        if end_date is None:
-            cleaned_data['end_date'] = datetime.date.today() + pd.Timedelta(days=365)
-
-        if datetime.date.today() > end_date:
-            raise forms.ValidationError('La fecha de debe ser mayor a la actual.')
-
-        return cleaned_data
-
     def __init__(self, *args, **kwargs):
         super(PeriodTravel, self).__init__(*args, **kwargs)
         self.fields['weekdays'].widget.attrs['class'] = 'form-control'

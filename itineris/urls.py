@@ -12,6 +12,7 @@ urlpatterns = [
     path("delete_waypoint/<str:waypoint_id>/", views.delete_waypoint, name="delete_waypoint"),
     path("show_segments/", views.show_segments, name="show_segments"),
     path("generate_segments/", views.generate_segments, name="generate_segments"),
+    path("end_travel_creation/", views.end_travel_creation, name="end_travel_creation"),
     path("get_available_options", views.get_available_options, name="get_available_options"),
     path("travel_result", views.travel_result, name="travel_result"),
     path("travel_result_failed", views.travel_result_failed, name="travel_result_failed"),

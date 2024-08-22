@@ -1,23 +1,20 @@
 import csv
-import itertools
 from datetime import datetime, date
 
 import mercadopago
 import pandas as pd
 import pytz
 from django.contrib import messages
-from django.db.models import Max
-from django.forms import modelformset_factory
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
     UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
-from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number
-from django.utils import timezone
+from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number, create_segments
 
 
 def index(request):
@@ -106,8 +103,8 @@ def create_travel(request):
 
     if request.method == "POST":
         form = CreateTravel(company.id, request.POST)
-
-        # TODO: Hacer period al final de todo del create.
+        period_form = PeriodTravel(request.POST)
+        toggle_checkbox = request.POST.get('period_checkbox')
 
         if form.is_valid():
             if company.is_verified:
@@ -116,6 +113,18 @@ def create_travel(request):
                                     vehicle=form.cleaned_data['vehicle'],
                                     addr_origin=form.cleaned_data['addr_origin'],
                                     addr_origin_num=form.cleaned_data['addr_origin_num'])
+
+                if toggle_checkbox and period_form.is_valid():
+                    period = period_form.save()
+
+                    if period.end_date is None:
+                        start_date = (pd.to_datetime(form.cleaned_data['datetime_departure']) + pd.Timedelta(days=1)).date()
+                        end_date = start_date + pd.Timedelta(days=365)
+                        period.end_date = end_date
+                        period.save()
+
+                    new_travel.period = period
+                    new_travel.save()
 
                 Waypoint.objects.create(
                     travel=new_travel,
@@ -137,9 +146,11 @@ def create_travel(request):
                 messages.success(request, 'No se puede crear el viaje, la compañía no está verificada.')
     else:
         form = CreateTravel(company.id)
+        period_form = PeriodTravel()
 
     return render(request, "itineris/create_travel.html", {
         'form': form,
+        'period_form': period_form,
     })
 
 
@@ -198,20 +209,7 @@ def generate_segments(request):
         i += 1
         waypoint.save()
 
-    list_of_segments = list(itertools.combinations(waypoints, 2))
-    print(list_of_segments)
-
-    for segment in list_of_segments:
-        origin, destination = segment
-        print("segment: ",segment)
-        print("origin: ",origin)
-        print("destination: ",destination)
-        duration = destination.estimated_datetime_arrival - origin.estimated_datetime_arrival
-        Segment.objects.create(travel=travel,
-                               waypoint_origin=origin,
-                               waypoint_destination=destination,
-                               duration=duration
-                               )
+    create_segments(travel, waypoints)
     return redirect('show_segments')
 
 
@@ -219,9 +217,8 @@ def show_segments(request):
     if request.method == 'POST':
         formset = EditSegmentFormSet(request.POST)
         if formset.is_valid():
-            print("Formset.is valid")
             formset.save()
-            return redirect('index')
+            return redirect('end_travel_creation')
         else:
             print("Formset is not valid: ", formset.errors)
             print("Formset data:", request.POST)
@@ -231,8 +228,57 @@ def show_segments(request):
 
     return render(request, 'itineris/show_segments.html',{"formset": formset})
 
+def end_travel_creation(request):
+    travel_id = request.session.get('travel_id')
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    travel.status = 'Agendado'
+    travel.save()
+
+    if travel.period:
+        waypoints = Waypoint.objects.all().filter(travel_id=travel_id).order_by("estimated_datetime_arrival")
+
+        start_date = pd.to_datetime(waypoints.first().estimated_datetime_arrival)
+        end_date = timezone.make_aware(pd.to_datetime(travel.period.end_date), timezone.get_current_timezone())
+
+        departure_time = waypoints.first().estimated_datetime_arrival.time()
+
+        period_weekdays = [weekday.weekday_id for weekday in travel.period.weekdays.all()]
+        date_range = pd.date_range(start=start_date + pd.Timedelta(days=1), end=end_date)
+        date_to_use = [d for d in date_range if d.weekday() + 1 in period_weekdays]
+
+        durations = []
+        for waypoint in waypoints[1:]:
+            durations.append(waypoint.estimated_datetime_arrival - start_date)
+        durations = [pd.Timedelta(days=0)] + durations
+
+        for d in date_to_use:
+            travel_copy = Travel.objects.create(
+                company=travel.company,
+                driver=travel.driver,
+                vehicle=travel.vehicle,
+                addr_origin=travel.addr_origin,
+                addr_origin_num=travel.addr_origin_num,
+                period=travel.period,
+                status=travel.status,
+            )
+            start_date = pd.to_datetime(datetime.combine(d, departure_time))
+
+            for waypoint, duration in zip(waypoints, durations):
+                datetime_dep = start_date + duration
+
+                Waypoint.objects.create(
+                    travel=travel_copy,
+                    city=waypoint.city,
+                    estimated_datetime_arrival=timezone.make_aware(datetime_dep,timezone.get_current_timezone()),
+                    node_number=waypoint.node_number
+                )
+            new_waypoints = Waypoint.objects.all().filter(travel_id=travel_copy.travel_id)
+            create_segments(travel_copy, new_waypoints)
+
+    return redirect('your_travels')
 
 def get_available_options(request):
+    # TODO: update
     if request.GET.get("salida") and request.GET.get("llegada"):
         vehicle_departure = datetime.strptime(request.GET.get("salida"), '%Y-%m-%dT%H:%M').astimezone()
         vehicle_arrival = datetime.strptime(request.GET.get("llegada"), '%Y-%m-%dT%H:%M').astimezone()
