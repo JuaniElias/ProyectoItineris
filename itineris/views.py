@@ -52,7 +52,7 @@ def index(request):
                                 f'a otras ciudades.')
 
                     results = [segment for segment in segments
-                               if segment.waypoint_origin.estimated_datetime_arrival == date_departure
+                               if segment.waypoint_origin.estimated_datetime_arrival.date() == date_departure.date()
                                ]
 
                     if not results:
