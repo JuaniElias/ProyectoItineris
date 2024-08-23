@@ -234,7 +234,9 @@ class PreCheckout(forms.ModelForm):
     dni_type = forms.ChoiceField(choices=DOCUMENT_CHOICES, label='Tipo de Documento', required=True)
     dni_description = forms.CharField(label='Descripción de Documento', max_length=20, required=False)
     dni = forms.CharField(label='DNI', max_length=8, required=True)
-    minor = forms.BooleanField(label='Es menor de edad?')
+    date_of_birth = forms.DateField(label='Fecha de nacimiento',
+                                    widget=forms.widgets.DateInput(attrs={'type': 'date'})
+                                    )
     sex = forms.ChoiceField(choices=SEX_CHOICES, label='Sexo', required=True)
     email = forms.EmailField(label='Email', max_length=100, required=True)
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
@@ -246,8 +248,8 @@ class PreCheckout(forms.ModelForm):
     class Meta:
         model = Traveler
         fields = ('first_name', 'last_name',
-                  'dni_type', 'dni_description', 'dni',
-                  'minor', 'sex', 'nationality', 'email', 'phone',
+                  'dni_type', 'dni_description', 'dni', 'date_of_birth',
+                  'sex', 'nationality', 'email', 'phone',
                   'addr_ori', 'addr_ori_num', 'addr_dest', 'addr_dest_num')
         widgets = {
             "nationality": NationalityWidget,
@@ -260,7 +262,7 @@ class PreCheckout(forms.ModelForm):
         self.fields['dni_type'].widget.attrs['class'] = 'form-control'
         self.fields['dni_description'].widget.attrs['class'] = 'form-control'
         self.fields['dni'].widget.attrs['class'] = 'form-control'
-        self.fields['minor'].widget.attrs['class'] = 'form-control'
+        self.fields['date_of_birth'].widget.attrs['class'] = 'form-control'
         self.fields['sex'].widget.attrs['class'] = 'form-control'
         self.fields['nationality'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
