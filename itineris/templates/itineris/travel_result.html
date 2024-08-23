@@ -9,7 +9,7 @@
             {% for segment in segments %}
                 <div class="card text-center mb-4">
                     <div class="card-header">
-                        <p>{{ segment.company.company_name }}</p>
+                        <p>{{ segment.travel.company.company_name }}</p>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -17,16 +17,16 @@
     
                             </div>
                             <div class="col-md-2">
-                                <p>{{ segment.waypoint_origin__city }}</p>
-                                <p>{{ segment.waypoint_origin__estimated_datetime_arrival }}</p>
+                                <p>{{ segment.waypoint_origin.city }}</p>
+                                <p>{{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
                             </div>
                             <div class="col-md-2">
                                 <p>Tiempo de viaje</p>
                                 <p>{{ segment.duration }}</p>
                             </div>
                             <div class="col-md-2">
-                                <p>{{ segment.waypoint_destination__city }}</p>
-                                <p>{{ segment.waypoint_origin__estimated_datetime_arrival }}</p>
+                                <p>{{ segment.waypoint_destination.city }}</p>
+                                <p>{{ segment.waypoint_destination.estimated_datetime_arrival }}</p>
                             </div>
                             <div class="col-md-3">
                                 <a href="{% url 'save_travel_id' segment.travel.travel_id %}">
@@ -35,12 +35,9 @@
                             </div>
                         </div>
                     </div>
-                    
-                {% with seats_left=segment.travel.vehicle.capacity|sub:segment.seats_occupied %}
                     <div class="card-footer text-body-secondary">
-                        Quedan {{ seats_left }} lugares disponibles
+                        Quedan {{ segment.seats_available }} lugares disponibles
                     </div>
-                {% endwith %}
                 </div>
             {% endfor %}
         </div>

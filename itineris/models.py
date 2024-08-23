@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import date
 
+from django.db.models import Sum
+
 
 # Create your models here.
 
@@ -43,29 +45,29 @@ class Segment(models.Model):
             self.duration = self.waypoint_destination.estimated_datetime_arrival - self.waypoint_origin.estimated_datetime_arrival
         super().save(*args, **kwargs)
 
-    # TODO:
-    '''def has_space_available(self, num_seats):
+
+    def seats_available(self):
         # Obtener todos los segmentos asociados al mismo Travel
-        all_segments = Segment.objects.filter(travel=self.travel)
+        travel_segments = Segment.objects.filter(travel=self.travel)
 
-        # Obtener la capacidad total del vehículo asociado a este Travel
+        # Obtener los segmentos que coinciden en el mismo tramo entre ciudades excluyendo los segmentos en ambos extremos
         vehicle_capacity = self.travel.vehicle.capacity
-        
-        for segment in segments_raw_queryset:
-            segment_start = segment.waypoint_origin.node_number
-            segment_end = segment.waypoint_destination.node_number
 
-            s = Segment.objects.all().filter(travel_id=segment.travel.travel_id,
-                                         waypoint_origin__node_number__gte=segment_start,
-                                         waypoint_destination__node_number__lte=segment_end)
-            if s.values('seats_occupied') > passengers:
-                pass
+        start_waypoint = self.waypoint_origin.node_number # 1
+        end_waypoint = self.waypoint_destination.node_number # 2
 
-        # Verificar si hay espacio disponible
-        if total_seats_occupied + num_seats <= vehicle_capacity:
-            return True
-        else:
-            return False'''
+        excluded_before_start = travel_segments.filter(travel_id=self.travel.travel_id,
+                                                       waypoint_destination__node_number__lte=start_waypoint
+                                                       )
+        excluded_after_end = travel_segments.filter(travel_id=self.travel.travel_id,
+                                                    waypoint_origin__node_number__gte=end_waypoint,
+                                                    )
+
+        valid_segments = travel_segments.exclude(id__in=excluded_before_start).exclude(id__in=excluded_after_end)
+
+        total_seats = valid_segments.aggregate(total=Sum('seats_occupied'))['total'] or 0
+
+        return vehicle_capacity - total_seats
 
 
 class Waypoint(models.Model):

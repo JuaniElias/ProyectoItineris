@@ -15,14 +15,14 @@ from django.views.decorators.csrf import csrf_exempt
 from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
     UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
-from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number, create_segments
+from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number, create_segments, \
+    search_segments
 
 
 def index(request):
     request.session['travelers'] = []
     if request.method == "POST":
         form = SearchTravel(request.POST)
-        print("Entro al form")
         if form.is_valid():
             city_origin = form.cleaned_data['city_origin']
             city_destination = form.cleaned_data['city_destination']
@@ -31,58 +31,39 @@ def index(request):
 
             request.session['passengers'] = passengers
 
-            # Busca viajes que coincidan con los criterios
-            # TODO: En seats_occupied hay que hacer la mugre de sumar los pasajeros con trayectos que se intersectan
-            #  TODO: Capaz passengers + (sumatoria de pasajeros de los otros viajes)?
-            #  TODO: Capaz que no podemos usar el filter y necesitamos hacer una query más grosa,
-            #    porque no sabría como traer lo de arriba
-            # travel.segment_set.seats_occupied + la restricción de que pase por el waypoint
-            segments_raw_queryset = Segment.objects.all().filter(waypoint_origin__city=city_origin,
-                                                                 waypoint_destination__city=city_destination,
-                                                                 waypoint_origin__estimated_datetime_arrival__date=date_departure,
-                                                                 travel__status='Agendado'
-                                                                 )
-            #travel_ids = segments_raw_queryset.values('travel_id').distinct()
-            #travels_queryset = Travel.objects.all().filter(travel_id__in=travel_ids)
-            #all_segments_queryset = Segment.objects.all().filter(travel_id__in=travel_ids)
+            segments = search_segments(city_origin, passengers)
 
-            segments = segments_raw_queryset
+            results = [segment for segment in segments
+                       if ((segment.waypoint_destination.city == city_destination) and
+                           (segment.waypoint_origin.estimated_datetime_arrival.date() == date_departure.date()))
+                       ]
 
-            segments.order_by('waypoint_origin__estimated_datetime_arrival')
-
-            if not segments:
+            if not results:
                 msg_text = (f'No hemos encontrado viajes para la fecha ingresada, te dejamos una lista de viajes'
                             f' para otras fechas de salida.')
-                maximum_date = date.today() + pd.Timedelta(days=60)
-                segments = Segment.objects.all().filter(waypoint_origin__city=city_origin,
-                                                        waypoint_destination__city=city_destination,
-                                                        seats_occupied__lte=passengers,
-                                                        waypoint_origin__estimated_datetime_arrival__date__lte=maximum_date,
-                                                        travel__status="Agendado"
-                                                        )
-                segments.order_by('waypoint_origin__estimated_datetime_arrival')
-                if segments.count() > 10:
-                    segments = segments[:10]
 
-                if not segments:
+                results = [segment for segment in segments if segment.waypoint_destination.city == city_destination]
+
+                if len(results) > 10:
+                    results = results[:10]
+
+                if not results:
                     msg_text = (f'No hemos encontrado viajes para la ciudad ingresada, te dejamos una lista de viajes '
                                 f'a otras ciudades.')
-                    segments = Segment.objects.all().filter(waypoint_origin__city=city_origin,
-                                                            seats_occupied__lte=passengers,
-                                                            waypoint_origin__estimated_datetime_arrival__date=date_departure,
-                                                            travel__status="Agendado"
-                                                            )
-                    segments.order_by('waypoint_origin__estimated_datetime_arrival')
 
-                    if not segments:
+                    results = [segment for segment in segments
+                               if segment.waypoint_origin.estimated_datetime_arrival == date_departure
+                               ]
+
+                    if not results:
                         return redirect('travel_result_failed')
 
                 messages.success(request, message=msg_text)
 
-            return render(request, 'itineris/travel_result.html', {'segments': segments,
-                                                                   'passengers': passengers})
+            return render(request, 'itineris/travel_result.html', {'segments': results })
     else:
         form = SearchTravel()
+
 
     if request.user.is_authenticated:
         return render(request, "itineris/your_travels.html")
@@ -408,8 +389,6 @@ def mark_travel_ended(request, travel_id):
     travel.save()
     travelers = Traveler.objects.filter(segment_id=travel_id, status='Confirmado')
 
-    # Esto me hace pensar que Traveler tiene que ir agarrado a Segment en vez de Travel, porque como hacer para buscar
-    # el trayecto que hizo el tipito?
     for traveler in travelers:
         to_email = traveler.email
         subject = f'Itineris | Viaje finalizado!'

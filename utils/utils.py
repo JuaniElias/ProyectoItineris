@@ -6,7 +6,7 @@ from django.conf import settings
 import googlemaps
 import pandas as pd
 from urllib.parse import quote
-
+from datetime import date
 from django.shortcuts import get_object_or_404
 
 from itineris.models import Traveler, Travel, Segment
@@ -193,3 +193,15 @@ def create_segments(travel, waypoints, segments=None):
                                duration=duration,
                                fee=fee
                                )
+
+
+def search_segments(city_origin, passengers):
+    maximum_date = date.today() + pd.Timedelta(days=60)
+    segments = Segment.objects.filter(
+        waypoint_origin__city=city_origin,
+        waypoint_origin__estimated_datetime_arrival__date__gte=date.today(),
+        waypoint_origin__estimated_datetime_arrival__date__lte=maximum_date,
+        travel__status='Agendado'
+    ).order_by('waypoint_origin__estimated_datetime_arrival')
+
+    return [segment for segment in segments if segment.seats_available() >= passengers]
