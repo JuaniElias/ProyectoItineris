@@ -20,7 +20,8 @@ from utils.utils import send_email, calculate_full_route, decrypt_number, encryp
 
 
 def index(request):
-    request.session['travelers'] = []
+    request.session.clear()
+    # request.session['travelers'] = []
     if request.method == "POST":
         form = SearchTravel(request.POST)
         if form.is_valid():
@@ -79,6 +80,7 @@ def about(request):
     return render(request, "itineris/about_us.html")
 
 
+# FIXME: Si vuelve atrás a la hora de cargar los segmentos, se generan muchos
 def create_travel(request):
     current_company_id = request.user.id
     company = get_object_or_404(Company, id=current_company_id)
@@ -215,6 +217,7 @@ def show_segments(request):
 
 def end_travel_creation(request):
     travel_id = request.session.get('travel_id')
+    request.session['travel_id'] = ''
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travel.status = 'Agendado'
     travel.save()
@@ -479,25 +482,20 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')
 
 
-def save_travel_id(request, travel_id):
-    request.session['travel_id'] = travel_id
-
-    return redirect('pre_checkout')
-
-
-def pre_checkout(request):
-    travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
+def pre_checkout(request, segment_id):
+    segment = get_object_or_404(Segment, id=segment_id)
     passenger_count = int(request.session.get('passengers'))
 
     # Inicializa la lista con los ID de los pasajeros
     travelers = request.session.get('travelers', [])
 
+    # TODO: REPLICAR LO QUE ESTA HECHO EN WAYPOINTS
     if len(travelers) < passenger_count:
         if request.method == "POST":
             form = PreCheckout(request.POST)
             if form.is_valid():
                 new_traveler = form.save(commit=False)
-                new_traveler.travel = travel
+                new_traveler.segment = segment
                 new_traveler.save()
                 travelers.append(new_traveler.id)
                 request.session['travelers'] = travelers  # This ain't the way
@@ -508,7 +506,7 @@ def pre_checkout(request):
     else:
         return redirect('checkout')
     return render(request, "itineris/pre_checkout.html",
-                  {'travel': travel, 'passengers': passenger_count, 'form': form})
+                  {'segment': segment, 'passengers': passenger_count, 'form': form})
 
 
 def checkout(request):

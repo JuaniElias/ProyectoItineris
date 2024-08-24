@@ -5,23 +5,23 @@
     <div class="row">
         <div class="col">
             <h2>Detalles del viaje</h2>
-            <p>Fecha y hora salida: {{ travel.datetime_departure }}</p>
+            <p>Fecha y hora salida: {{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
             <div class="row-form-2">
                 <div class="col-form-2">
-                    <p>Origen: {{ travel.city_origin }}</p>
+                    <p>Origen: {{ segment.waypoint_origin.city }}</p>
                 </div>
                 <div class="col-form-2">
-                    <p>Destino: {{ travel.city_destination }}</p>
+                    <p>Destino: {{ segment.waypoint_destination.city }}</p>
                 </div>
             </div>
             <p>Pasajero: {{ request.session.travelers|length|add:"1" }}</p>
-            <p>Importe por persona: ${{ travel.fee }}</p>
+            <p>Importe por persona: ${{ segment.fee }}</p>
         </div>
     </div>
     <div class="row">
         <div class="col">
                 <div class="card m-4 p-3">
-                    <form action="{% url 'pre_checkout' %}" method=POST>
+                    <form action="{% url 'pre_checkout' segment.id%}" method=POST>
                         {% csrf_token %}
                         <table>
                             {{ form.as_table }}

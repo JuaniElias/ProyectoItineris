@@ -178,12 +178,16 @@ def calculate_full_route(travel_id):
 def create_segments(travel, waypoints, segments=None):
     list_of_segments = list(itertools.combinations(waypoints, 2))
 
+    travel.segment_set.all().delete()
+
     for segment in list_of_segments:
         origin, destination = segment
         duration = destination.estimated_datetime_arrival - origin.estimated_datetime_arrival
 
         if segments:
-            fee = segments.filter(waypoint_origin__city=origin.city, waypoint_destination__city=destination.city).values('fee')[0]['fee']
+            fee = segments.filter(waypoint_origin__city=origin.city,
+                                  waypoint_destination__city=destination.city
+                                  ).values('fee')[0]['fee']
         else:
             fee = 0
 
