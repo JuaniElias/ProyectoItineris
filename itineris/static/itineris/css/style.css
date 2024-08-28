@@ -382,7 +382,7 @@ input, select{
 .your-business{
     position: relative;
     left: 278px;
-    width: calc(100% - 88px);
+    width: calc(100% - 275px);
     min-height: 100vh;
     background-color: #545F8D;
     transition: var(--tran-05);

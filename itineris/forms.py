@@ -1,4 +1,5 @@
 import datetime
+from cProfile import label
 
 import pandas as pd
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -6,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
 from django.http import request
 
-from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday, Segment, City, Waypoint
+from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday, Segment, City, Waypoint, Nationality
 
 from django import forms
 from django_select2 import forms as s2forms
@@ -28,11 +29,6 @@ class CompanyChangeForm(UserChangeForm):
         model = Company
         fields = ('username', 'email')
 
-
-class NationalityWidget(s2forms.ModelSelect2Widget):
-    search_fields = [
-        "name__icontains",
-    ]
 
 
 class CreateTravel(forms.Form):
@@ -238,6 +234,14 @@ class PreCheckout(forms.ModelForm):
                                     widget=forms.widgets.DateInput(attrs={'type': 'date'})
                                     )
     sex = forms.ChoiceField(choices=SEX_CHOICES, label='Sexo', required=True)
+    nationality = forms.ModelChoiceField(queryset=Nationality.objects.all().order_by('name'),
+                                         label = 'Nacionalidad',
+                                         widget=s2forms.ModelSelect2Widget(
+                                             search_fields = ["name__icontains"],
+                                             attrs = {
+                                                "data-minimum-input-length": 0,
+                                             })
+                                         )
     email = forms.EmailField(label='Email', max_length=100, required=True)
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
     addr_ori = forms.CharField(label='Dirección origen', max_length=50, required=True)
@@ -251,9 +255,6 @@ class PreCheckout(forms.ModelForm):
                   'dni_type', 'dni_description', 'dni', 'date_of_birth',
                   'sex', 'nationality', 'email', 'phone',
                   'addr_ori', 'addr_ori_num', 'addr_dest', 'addr_dest_num')
-        widgets = {
-            "nationality": NationalityWidget,
-        }
 
     def __init__(self, *args, **kwargs):
         super(PreCheckout, self).__init__(*args, **kwargs)

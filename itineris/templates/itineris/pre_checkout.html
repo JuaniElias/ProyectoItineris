@@ -3,32 +3,27 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col">
-            <h2>Detalles del viaje</h2>
-            <p>Fecha y hora salida: {{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
-            <div class="row-form-2">
-                <div class="col-form-2">
-                    <p>Origen: {{ segment.waypoint_origin.city }}</p>
-                </div>
-                <div class="col-form-2">
-                    <p>Destino: {{ segment.waypoint_destination.city }}</p>
-                </div>
+        <div class="col-5">
+            <h3 class="text-center"> Completa los datos del pasajero {{ request.session.travelers|length|add:"1" }} </h3>
+            <div class="card m-4 p-3">
+                <form action="{% url 'pre_checkout' segment.id%}" method=POST>
+                    {% csrf_token %}
+                    <table>
+                        {{ form.as_table }}
+                    </table>
+                    <button type="submit" class="btn btn-primary">Siguiente</button>
+                </form>
             </div>
-            <p>Pasajero: {{ request.session.travelers|length|add:"1" }}</p>
-            <p>Importe por persona: ${{ segment.fee }}</p>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-                <div class="card m-4 p-3">
-                    <form action="{% url 'pre_checkout' segment.id%}" method=POST>
-                        {% csrf_token %}
-                        <table>
-                            {{ form.as_table }}
-                        </table>
-                        <button type="submit" class="btn btn-primary">Siguiente</button>
-                    </form>
-                </div>
+        <div class="col-5 text-center" style="margin-top: 5rem">
+            <h2>Detalles del viaje</h2>
+            <div class="fs-4 text-secondary">
+                <p>Fecha y hora salida: {{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
+                <p>{{ segment.waypoint_origin.city }}
+                <p class="mb-3 text-primary"><i class="bi bi-arrow-down"></i></p>
+                <p>{{ segment.waypoint_destination.city }}</p>
+                <p class="text-success">Importe por persona: ${{ segment.fee }}</p>
+            </div>
         </div>
     </div>
 </div>
