@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, PreCheckout, PeriodTravel, \
+from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, CreateTraveler, PeriodTravel, \
     UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
 from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number, create_segments, \
@@ -28,7 +28,7 @@ def index(request):
             city_origin = form.cleaned_data['city_origin']
             city_destination = form.cleaned_data['city_destination']
             date_departure = form.cleaned_data['datetime_departure']
-            passengers = form.cleaned_data['passengers']
+            passengers = int(form.cleaned_data['passengers'])
 
             request.session['passengers'] = passengers
 
@@ -80,7 +80,6 @@ def about(request):
     return render(request, "itineris/about_us.html")
 
 
-# FIXME: Si vuelve atrás a la hora de cargar los segmentos, se generan muchos
 def create_travel(request):
     current_company_id = request.user.id
     company = get_object_or_404(Company, id=current_company_id)
@@ -482,34 +481,64 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')
 
 
-def pre_checkout(request, segment_id):
+def show_travelers(request):
+    skip_creation = request.session.get('skip_creation', None)
+    if skip_creation:
+        return redirect('otra_pag')
+
+    segment_id = request.session.get('segment_id')
     segment = get_object_or_404(Segment, id=segment_id)
     passenger_count = int(request.session.get('passengers'))
 
-    # Inicializa la lista con los ID de los pasajeros
-    travelers = request.session.get('travelers', [])
+    travelers_list = request.session.get('travelers', [])
 
-    # TODO: REPLICAR LO QUE ESTA HECHO EN WAYPOINTS
-    if len(travelers) < passenger_count:
-        if request.method == "POST":
-            form = PreCheckout(request.POST)
-            if form.is_valid():
-                new_traveler = form.save(commit=False)
-                new_traveler.segment = segment
-                new_traveler.save()
-                travelers.append(new_traveler.id)
-                request.session['travelers'] = travelers  # This ain't the way
 
-                return redirect('pre_checkout')
-        else:
-            form = PreCheckout()
+    travelers = Traveler.objects.all().filter(segment_id=segment_id, id__in=travelers_list)
+
+    if request.method == 'POST':
+
+        form = CreateTraveler(request.POST)
+        if form.is_valid():
+            traveler = form.save(commit=False)
+            traveler.segment_id = segment_id
+            traveler.save()
+            travelers_list.append(traveler.id)
+            request.session['travelers'] = travelers_list
+            request.session['passengers'] = passenger_count - 1
+            print(passenger_count)
+            if passenger_count <= 1:
+                return redirect('checkout')
+            else:
+                return redirect('show_travelers')
     else:
-        return redirect('checkout')
-    return render(request, "itineris/pre_checkout.html",
-                  {'segment': segment, 'passengers': passenger_count, 'form': form})
+        form = CreateTraveler()
 
+    return render(request, "itineris/pre_checkout.html", {
+        "segment": segment,
+        "travelers": travelers,
+        "form": form,
+    })
+
+
+def edit_traveler(request, traveler_id):
+    traveler = get_object_or_404(Traveler, id=traveler_id)
+    segment = get_object_or_404(Segment, id=traveler.segment_id)
+    travelers_list = request.session.get('travelers', [])
+    travelers = Traveler.objects.all().filter(segment_id=segment.id, id__in=travelers_list)
+
+    form = CreateTraveler(instance=traveler)
+    return redirect(request, "itineris/pre_checkout.html", {
+        "segment": segment,
+        "travelers": travelers,
+        "form": form,
+    })
+
+def pre_checkout(request, segment_id):
+    request.session['segment_id'] = segment_id
+    return redirect('show_travelers')
 
 def checkout(request):
+    request.session['skip_creation'] = True
     travelers = request.session.get('travelers')
     # request.session['travelers'] = []  # Limpia los travelers de la session cuando entra a checkout y no está muy bien
     if not travelers:
@@ -519,13 +548,13 @@ def checkout(request):
     checkout_url = request.build_absolute_uri(reverse('checkout'))
     payment_success_url = request.build_absolute_uri(reverse('payment_success'))
 
-    travel = get_object_or_404(Travel, travel_id=request.session.get('travel_id'))
+    segment = get_object_or_404(Segment, id=request.session.get('segment_id'))
     sdk = mercadopago.SDK('APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037')
     preference_data = {
         "items": [
             {
                 "title": "Pasaje: Itineris",
-                "unit_price": travel.fee,
+                "unit_price": segment.fee,
                 "quantity": travelers_obj.count()
             }
         ],

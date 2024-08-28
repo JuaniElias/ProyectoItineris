@@ -4,9 +4,9 @@
 <div class="container">
     <div class="row">
         <div class="col-5">
-            <h3 class="text-center"> Completa los datos del pasajero {{ request.session.travelers|length|add:"1" }} </h3>
+            <h3 class="text-center"> Completa los datos de los pasajeros </h3>
             <div class="card m-4 p-3">
-                <form action="{% url 'pre_checkout' segment.id%}" method=POST>
+                <form action="{% url 'show_travelers' %}" method=POST>
                     {% csrf_token %}
                     <table>
                         {{ form.as_table }}
@@ -15,7 +15,7 @@
                 </form>
             </div>
         </div>
-        <div class="col-5 text-center" style="margin-top: 5rem">
+        <div class="col-4 text-center" style="margin-top: 5rem">
             <h2>Detalles del viaje</h2>
             <div class="fs-4 text-secondary">
                 <p>Fecha y hora salida: {{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
@@ -25,17 +25,27 @@
                 <p class="text-success">Importe por persona: ${{ segment.fee }}</p>
             </div>
         </div>
+        <div class="col-3 text-center" style="margin-top: 5rem">
+            {% for traveler in travelers %}
+                <div class="card mb-3" style="max-width: 540px;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small_2x/user-profile-icon-free-vector.jpg" class="img-fluid rounded-start" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{traveler.first_name}} {{ traveler.last_name }}</h5>
+                                <p class="card-text">N° Documento: {{ traveler.dni }}</p>
+                                <p class="card-text"><small class="text-body-secondary"></small></p>
+                                <a href="{% url 'edit_traveler' traveler.id %}">
+                                    <i class="bi bi-pencil-square fs-3 text-grey"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
-    <script>
-    window.addEventListener( "pageshow", function ( event ) {
-        const historyTraversal = event.persisted ||
-            (typeof window.performance != "undefined" &&
-                window.performance.getEntriesByType("navigation")[0].type === "back_forward");
-        if ( historyTraversal ) {
-    // Handle page restore.
-    window.location.reload();
-      }
-    });
-    </script>
 {% endblock %}

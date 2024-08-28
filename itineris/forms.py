@@ -1,11 +1,6 @@
-import datetime
-from cProfile import label
-
-import pandas as pd
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
-from django.http import request
 
 from .models import Company, Vehicle, Driver, Travel, Traveler, Period, Weekday, Segment, City, Waypoint, Nationality
 
@@ -191,6 +186,14 @@ class CreateDriver(forms.ModelForm):
 
 
 class SearchTravel(forms.Form):
+    NUMBER_CHOICES = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+    ]
+
     city_origin = forms.ModelChoiceField(queryset=City.objects.all(),
                                          label='Ciudad de salida',
                                          widget=s2forms.ModelSelect2Widget(
@@ -205,7 +208,7 @@ class SearchTravel(forms.Form):
                                               )
     datetime_departure = forms.DateTimeField(label='Fecha Salida', required=True,
                                              widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    passengers = forms.IntegerField(label='Pasajeros', min_value=1)
+    passengers = forms.ChoiceField(choices=NUMBER_CHOICES, label='Pasajeros', required=True)
 
     def __init__(self, *args, **kwargs):
         super(SearchTravel, self).__init__(*args, **kwargs)
@@ -215,7 +218,7 @@ class SearchTravel(forms.Form):
         self.fields['passengers'].widget.attrs['class'] = 'form-control'
 
 
-class PreCheckout(forms.ModelForm):
+class CreateTraveler(forms.ModelForm):
     DOCUMENT_CHOICES = [
         ('DNI', 'DNI'),
         ('PASAPORTE', 'Pasaporte'),
@@ -228,8 +231,7 @@ class PreCheckout(forms.ModelForm):
     first_name = forms.CharField(label='Nombre', max_length=50, required=True)
     last_name = forms.CharField(label='Apellido', max_length=50, required=True)
     dni_type = forms.ChoiceField(choices=DOCUMENT_CHOICES, label='Tipo de Documento', required=True)
-    dni_description = forms.CharField(label='Descripción de Documento', max_length=20, required=False)
-    dni = forms.CharField(label='DNI', max_length=8, required=True)
+    dni = forms.CharField(label='Número de documento', max_length=8, required=True)
     date_of_birth = forms.DateField(label='Fecha de nacimiento',
                                     widget=forms.widgets.DateInput(attrs={'type': 'date'})
                                     )
@@ -252,16 +254,15 @@ class PreCheckout(forms.ModelForm):
     class Meta:
         model = Traveler
         fields = ('first_name', 'last_name',
-                  'dni_type', 'dni_description', 'dni', 'date_of_birth',
+                  'dni_type', 'dni', 'date_of_birth',
                   'sex', 'nationality', 'email', 'phone',
                   'addr_ori', 'addr_ori_num', 'addr_dest', 'addr_dest_num')
 
     def __init__(self, *args, **kwargs):
-        super(PreCheckout, self).__init__(*args, **kwargs)
+        super(CreateTraveler, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['dni_type'].widget.attrs['class'] = 'form-control'
-        self.fields['dni_description'].widget.attrs['class'] = 'form-control'
         self.fields['dni'].widget.attrs['class'] = 'form-control'
         self.fields['date_of_birth'].widget.attrs['class'] = 'form-control'
         self.fields['sex'].widget.attrs['class'] = 'form-control'

@@ -159,6 +159,12 @@ class Traveler(models.Model):
         if not self.pk:
             age = (pd.to_datetime(date.today()) - pd.to_datetime(self.date_of_birth)) // pd.Timedelta(days=365.25)
             self.minor = True if age < 18 else False
+
+            if self.dni_type == 'OTRO':
+                self.dni_description = 'OTRO'
+            else:
+                self.dni_description = None
+
         super().save(*args, **kwargs)
 
 
