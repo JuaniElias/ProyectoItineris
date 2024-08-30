@@ -481,7 +481,6 @@ def delete_vehicle(request, plate_number):
         vehicle.save()
     return redirect('your_vehicles')
 
-
 def pre_checkout(request, segment_id):
     request.session['segment_id'] = segment_id
     return redirect('show_travelers')
@@ -491,14 +490,16 @@ def show_travelers(request):
     create_traveler_formset = modelformset_factory(Traveler, form=CreateTraveler,
                                                    extra=int(request.session.get("passengers_count")))
     segment = get_object_or_404(Segment, id=request.session.get("segment_id"))
-
+    t = []
     if request.method == 'POST':
         formset = create_traveler_formset(request.POST)
         if formset.is_valid():
             travelers = formset.save(commit=False)
             for traveler in travelers:
                 traveler.segment = segment
+                t.append(traveler.id)
                 traveler.save()
+            request.session['travelers'] = t
             return redirect('checkout')
         else:
             print("Formset is not valid: ", formset.errors)
@@ -510,12 +511,11 @@ def show_travelers(request):
 
 
 def checkout(request):
-    request.session['skip_creation'] = True
-    travelers = request.session.get('travelers')
+    t = request.session.get('travelers')
     # request.session['travelers'] = []  # Limpia los travelers de la session cuando entra a checkout y no está muy bien
-    if not travelers:
-        return HttpResponseBadRequest("No se han creado viajeros.")
-    travelers_obj = Traveler.objects.filter(id__in=travelers)
+    # if not travelers:
+        #return HttpResponseBadRequest("No se han creado viajeros.")
+    travelers = Traveler.objects.filter(id__in=t)
 
     checkout_url = request.build_absolute_uri(reverse('checkout'))
     payment_success_url = request.build_absolute_uri(reverse('payment_success'))
@@ -527,7 +527,7 @@ def checkout(request):
             {
                 "title": "Pasaje: Itineris",
                 "unit_price": segment.fee,
-                "quantity": travelers_obj.count()
+                "quantity": travelers.count()
             }
         ],
         "purpose": "onboarding_credits",
@@ -539,10 +539,10 @@ def checkout(request):
     }
 
     preference_response = sdk.preference().create(preference_data)
-    preference_id = preference_response["response"]["id"]
+    preference_id = preference_response["response"]
 
     return render(request, "itineris/checkout.html",
-                  {'travelers': travelers_obj, 'preference_id': preference_id})
+                  {'travelers': travelers, 'preference_id': preference_id})
 
 
 @csrf_exempt
