@@ -55,36 +55,33 @@
                     <table id="travel-history-table" class="content-table">
                         <thead>
                             <tr>
-                                <th> Salida </th>
-                                <th> Origen </th>
-                                <th> Destino </th>
-                                <th> Pasajeros </th>
-                                <th> Conductor </th>
-                                <th> Vehículo </th>
-                                <th> Estado </th>
-                                <th> Pago </th>
-                                <th> Info </th>
+                                <th>Salida</th>
+                                <th>Se anuncia a</th>
+                                <th>Pasajeros</th>
+                                <th>Conductor</th>
+                                <th>Vehículo</th>
+                                <th>Estado</th>
+                                <th>Revenue</th>
+                                <th>Pago</th>
+                                <th>Info</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for travel in travels %}
+                            {% for waypoint in travels %}
                                 <tr>
-                                    <td>{{ travel.datetime_departure }}</td>
-                                    <td>{{ travel.city_origin }}</td>
-                                    <td>{{ travel.city_destination }}</td>
-                                    <td>{{ travel.vehicle.capacity|sub:travel.seats_left}}/{{ travel.vehicle.capacity }}</td>
-                                    <td>{{ travel.driver }} </td>
-                                    <td>{{ travel.vehicle.plate_number }}</td>
-                                    <td>{{ travel.status }}</td>
-                                    <td>{{ travel.payment_status }}</td>
-
-                                    <td>
-                                        <a href="{% url 'travel_detail' travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
-                                            <i class="bi bi-info-circle"></i>
-                                        </a>
-                                    </td>
-
-                                </tr>
+                                <td>{{ waypoint.0.estimated_datetime_arrival|date:"Y-m-d H:i" }}</td>
+                                <td>{{ waypoint.0.city }} - {{ waypoint.1.city }}</td>
+                                <td>{{ waypoint.2 }}</td>
+                                <td>{{ waypoint.0.travel.driver }}</td>
+                                <td>{{ waypoint.0.travel.vehicle.plate_number }}</td>
+                                <td>{{ waypoint.0.travel.status }}</td>
+                                <td>${{ waypoint.3 }}</td>
+                                <td>{{ waypoint.0.travel.payment_status }}</td>
+                                <td>
+                                    <a href="{% url 'travel_detail' waypoint.0.travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
+                                        <i class="bi bi-info-circle"></i>
+                                    </a>
+                                </td>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -112,9 +109,9 @@
         let vehicle_selected = vehicleFilter.options[vehicleFilter.selectedIndex].text;
         let status_selected = statusFilter.options[statusFilter.selectedIndex].text;
 
-        let driver = data[4] || "Todos";
-        let vehicle = data[5] || "Todos";
-        let status = data[6] || "Todos";
+        let driver = data[3] || "Todos";
+        let vehicle = data[4] || "Todos";
+        let status = data[5] || "Todos";
 
         return (driver_selected === "Todos" || driver_selected === driver) &&
             (vehicle_selected === "Todos" || vehicle_selected === vehicle) &&
