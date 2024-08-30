@@ -411,7 +411,7 @@ def mark_travel_ended(request, travel_id):
     travel.real_datetime_arrival = datetime.now()
     travel.status = 'Finalizado'
     travel.save()
-    travelers = Traveler.objects.filter(segment_id=travel_id, status='Confirmado')
+    travelers = Traveler.objects.filter(segment_id=travel_id, payment_status='Confirmado')
 
     for traveler in travelers:
         to_email = traveler.email
@@ -439,7 +439,7 @@ def start_trip(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travel.status = 'En proceso'
     travel.save()
-    travelers = Traveler.objects.filter(segment__travel=travel_id, status='Confirmado')
+    travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
     driver_message = (f"Lista de pasajeros para el viaje: <br>"
                       f"<table><thead>"
@@ -696,13 +696,16 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
     return redirect('index')
 
 
+# TODO: Arreglar HTML porque se ve para la tula.
 def update_travel(request, travel_id):
     travel = Travel.objects.get(travel_id=travel_id)
     original_travel = Travel.objects.get(travel_id=travel_id)
+    waypoints = travel.waypoint_set.all().order_by('node_number')
+    first = waypoints.first()
 
     can_cancel = True
     # Dos días antes se puede cancelar el viaje
-    date_to_check = travel.datetime_departure - pd.Timedelta(days=2)
+    date_to_check = first.estimated_datetime_arrival - pd.Timedelta(days=2)
 
     if datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')) >= date_to_check:
         can_cancel = False

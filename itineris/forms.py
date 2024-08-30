@@ -310,7 +310,7 @@ class UpdateTravel(forms.ModelForm):
         # get Travel to get min_capacity to filter the vehicles
         travel = Travel.objects.get(travel_id=travel_id)
         company_id = travel.company_id
-        min_capacity = travel.vehicle.capacity - travel.seats_left
+        min_capacity = travel.vehicle.capacity
 
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
                                                                                       active=1))
