@@ -124,7 +124,6 @@ class EditSegment(forms.ModelForm):
 
 EditSegmentFormSet = modelformset_factory(Segment, form=EditSegment, extra=0)
 
-
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
                                               widget=s2forms.ModelSelect2MultipleWidget(

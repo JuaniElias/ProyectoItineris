@@ -13,15 +13,15 @@
                 <div class="row d-flex row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 p-3">
                     {{ formset.management_form }}
                     {% csrf_token %}
-                        {% for form in formset %}
-                            <div class="col">
-                                <div class="card me-2" style="width: 18rem;">
-                                    <div class="card-body">
-                                        {{ form.as_p }}
-                                    </div>
+                    {% for form in formset %}
+                        <div class="col">
+                            <div class="card me-2" style="width: 18rem;">
+                                <div class="card-body">
+                                    {{ form.as_p }}
                                 </div>
                             </div>
-                        {% endfor %}
+                        </div>
+                    {% endfor %}
                 </div>
                 <div class="row">
                     <div class="col text-center">

@@ -6,6 +6,7 @@ import pandas as pd
 import pytz
 from django.contrib import messages
 from django.db.models import Sum
+from django.forms import modelformset_factory
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -28,11 +29,11 @@ def index(request):
             city_origin = form.cleaned_data['city_origin']
             city_destination = form.cleaned_data['city_destination']
             date_departure = form.cleaned_data['datetime_departure']
-            passengers = int(form.cleaned_data['passengers'])
+            passengers_count = int(form.cleaned_data['passengers'])
 
-            request.session['passengers'] = passengers
+            request.session['passengers_count'] = passengers_count
 
-            segments = search_segments(city_origin, passengers)
+            segments = search_segments(city_origin, passengers_count)
 
             results = [segment for segment in segments
                        if ((segment.waypoint_destination.city == city_destination) and
@@ -481,61 +482,32 @@ def delete_vehicle(request, plate_number):
     return redirect('your_vehicles')
 
 
-def show_travelers(request):
-    skip_creation = request.session.get('skip_creation', None)
-    if skip_creation:
-        return redirect('otra_pag')
-
-    segment_id = request.session.get('segment_id')
-    segment = get_object_or_404(Segment, id=segment_id)
-    passenger_count = int(request.session.get('passengers'))
-
-    travelers_list = request.session.get('travelers', [])
-
-
-    travelers = Traveler.objects.all().filter(segment_id=segment_id, id__in=travelers_list)
-
-    if request.method == 'POST':
-
-        form = CreateTraveler(request.POST)
-        if form.is_valid():
-            traveler = form.save(commit=False)
-            traveler.segment_id = segment_id
-            traveler.save()
-            travelers_list.append(traveler.id)
-            request.session['travelers'] = travelers_list
-            request.session['passengers'] = passenger_count - 1
-            print(passenger_count)
-            if passenger_count <= 1:
-                return redirect('checkout')
-            else:
-                return redirect('show_travelers')
-    else:
-        form = CreateTraveler()
-
-    return render(request, "itineris/pre_checkout.html", {
-        "segment": segment,
-        "travelers": travelers,
-        "form": form,
-    })
-
-
-def edit_traveler(request, traveler_id):
-    traveler = get_object_or_404(Traveler, id=traveler_id)
-    segment = get_object_or_404(Segment, id=traveler.segment_id)
-    travelers_list = request.session.get('travelers', [])
-    travelers = Traveler.objects.all().filter(segment_id=segment.id, id__in=travelers_list)
-
-    form = CreateTraveler(instance=traveler)
-    return redirect(request, "itineris/pre_checkout.html", {
-        "segment": segment,
-        "travelers": travelers,
-        "form": form,
-    })
-
 def pre_checkout(request, segment_id):
     request.session['segment_id'] = segment_id
     return redirect('show_travelers')
+
+
+def show_travelers(request):
+    create_traveler_formset = modelformset_factory(Traveler, form=CreateTraveler,
+                                                   extra=int(request.session.get("passengers_count")))
+    segment = get_object_or_404(Segment, id=request.session.get("segment_id"))
+
+    if request.method == 'POST':
+        formset = create_traveler_formset(request.POST)
+        if formset.is_valid():
+            travelers = formset.save(commit=False)
+            for traveler in travelers:
+                traveler.segment = segment
+                traveler.save()
+            return redirect('checkout')
+        else:
+            print("Formset is not valid: ", formset.errors)
+            print("Formset data:", request.POST)
+    else:
+        formset = create_traveler_formset(queryset=Traveler.objects.none())
+
+    return render(request, 'itineris/pre_checkout.html', {"formset": formset, "segment":segment})
+
 
 def checkout(request):
     request.session['skip_creation'] = True
