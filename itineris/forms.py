@@ -266,6 +266,7 @@ class CreateTraveler(forms.ModelForm):
         self.fields['date_of_birth'].widget.attrs['class'] = 'form-control'
         self.fields['sex'].widget.attrs['class'] = 'form-control'
         self.fields['nationality'].widget.attrs['class'] = 'form-control'
+        self.fields['nationality'].widget.attrs['style'] = 'width: 220px;'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['addr_ori'].widget.attrs['class'] = 'form-control'

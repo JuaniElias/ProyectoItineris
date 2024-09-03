@@ -1,37 +1,60 @@
 {% extends 'itineris/base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-7">
-            <h3 class="text-center"> Completa los datos de los pasajeros </h3>
-            <form action="{% url 'show_travelers' %}" method=POST>
-                {{ formset.management_form }}
-                {{ formset.media.js }}
-                {{ formset.media.css }}
-                {% csrf_token %}
-                {% for form in formset %}
-                    <div class="card m-4 p-3" style="width: 28rem;">
-                        <div class="card-body">
-                            <table>
-                                {{ form.as_table }}
-                            </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-7">
+                <h3 class="text-center"> Completa los datos de los pasajeros </h3>
+                <form action="{% url 'show_travelers' %}" method=POST>
+                    {{ formset.management_form }}
+                    {{ formset.media.js }}
+                    {{ formset.media.css }}
+                    {% csrf_token %}
+                    <div id="carouselExample" class="carousel slide">
+                        <div class="carousel-inner">
+                            {% for form in formset %}
+                                <div class="carousel-item">
+                                    <div class="card m-4 p-3 d-block" style="width: 32rem;">
+                                        <div class="card-body">
+                                            <table>
+                                                {{ form.as_table }}
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                                data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                                data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                     </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary" onclick="return confirm('Revisa que tus datos sean correctos antes de continuar')">Siguiente</button>
-            </form>
-        </div>
-        <div class="col-4 text-center" style="margin-top: 5rem">
-            <h2>Detalles del viaje</h2>
-            <div class="fs-4 text-secondary">
-                <p>Fecha y hora salida: {{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
-                <p>{{ segment.waypoint_origin.city }}
-                <p class="mb-3 text-primary"><i class="bi bi-arrow-down"></i></p>
-                <p>{{ segment.waypoint_destination.city }}</p>
-                <p class="text-success">Importe por persona: ${{ segment.fee }}</p>
+                    <button type="submit" class="btn btn-primary"
+                            onclick="return confirm('Revisa que tus datos sean correctos antes de continuar')">Siguiente
+                    </button>
+                </form>
+            </div>
+            <div class="col-4 text-center" style="margin-top: 5rem">
+                <h2>Detalles del viaje</h2>
+                <div class="fs-4 text-secondary">
+                    <p>Fecha y hora salida: {{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
+                    <p>{{ segment.waypoint_origin.city }}
+                    <p class="mb-3 text-primary"><i class="bi bi-arrow-down"></i></p>
+                    <p>{{ segment.waypoint_destination.city }}</p>
+                    <p class="text-success">Importe por persona: ${{ segment.fee }}</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <script>
+        $(document).ready(function () {
+            $('.carousel-item').first().addClass('active');
+        });
+    </script>
 {% endblock %}
