@@ -124,7 +124,6 @@ class EditSegment(forms.ModelForm):
 
 EditSegmentFormSet = modelformset_factory(Segment, form=EditSegment, extra=0)
 
-
 class PeriodTravel(forms.ModelForm):
     weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
                                               widget=s2forms.ModelSelect2MultipleWidget(
@@ -267,6 +266,7 @@ class CreateTraveler(forms.ModelForm):
         self.fields['date_of_birth'].widget.attrs['class'] = 'form-control'
         self.fields['sex'].widget.attrs['class'] = 'form-control'
         self.fields['nationality'].widget.attrs['class'] = 'form-control'
+        self.fields['nationality'].widget.attrs['style'] = 'width: 220px;'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['addr_ori'].widget.attrs['class'] = 'form-control'
@@ -311,7 +311,7 @@ class UpdateTravel(forms.ModelForm):
         # get Travel to get min_capacity to filter the vehicles
         travel = Travel.objects.get(travel_id=travel_id)
         company_id = travel.company_id
-        min_capacity = travel.vehicle.capacity - travel.seats_left
+        min_capacity = travel.vehicle.capacity
 
         self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
                                                                                       active=1))

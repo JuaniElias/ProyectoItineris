@@ -8,8 +8,6 @@
     </div>
     <div class="row">
         <div class="travel-col">
-            
-
             <form action="{% url 'index' %}" method=POST>
                 {% csrf_token %}
                 {{ form.as_p }}

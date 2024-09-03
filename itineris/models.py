@@ -142,7 +142,6 @@ class Traveler(models.Model):
     sex = models.CharField(max_length=1)
     date_of_birth = models.DateField()
     minor = models.BooleanField()
-    # TODO: Poner default a la hora de hacer la carga
     nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
     phone = models.CharField(max_length=30)
     # FIXME: Si terminamos aplicando la Places API de Google vamos a seguir guardando de esta manera las direcciones?
@@ -153,7 +152,7 @@ class Traveler(models.Model):
     addr_dest_num = models.CharField(max_length=10)
     feedback = models.TextField(max_length=200, null=True, default='-')
     payment_status = models.CharField(max_length=50,
-                                      default="En Proceso")  # En Proceso | Confirmado | Finalizado | Cancelado
+                                      default="En Proceso")  # En Proceso | Confirmado | Cancelado
 
     def save(self, *args, **kwargs):
         if not self.pk:
