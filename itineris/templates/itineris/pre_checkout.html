@@ -5,17 +5,18 @@
         <div class="row">
             <div class="col-7">
                 <h3 class="text-center"> Completa los datos de los pasajeros </h3>
-                <form action="{% url 'show_travelers' %}" method=POST>
+                <form class="d-flex flex-column align-items-center" action="{% url 'show_travelers' %}" method=POST>
                     {{ formset.management_form }}
                     {{ formset.media.js }}
                     {{ formset.media.css }}
                     {% csrf_token %}
-                    <div id="carouselExample" class="carousel slide">
+                    <div id="carouselExample" class="carousel carousel-dark slide">
                         <div class="carousel-inner">
                             {% for form in formset %}
                                 <div class="carousel-item">
-                                    <div class="card m-4 p-3 d-block" style="width: 32rem;">
+                                    <div class="card p-3 d-block" style="width: 32rem;margin: 2rem 6rem">
                                         <div class="card-body">
+                                            <h4 class="card-title text-center mb-3">Pasajero N° {{ forloop.counter }}</h4>
                                             <table>
                                                 {{ form.as_table }}
                                             </table>
@@ -35,7 +36,7 @@
                             <span class="visually-hidden">Next</span>
                         </button>
                     </div>
-                    <button type="submit" class="btn btn-primary"
+                    <button type="submit" class="btn btn-lg btn-success"
                             onclick="return confirm('Revisa que tus datos sean correctos antes de continuar')">Siguiente
                     </button>
                 </form>
