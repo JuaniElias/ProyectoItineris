@@ -30,6 +30,14 @@ class Travel(models.Model):
                               default="Borrador")  # En Proceso | Agendado | Finalizado | Cancelado | Borrador
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
 
+    @property
+    def origin(self):
+        return self.waypoint_set.all().order_by('node_number').first()
+
+    @property
+    def destination(self):
+        return self.waypoint_set.all().order_by('node_number').last()
+
 
 class Segment(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)
@@ -153,6 +161,7 @@ class Traveler(models.Model):
     feedback = models.TextField(max_length=200, null=True, default='-')
     payment_status = models.CharField(max_length=50,
                                       default="En Proceso")  # En Proceso | Confirmado | Cancelado
+    paid_amount = models.IntegerField()
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -163,6 +172,8 @@ class Traveler(models.Model):
                 self.dni_description = 'OTRO'
             else:
                 self.dni_description = None
+
+        self.paid_amount = self.segment.fee
 
         super().save(*args, **kwargs)
 

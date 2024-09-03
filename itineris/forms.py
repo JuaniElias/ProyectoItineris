@@ -1,3 +1,5 @@
+from cProfile import label
+
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
@@ -296,8 +298,8 @@ class UpdateTraveler(forms.ModelForm):
 
 
 class UpdateTravel(forms.ModelForm):
-    driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
-    vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
+    driver = forms.ModelChoiceField(queryset=Driver.objects.none(), required=True)
+    vehicle = forms.ModelChoiceField(queryset=Vehicle.objects.none(), required=True)
     addr_origin = forms.CharField(label='Dirección de salida', max_length=100, required=True)
     addr_origin_num = forms.CharField(label='Número', max_length=10, required=True)
 
@@ -313,10 +315,12 @@ class UpdateTravel(forms.ModelForm):
         company_id = travel.company_id
         min_capacity = travel.vehicle.capacity
 
-        self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
-                                                                                      active=1))
+        self.fields['driver'] = forms.ModelChoiceField(label='Conductor',
+                                                       queryset=Driver.objects.filter(company_id=company_id,active=1)
+                                                       )
         self.fields['driver'].widget.attrs['class'] = 'form-control'
-        self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id,
+        self.fields['vehicle'] = forms.ModelChoiceField(label='Vehículo',
+                                                        queryset=Vehicle.objects.filter(company_id=company_id,
                                                                                         status='Disponible',
                                                                                         capacity__gte=min_capacity,
                                                                                         ))

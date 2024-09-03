@@ -62,10 +62,9 @@ def index(request):
 
                 messages.success(request, message=msg_text)
 
-            return render(request, 'itineris/travel_result.html', {'segments': results })
+            return render(request, 'itineris/travel_result.html', {'segments': results})
     else:
         form = SearchTravel()
-
 
     if request.user.is_authenticated:
         return render(request, "itineris/your_travels.html")
@@ -281,11 +280,8 @@ def get_available_options(request):
         available_drivers = Driver.objects.filter(company_id=request.user.id, active=True)
 
         for travel in scheduled_travels:
-            waypoints = travel.waypoint_set.all().order_by('node_number')
-            first = waypoints.first()
-            last = waypoints.last()
-            if (vehicle_departure <= last.estimated_datetime_arrival.astimezone() and
-                    first.estimated_datetime_arrival.astimezone() <= vehicle_arrival):
+            if (vehicle_departure <= travel.destination.estimated_datetime_arrival.astimezone() and
+                    travel.origin.estimated_datetime_arrival.astimezone() <= vehicle_arrival):
                 vehicle_exclude.append(travel.vehicle.plate_number)
                 driver_exclude.append(travel.driver.driver_id)
 
@@ -312,14 +308,10 @@ def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
-    waypoints = travel.waypoint_set.all().order_by('node_number')
-    first = waypoints.first()
-    last = waypoints.last()
-
     total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
-    gross_revenue = travelers.aggregate(total=Sum('segment__fee'))['total'] or 0
+    gross_revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
 
-    waypoints = (first, last, total_passengers, gross_revenue)
+    waypoints = (travel.origin, travel.destination, total_passengers, gross_revenue)
     return render(request, "itineris/travel_detail.html",
                   {'travelers': travelers, 'waypoints': waypoints, 'travel': travel})
 
@@ -359,19 +351,15 @@ def delete_driver(request, driver_id):
 
 
 def your_travels(request):
-
     travels = Travel.objects.all().filter(company=request.user.id, status='Agendado')
     wp = []
     for travel in travels:
-        waypoints = travel.waypoint_set.all().order_by('node_number')
-        first = waypoints.first()
-        last = waypoints.last()
-
         total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
 
-        fee = Segment.objects.all().filter(waypoint_origin=first, waypoint_destination=last).values('fee')[0]['fee']
+        fee = Segment.objects.all().filter(waypoint_origin=travel.origin,
+                                           waypoint_destination=travel.destination).values('fee')[0]['fee']
 
-        wp.append((first, last, total_passengers, fee))
+        wp.append((travel.origin, travel.destination, total_passengers, fee))
 
     wp.sort(key=lambda x: x[0].estimated_datetime_arrival)
 
@@ -379,7 +367,6 @@ def your_travels(request):
 
 
 def travel_history(request):
-
     travels = Travel.objects.all().filter(company=request.user.id).exclude(status='Borrador')
 
     vehicles = Vehicle.objects.filter(company_id=request.user.id)
@@ -387,18 +374,15 @@ def travel_history(request):
 
     wp = []
     for travel in travels:
-        waypoints = travel.waypoint_set.all().order_by('node_number')
-        first = waypoints.first()
-        last = waypoints.last()
-
         total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
 
-        total_fee = Segment.objects.filter(
-            travel=travel,
-            traveler__payment_status="Confirmado"
-        ).aggregate(total_fee=Sum('fee'))['total_fee'] or 0
+        segments = travel.segment_set.all()
+        total_paid_amount = (Traveler.objects.all()
+                             .filter(segment__in=segments, payment_status='Confirmado')
+                             .aggregate(total=Sum('paid_amount'))
+                             )['total'] or 0
 
-        wp.append((first, last, total_passengers, total_fee))
+        wp.append((travel.origin, travel.destination, total_passengers, total_paid_amount))
 
     wp.sort(key=lambda x: x[0].estimated_datetime_arrival)
 
@@ -454,22 +438,23 @@ def start_trip(request, travel_id):
     for traveler in travelers:
         to_email = traveler.email
         subject = f'Itineris | El chofer {travel.driver} inició tu viaje!'
-        message = (f'Se ha iniciado el viaje de {traveler.segment.waypoint_origin.city} a {traveler.segment.waypoint_destination.city}<br>'
-                   f'El chofer se estará comunicando contigo por teléfono.<br>'
-                   f'Este es su número de teléfono en caso de que lo necesites! {travel.driver.phone_number} <br>'
-                   f'Empresa: {travel.company.company_name}<br>'
-                   f'Vehículo: {travel.vehicle}<br>'
-                   f'Recuerda chequear que el vehículo sea el correcto. Te brindamos la ruta que el conductor estará '
-                   f'siguiendo <a href="{travel.url}">aquí</a>'
-                   )
-        driver_message += (f"<tr><td>{ traveler.first_name }</td>"
-                           f"<td>{ traveler.last_name }</td>"
-                           f"<td>{ traveler.dni }</td>"
-                           f"<td>{ traveler.phone }</td>"
-                           f"<td>{ traveler.addr_ori } { traveler.addr_ori_num }</td>"
-                           f"<td>{ traveler.addr_dest } { traveler.addr_dest_num }</td>"
-                           f"<td>{ traveler.segment.waypoint_origin.city.city_name 
-                           } - { traveler.segment.waypoint_destination.city.city_name }</td></tr>")
+        message = (
+            f'Se ha iniciado el viaje de {traveler.segment.waypoint_origin.city} a {traveler.segment.waypoint_destination.city}<br>'
+            f'El chofer se estará comunicando contigo por teléfono.<br>'
+            f'Este es su número de teléfono en caso de que lo necesites! {travel.driver.phone_number} <br>'
+            f'Empresa: {travel.company.company_name}<br>'
+            f'Vehículo: {travel.vehicle}<br>'
+            f'Recuerda chequear que el vehículo sea el correcto. Te brindamos la ruta que el conductor estará '
+            f'siguiendo <a href="{travel.url}">aquí</a>'
+            )
+        driver_message += (f"<tr><td>{traveler.first_name}</td>"
+                           f"<td>{traveler.last_name}</td>"
+                           f"<td>{traveler.dni}</td>"
+                           f"<td>{traveler.phone}</td>"
+                           f"<td>{traveler.addr_ori} {traveler.addr_ori_num}</td>"
+                           f"<td>{traveler.addr_dest} {traveler.addr_dest_num}</td>"
+                           f"<td>{traveler.segment.waypoint_origin.city.city_name
+                           } - {traveler.segment.waypoint_destination.city.city_name}</td></tr>")
         try:
             send_email(to_email, subject, message, file=None, html=True)
         except Exception as e:
@@ -527,6 +512,7 @@ def delete_vehicle(request, plate_number):
         vehicle.save()
     return redirect('your_vehicles')
 
+
 def pre_checkout(request, segment_id):
     request.session['segment_id'] = segment_id
     return redirect('show_travelers')
@@ -554,7 +540,7 @@ def show_travelers(request):
     else:
         formset = create_traveler_formset(queryset=Traveler.objects.none())
 
-    return render(request, 'itineris/pre_checkout.html', {"formset": formset, "segment":segment})
+    return render(request, 'itineris/pre_checkout.html', {"formset": formset, "segment": segment})
 
 
 def checkout(request):
@@ -700,60 +686,94 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
 def update_travel(request, travel_id):
     travel = Travel.objects.get(travel_id=travel_id)
     original_travel = Travel.objects.get(travel_id=travel_id)
-    waypoints = travel.waypoint_set.all().order_by('node_number')
-    first = waypoints.first()
 
     can_cancel = True
     # Dos días antes se puede cancelar el viaje
-    date_to_check = first.estimated_datetime_arrival - pd.Timedelta(days=2)
+    date_to_check = travel.origin.estimated_datetime_arrival - pd.Timedelta(days=2)
 
     if datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')) >= date_to_check:
         can_cancel = False
 
     if travel.status == "Agendado":
         if request.method == 'POST':
+            formset = EditSegmentFormSet(request.POST)
             form = UpdateTravel(travel_id, request.POST, instance=travel)
-            if form.is_valid():
+            if form.is_valid() and formset.is_valid():
                 updated_travel = form.save(commit=False)
                 changed_fields = []
                 for field in form.changed_data:
-                    original_travel = getattr(original_travel, field)
-                    updated_travel = getattr(updated_travel, field)
-                    if original_travel != updated_travel:
+                    original_value = getattr(original_travel, field)
+                    updated_value = getattr(updated_travel, field)
+                    if original_value != updated_value:
                         changed_fields.append(field)
                 updated_travel.save()
+                formset.save()
+
+                if updated_travel.period:
+                    if request.POST.get('radio_period') == 'following':
+                        travels = Travel.objects.filter(period=updated_travel.period)
+                        # Filtrar los viajes en Python, no en la base de datos
+                        future_travels = [
+                            travel for travel in travels
+                            if
+                            travel.origin.estimated_datetime_arrival > updated_travel.origin.estimated_datetime_arrival
+                        ]
+                        for travel in future_travels:
+                            travel.driver = updated_travel.driver
+                            travel.vehicle = updated_travel.vehicle
+                            travel.addr_origin = updated_travel.addr_origin
+                            travel.addr_origin_num = updated_travel.addr_origin_num
+                            travel.save()
+
+                            # TODO: try this instead
+                            # travel = form.save()
+
+                            segments = updated_travel.segment_set.all()
+                            for segment in segments:
+                                updated_segment = get_object_or_404(Segment,
+                                                                    waypoint_origin__city=segment.waypoint_origin.city,
+                                                                    waypoint_destination__city=segment.waypoint_destination.city,
+                                                                    travel_id=travel.travel_id)
+                                updated_segment.fee = segment.fee
+                                updated_segment.save()
+
                 messages.success(request, "El viaje fue modificado exitosamente.")
 
                 if 'driver' in changed_fields or 'vehicle' in changed_fields:
                     travelers = Traveler.objects.filter(segment__travel=travel_id, status='Confirmado')
-                    for traveler in travelers:
-                        to_email = traveler.email
-                        subject = f'Itineris | Hubo un cambio en tu viaje.'
-                        message = (
-                            f'Se han actualizado los datos del viaje de {traveler.segment.waypoint_origin.city
-                            } a {traveler.segment.waypoint_destination.city} '
-                            f'para la fecha {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
-                            f'Empresa: {travel.company.company_name}<br>'
-                            f'Chofer: ({travel.driver}) se estará comunicando contigo por teléfono.<br>'
-                            f'Este es su número de teléfono en caso de que lo necesites! {travel.driver.phone_number}<br>'
-                            f'Vehículo: {travel.vehicle}<br>'
-                            f'Saludos!'
-                        )
-                        try:
-                            send_email(to_email, subject, message, file=None, html=True)
-                        except Exception as e:
-                            messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
+                    if travelers:
+                        for traveler in travelers:
+                            to_email = traveler.email
+                            subject = f'Itineris | Hubo un cambio en tu viaje.'
+                            message = (
+                                f'Se han actualizado los datos del viaje de {traveler.segment.waypoint_origin.city
+                                } a {traveler.segment.waypoint_destination.city} '
+                                f'para la fecha {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
+                                f'Empresa: {travel.company.company_name}<br>'
+                                f'Chofer: ({travel.driver}) se estará comunicando contigo por teléfono.<br>'
+                                f'Este es su número de teléfono en caso de que lo necesites! {travel.driver.phone_number}<br>'
+                                f'Vehículo: {travel.vehicle}<br>'
+                                f'Saludos!'
+                            )
+                            try:
+                                send_email(to_email, subject, message, file=None, html=True)
+                            except Exception as e:
+                                messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
 
                 return redirect('your_travels')
         else:
             form = UpdateTravel(travel_id=travel_id, instance=travel)
+            formset = EditSegmentFormSet(queryset=Segment.objects.all().filter(travel_id=travel_id))
     else:
         messages.success(request, "No se pueden editar los datos en este momento.")
         return redirect('your_travels')
 
-    return render(request, "itineris/update_travel.html", {'form': form, 'travel': travel,
-                                                           'travel_id': travel_id,
-                                                           'can_cancel': can_cancel})
+    return render(request, "itineris/update_travel.html", {
+        'form': form,
+        'formset': formset,
+        'travel': travel,
+        'can_cancel': can_cancel,
+        'waypoints': (travel.origin, travel.destination)})
 
 
 def cancel_travel(request, travel_id):
@@ -788,12 +808,9 @@ def cancel_travel(request, travel_id):
 
 def export_travelers_to_csv(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    waypoints = travel.waypoint_set.all().order_by('node_number')
-    first = waypoints.first()
-    last = waypoints.last()
-    date_ = first.estimated_datetime_arrival.strftime("%Y-%m-%d")
-    city_origin = first.city.city_name
-    city_destination = last.city.city_name
+    date_ = travel.origin.estimated_datetime_arrival.strftime("%Y-%m-%d")
+    city_origin = travel.origin.city.city_name
+    city_destination = travel.destination.city.city_name
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{city_origin}_a_{city_destination}_{date_}.csv"'
 
