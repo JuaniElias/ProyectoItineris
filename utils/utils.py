@@ -171,6 +171,41 @@ def calculate_full_route(travel_id):
     final_route = best_route_pickup[:-1] + best_route_drop_off
     url = get_url_route(final_route)
 
+    # Inicialización
+    ubicacion_inicial = 0
+    ruta_inicial = [ubicacion_inicial]
+    mejor_ruta = []
+    mejor_distancia = float('inf')
+    # Supongamos que tienes un DataFrame con las distancias entre nodos
+    # M nodos de recolección y Z nodos de entrega
+    distancias_df = pd.DataFrame({
+        0: [0, 10, 15, 20, 10, 25, 30],
+        1: [10, 0, 35, 25, 30, 15, 20],
+        2: [15, 35, 0, 30, 20, 25, 10],
+        3: [20, 25, 30, 0, 10, 15, 35],
+        4: [10, 30, 20, 10, 0, 40, 25],
+        5: [25, 15, 25, 15, 40, 0, 10],
+        6: [30, 20, 10, 35, 25, 10, 0]
+    })
+
+    nodos_recoleccion = [1, 3, 5]  # Nodos donde se recogen pasajeros
+    nodos_entrega = [2, 4, 6]  # Nodos donde se dejan pasajeros
+    capacidad_maxima = 4  # Capacidad máxima del vehículo
+    pasajeros_iniciales = 2  # Pasajeros iniciales en el auto (N)
+
+    # Nodos que deben ser visitados
+    nodos_pendientes = nodos_recoleccion + nodos_entrega
+
+    # Llamada al algoritmo
+    mejor_distancia = branch_and_bound(
+        ubicacion_inicial, ruta_inicial, capacidad_maxima, pasajeros_iniciales, nodos_pendientes, mejor_ruta,
+        mejor_distancia
+    )
+
+    # Resultado final
+    print("La mejor ruta es:", mejor_ruta)
+    print("Con una distancia total de:", mejor_distancia)
+
     travel.url = url
     travel.save()
 
@@ -209,3 +244,45 @@ def search_segments(city_origin, passengers):
     ).order_by('waypoint_origin__estimated_datetime_arrival')
 
     return [segment for segment in segments if segment.seats_available() >= passengers]
+
+# For futute
+'''# Función para calcular la distancia total de una ruta
+def calcular_distancia(ruta, distancias_df):
+    distancia_total = 0
+    for i in range(len(ruta) - 1):
+        distancia_total += distancias_df.iloc[ruta[i], ruta[i + 1]]
+    return distancia_total
+
+# Función para realizar el algoritmo de Branch and Bound
+def branch_and_bound(ubicacion_actual, ruta_actual, capacidad_actual, pasajeros, nodos_pendientes, mejor_ruta,
+                     mejor_distancia, nodo_final):
+    # Si no quedan nodos por visitar, terminamos el recorrido
+    if not nodos_pendientes:
+        distancia = calcular_distancia(ruta_actual + [nodo_final], distancias_df)  # Vuelve al nodo inicial
+        if distancia < mejor_distancia:
+            mejor_ruta[:] = ruta_actual + [0]  # Actualiza la mejor ruta
+            mejor_distancia = distancia
+        return mejor_distancia
+
+    # Exploramos las ramas posibles (visitando los nodos pendientes)
+    for siguiente_nodo in nodos_pendientes:
+        if siguiente_nodo in nodos_recoleccion and pasajeros < capacidad_maxima:  # Recoger pasajero
+            nueva_ruta = ruta_actual + [siguiente_nodo]
+            nueva_capacidad = capacidad_actual - 1
+            nueva_lista_pendiente = nodos_pendientes.copy()
+            nueva_lista_pendiente.remove(siguiente_nodo)
+            mejor_distancia = branch_and_bound(
+                siguiente_nodo, nueva_ruta, nueva_capacidad, pasajeros + 1, nueva_lista_pendiente, mejor_ruta,
+                mejor_distancia, nodo_final
+            )
+        elif siguiente_nodo in nodos_entrega and pasajeros > 0:  # Dejar pasajero
+            nueva_ruta = ruta_actual + [siguiente_nodo]
+            nueva_capacidad = capacidad_actual + 1
+            nueva_lista_pendiente = nodos_pendientes.copy()
+            nueva_lista_pendiente.remove(siguiente_nodo)
+            mejor_distancia = branch_and_bound(
+                siguiente_nodo, nueva_ruta, nueva_capacidad, pasajeros - 1, nueva_lista_pendiente, mejor_ruta,
+                mejor_distancia, nodo_final
+            )
+
+    return mejor_distancia'''
