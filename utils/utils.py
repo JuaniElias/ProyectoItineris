@@ -245,7 +245,7 @@ def search_segments(city_origin, passengers):
 
     return [segment for segment in segments if segment.seats_available() >= passengers]
 
-# For futute
+# For future development
 '''# Función para calcular la distancia total de una ruta
 def calcular_distancia(ruta, distancias_df):
     distancia_total = 0

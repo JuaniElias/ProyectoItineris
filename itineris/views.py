@@ -308,12 +308,14 @@ def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
+    # TODO: Validar que esto funque / mirar models
     total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
     gross_revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
 
+    segments = Segment.objects.all().filter(travel_id=travel_id)
     waypoints = (travel.origin, travel.destination, total_passengers, gross_revenue)
     return render(request, "itineris/travel_detail.html",
-                  {'travelers': travelers, 'waypoints': waypoints, 'travel': travel})
+                  {'travelers': travelers, 'waypoints': waypoints, 'travel': travel, 'segments': segments})
 
 
 def your_drivers(request):
@@ -618,7 +620,6 @@ def payment_success(request):
                 except Exception as e:
                     messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
                 traveler.save()
-
             return redirect('payment_success')
         else:
             return redirect('checkout')

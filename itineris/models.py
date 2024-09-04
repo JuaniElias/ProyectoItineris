@@ -48,6 +48,9 @@ class Segment(models.Model):
     fee = models.IntegerField(default=0, null=True)
     seats_occupied = models.IntegerField(default=0)
 
+    def __str__(self):
+        return str(self.waypoint_origin.city) + ' - ' + str(self.waypoint_destination.city)
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.duration = self.waypoint_destination.estimated_datetime_arrival - self.waypoint_origin.estimated_datetime_arrival
@@ -61,8 +64,8 @@ class Segment(models.Model):
         # Obtener los segmentos que coinciden en el mismo tramo entre ciudades excluyendo los segmentos en ambos extremos
         vehicle_capacity = self.travel.vehicle.capacity
 
-        start_waypoint = self.waypoint_origin.node_number # 1
-        end_waypoint = self.waypoint_destination.node_number # 2
+        start_waypoint = self.waypoint_origin.node_number
+        end_waypoint = self.waypoint_destination.node_number
 
         excluded_before_start = travel_segments.filter(travel_id=self.travel.travel_id,
                                                        waypoint_destination__node_number__lte=start_waypoint
@@ -76,6 +79,12 @@ class Segment(models.Model):
         total_seats = valid_segments.aggregate(total=Sum('seats_occupied'))['total'] or 0
 
         return vehicle_capacity - total_seats
+
+    @property
+    def revenue(self):
+        travelers = self.traveler_set
+        revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
+        return revenue
 
 
 class Waypoint(models.Model):
@@ -174,6 +183,10 @@ class Traveler(models.Model):
                 self.dni_description = None
 
         self.paid_amount = self.segment.fee
+        # TODO: YYyyy mirá loco
+        if self.payment_status == 'Confirmado':
+            self.segment.seats_occupied += 1
+            self.segment.save()
 
         super().save(*args, **kwargs)
 
