@@ -5,130 +5,129 @@
 {% block content %}
 
     <section class="your-business">
-            <div class="row">
-                <div class="col mx-5 p-3">
-                    <div class="card">
-                        <h2 class="modal-title" id="travelModalLabel">Detalle del viaje: {{ waypoints.0.city }}
-                            - {{ waypoints.1.city }}</h2>
-                        <br>
-                        <div class="row">
-                            <div class="col-5">
-                                <p><b>Salida:</b> {{ waypoints.0.estimated_datetime_arrival }}</p>
-                                <p><b>Llegada estimada:</b> {{ waypoints.1.estimated_datetime_arrival }}</p>
-                                {% if travel.real_datetime_arrival %}
-                                    <p><b>Llegada:</b> {{ travel.real_datetime_arrival }}</p>
-                                {% endif %}
-                                <p><b>Estado:</b> {{ travel.status }}</p>
-                            </div>
-                            <div class="col-5">
-                                <p><b>Conductor:</b> {{ travel.driver }}</p>
-                                <p><b>Vehículo:</b> {{ travel.vehicle }}</p>
-                            </div>
-                            <div class="col-2">
-                                <p><b>Pasajeros totales:</b> {{ waypoints.2 }}</p>
-                                <p><b>Ingresos brutos:</b> ${{ waypoints.3 }}</p>
-                            </div>
+        <div class="row pt-2">
+            <div class="col-7">
+                <div class="card mx-3 p-3">
+                    <h2 class="modal-title" id="travelModalLabel">Detalle del viaje: {{ waypoints.0.city }}
+                        - {{ waypoints.1.city }}</h2>
+                    <br>
+                    <div class="row">
+                        <div class="col-5">
+                            <p><b>Salida:</b> {{ waypoints.0.estimated_datetime_arrival }}</p>
+                            <p><b>Llegada estimada:</b> {{ waypoints.1.estimated_datetime_arrival }}</p>
+                            {% if travel.real_datetime_arrival %}
+                                <p><b>Llegada:</b> {{ travel.real_datetime_arrival }}</p>
+                            {% endif %}
+                            <p><b>Estado:</b> {{ travel.status }}</p>
                         </div>
+                        <div class="col-4">
+                            <p><b>Conductor:</b> {{ travel.driver }}</p>
+                            <p><b>Vehículo:</b> {{ travel.vehicle }}</p>
+                        </div>
+                        <div class="col-3">
+                            <p><b>Pasajeros totales:</b> {{ waypoints.2 }}</p>
+                            <p><b>Ingresos brutos:</b> ${{ waypoints.3 }}</p>
+                        </div>
+                    </div>
 
-                        {% if waypoints.2 > 0 %}
-                            <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
-                                <button type="submit" class="btn btn-primary mb-2">Generar mapa de ruta</button>
-                            </form>
-                            <a href="{{ travel.url }}">Ruta</a>
-                        {% endif %}
-                        {% if travel.status == 'Agendado' %}
-                            <form action="{% url 'start_trip'  travel.travel_id %}" method="get">
-                                <button type="submit" class="btn btn-primary mb-2">Dar inicio al viaje</button>
-                            </form>
-                        {% elif travel.status == 'En proceso' %}
-                            <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
-                                <button type="submit" class="btn btn-primary mb-2">Marcar viaje como completado</button>
-                            </form>
-                        {% endif %}
-                        <div class="d-flex w-100 justify-content-between">
-                            <form action="{% url 'export_travelers_to_csv' travel.travel_id %}" method="get">
-                                <button type="submit" class="btn btn-success">Exportar datos a CSV</button>
-                            </form>
-                        </div>
+                    {% if waypoints.2 > 0 %}
+                        <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-primary mb-2">Generar mapa de ruta</button>
+                        </form>
+                        <a href="{{ travel.url }}">Ruta</a>
+                    {% endif %}
+                    {% if travel.status == 'Agendado' %}
+                        <form action="{% url 'start_trip'  travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-primary mb-2">Dar inicio al viaje</button>
+                        </form>
+                    {% elif travel.status == 'En proceso' %}
+                        <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-primary mb-2">Marcar viaje como completado</button>
+                        </form>
+                    {% endif %}
+                    <div class="d-flex w-100 justify-content-between">
+                        <form action="{% url 'export_travelers_to_csv' travel.travel_id %}" method="get">
+                            <button type="submit" class="btn btn-success">Exportar datos a CSV</button>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col mx-5 p-3">
-                    <div class="card">
-                        <table id="segment-table" class="content-table">
-                            <thead>
+
+            <div class="col-5">
+                <div class="card me-3 p-3">
+                    <table id="segment-table" class="content-table">
+                        <thead>
+                        <tr>
+                            <th>Trayecto</th>
+                            <th>Llegada estimada</th>
+                            <th>Pasajeros</th>
+                            <th>Monto recaudo</th>
+                        </tr>
+
+                        </thead>
+                        <tbody>
+                        {% for segment in segments %}
                             <tr>
-                                <th>Trayecto</th>
-                                <th>Llegada estimada</th>
-                                <th>Pasajeros</th>
-                                <th>Monto recaudo</th>
+                                <td>{{ segment }}</td>
+                                <td>{{ segment.waypoint_destination.estimated_datetime_arrival }}</td>
+                                <td>{{ segment.seats_occupied }}</td>
+                                <td>{{ segment.revenue }}</td>
                             </tr>
-
-                            </thead>
-                            <tbody>
-                            {% for segment in segments %}
-                                <tr>
-                                    <td>{{ segment }}</td>
-                                    <td>{{ segment.waypoint_destination.estimated_datetime_arrival }}</td>
-                                    <td>{{ segment.seats_occupied }}</td>
-                                    <td>{{ segment.revenue }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="row">
-                <div class="col mx-5 p-3">
-                    <div class="card">
-                        <div class="col-md-5">
-                            <label>
-                                Trayecto
-                                <select id="segmentFilter" class="form-control">
-                                    <option value="Todos">Todos</option>
-                                    {% for segment in segments %}
-                                        <option value="{{ segment.id }}">{{ segment }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
-                        </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card m-3 p-3">
+                    <div class="col-md-5">
+                        <label>
+                            Trayecto
+                            <select id="segmentFilter" class="form-control">
+                                <option value="Todos">Todos</option>
+                                {% for segment in segments %}
+                                    <option value="{{ segment.id }}">{{ segment }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
 
-                        <table id="traveler-table" class="content-table">
-                            <thead>
+                    <table id="traveler-table" class="content-table">
+                        <thead>
+                        <tr>
+                            <th>Trayecto</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>DNI</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Dirección Origen</th>
+                            <th>Dirección Destino</th>
+                            <th>Feedback</th>
+                        </tr>
+
+                        </thead>
+                        <tbody>
+                        {% for traveler in travelers %}
                             <tr>
-                                <th>Trayecto</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>DNI</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Dirección Origen</th>
-                                <th>Dirección Destino</th>
-                                <th>Feedback</th>
+                                <td>{{ traveler.segment }}</td>
+                                <td>{{ traveler.first_name }}</td>
+                                <td>{{ traveler.last_name }}</td>
+                                <td>{{ traveler.dni }}</td>
+                                <td>{{ traveler.email }}</td>
+                                <td>{{ traveler.phone }}</td>
+                                <td>{{ traveler.addr_ori }} {{ traveler.addr_ori_num }}</td>
+                                <td>{{ traveler.addr_dest }} {{ traveler.addr_dest_num }}</td>
+                                <td>{{ traveler.feedback }}</td>
                             </tr>
-
-                            </thead>
-                            <tbody>
-                            {% for traveler in travelers %}
-                                <tr>
-                                    <td>{{ traveler.segment }}</td>
-                                    <td>{{ traveler.first_name }}</td>
-                                    <td>{{ traveler.last_name }}</td>
-                                    <td>{{ traveler.dni }}</td>
-                                    <td>{{ traveler.email }}</td>
-                                    <td>{{ traveler.phone }}</td>
-                                    <td>{{ traveler.addr_ori }} {{ traveler.addr_ori_num }}</td>
-                                    <td>{{ traveler.addr_dest }} {{ traveler.addr_dest_num }}</td>
-                                    <td>{{ traveler.feedback }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
     </section>
     <script>
         const segmentFilter = document.querySelector('#segmentFilter');
