@@ -21,8 +21,8 @@ class Travel(models.Model):
     company = models.ForeignKey("Company", on_delete=models.DO_NOTHING)
     driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING)
     vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
-    addr_origin = models.CharField(max_length=100)
-    addr_origin_num = models.CharField(max_length=10)
+    address = models.CharField(max_length=200, null=True)
+    geolocation = models.CharField(max_length=100, null=True)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
     payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
@@ -161,12 +161,10 @@ class Traveler(models.Model):
     minor = models.BooleanField()
     nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
     phone = models.CharField(max_length=30)
-    # FIXME: Si terminamos aplicando la Places API de Google vamos a seguir guardando de esta manera las direcciones?
-    #  Es decir, separar la dirección de la altura.
-    addr_ori = models.CharField(max_length=100)
-    addr_ori_num = models.CharField(max_length=10)
-    addr_dest = models.CharField(max_length=100)
-    addr_dest_num = models.CharField(max_length=10)
+    address_origin = models.CharField(max_length=200, null=True)
+    geocode_origin = models.CharField(max_length=100, null=True)
+    address_destination = models.CharField(max_length=200, null=True)
+    geocode_destination = models.CharField(max_length=100, null=True)
     feedback = models.TextField(max_length=200, null=True, default='-')
     payment_status = models.CharField(max_length=50,
                                       default="En Proceso")  # En Proceso | Confirmado | Cancelado

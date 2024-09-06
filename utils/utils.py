@@ -136,7 +136,7 @@ def calculate_full_route(travel_id):
     gmaps = googlemaps.Client(key='')
     # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    start_point = travel.addr_origin + ' ' + travel.addr_origin_num + ', ' + str(travel.city_origin)
+    start_point = travel.address + ' ' + str(travel.city_origin)
     # esta lista debería venir de una query a la base de datos trayendo todos los destinos para un viaje
     pickup_addresses = [start_point]
     drop_off_addresses = []
@@ -144,9 +144,9 @@ def calculate_full_route(travel_id):
     travelers = Traveler.objects.filter(travel_id=travel_id)
 
     for traveler in travelers:
-        address_ori = f'{traveler.addr_ori} {traveler.addr_ori_num}, {traveler.segment.waypoint_origin.city}'
+        address_ori = f'{traveler.address_origin}, {traveler.segment.waypoint_origin.city}'
         pickup_addresses.append(address_ori)
-        address_dest = f'{traveler.addr_dest} {traveler.addr_dest_num}, {traveler.segment.waypoint_destination.city}'
+        address_dest = f'{traveler.address_destination}, {traveler.segment.waypoint_destination.city}'
         drop_off_addresses.append(address_dest)
 
     distance_matrix_pickup = get_distance_matrix(pickup_addresses, gmaps)

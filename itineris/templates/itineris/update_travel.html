@@ -64,5 +64,31 @@
             </div>
         </div>
     </section>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places"></script>
+<script>
+    function initialize() {
+        var input = document.getElementById('autocomplete');
+        var autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ['address'],
+            componentRestrictions: { country: 'ar' }  // Restricción para Argentina
+        });
 
+        autocomplete.addListener('place_changed', function () {
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.log("No details available for input: '" + place.name + "'");
+                return;
+            }
+
+            // Obtener las coordenadas (latitud y longitud) de la ubicación seleccionada
+            var lat = place.geometry.location.lat();
+            var lng = place.geometry.location.lng();
+
+            // Guardar las coordenadas en el campo oculto 'geolocation'
+            document.getElementById('id_geolocation').value = lat + "," + lng;
+        });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+</script>
 {% endblock %}

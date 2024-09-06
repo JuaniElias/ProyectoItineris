@@ -94,8 +94,8 @@ def create_travel(request):
                 new_travel = Travel.objects.create(company=company,
                                                    driver=form.cleaned_data['driver'],
                                                    vehicle=form.cleaned_data['vehicle'],
-                                                   addr_origin=form.cleaned_data['addr_origin'],
-                                                   addr_origin_num=form.cleaned_data['addr_origin_num'])
+                                                   address=form.cleaned_data['address'],
+                                                   geolocation=form.cleaned_data['geolocation'])
 
                 if toggle_checkbox and period_form.is_valid():
                     period = period_form.save()
@@ -244,8 +244,8 @@ def end_travel_creation(request):
                 company=travel.company,
                 driver=travel.driver,
                 vehicle=travel.vehicle,
-                addr_origin=travel.addr_origin,
-                addr_origin_num=travel.addr_origin_num,
+                address=travel.address,
+                geolocation=travel.geolocation,
                 period=travel.period,
                 status=travel.status,
             )
@@ -404,8 +404,8 @@ def mark_travel_ended(request, travel_id):
         subject = f'Itineris | Viaje finalizado!'
         message = (f'¡Gracias por elegirnos!<br>'
                    f'Se ha completado el viaje de '
-                   f'{traveler.addr_ori}, {traveler.addr_ori_num}, {traveler.segment.waypoint_origin.city} a '
-                   f'{traveler.addr_dest}, {traveler.addr_dest_num}, {traveler.segment.waypoint_destination.city}<br>'
+                   f'{traveler.address_origin}, {traveler.segment.waypoint_origin.city} a '
+                   f'{traveler.address_destination}, {traveler.segment.waypoint_destination.city}<br>'
                    f'Día de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
                    f'Finalizado el: {traveler.segment.waypoint_destination.estimated_datetime_arrival}<br>'
                    f'Empresa: {traveler.segment.travel.company.company_name}<br>'
@@ -453,8 +453,8 @@ def start_trip(request, travel_id):
                            f"<td>{traveler.last_name}</td>"
                            f"<td>{traveler.dni}</td>"
                            f"<td>{traveler.phone}</td>"
-                           f"<td>{traveler.addr_ori} {traveler.addr_ori_num}</td>"
-                           f"<td>{traveler.addr_dest} {traveler.addr_dest_num}</td>"
+                           f"<td>{traveler.address_origin}</td>"
+                           f"<td>{traveler.address_destination}</td>"
                            f"<td>{traveler.segment.waypoint_origin.city.city_name
                            } - {traveler.segment.waypoint_destination.city.city_name}</td></tr>")
         try:
@@ -603,8 +603,8 @@ def payment_success(request):
                 subject = f'Pasaje Itineris - {traveler.segment.waypoint_origin.city} a {traveler.segment.waypoint_destination.city}'
                 message = (f'¡Te brindamos los datos de tu pasaje!<br>'
                            f'Información de tu pasaje:\n'
-                           f'Origen: {traveler.addr_ori}, {traveler.addr_ori_num}<br>'
-                           f'Destino: {traveler.addr_dest}, {traveler.addr_dest_num}<br>'
+                           f'Origen: {traveler.address_origin}<br>'
+                           f'Destino: {traveler.address_destination}<br>'
                            f'Fecha y hora de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
                            f'Fecha y hora estimada de llegada: {traveler.segment.waypoint_destination.estimated_datetime_arrival}<br>'
                            f'Empresa: {traveler.segment.travel.company.company_name}<br>'
@@ -722,8 +722,8 @@ def update_travel(request, travel_id):
                         for travel in future_travels:
                             travel.driver = updated_travel.driver
                             travel.vehicle = updated_travel.vehicle
-                            travel.addr_origin = updated_travel.addr_origin
-                            travel.addr_origin_num = updated_travel.addr_origin_num
+                            travel.address = updated_travel.address
+                            travel.geolocation = updated_travel.geolocation
                             travel.save()
 
                             # TODO: try this instead
