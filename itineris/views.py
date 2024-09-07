@@ -574,10 +574,10 @@ def checkout(request):
     }
 
     preference_response = sdk.preference().create(preference_data)
-    preference_id = preference_response["response"]
+    preference = preference_response["response"]
 
     return render(request, "itineris/checkout.html",
-                  {'travelers': travelers, 'preference_id': preference_id})
+                  {'travelers': travelers, 'preference': preference})
 
 
 @csrf_exempt
