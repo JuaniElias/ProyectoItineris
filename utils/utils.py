@@ -1,4 +1,5 @@
 import itertools
+import os
 
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -8,6 +9,7 @@ import pandas as pd
 from urllib.parse import quote
 from datetime import date
 from django.shortcuts import get_object_or_404
+from dotenv import load_dotenv
 
 from itineris.models import Traveler, Travel, Segment
 
@@ -133,7 +135,8 @@ def get_url_route(best_route: list):
 
 
 def calculate_full_route(travel_id):
-    gmaps = googlemaps.Client(key='')
+    load_dotenv()
+    gmaps = googlemaps.Client(key=os.getenv('GOOGLE_API_KEY'))
     # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
     travel = get_object_or_404(Travel, travel_id=travel_id)
     start_point = travel.address + ' ' + str(travel.city_origin)
