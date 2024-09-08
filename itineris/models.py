@@ -92,6 +92,7 @@ class Waypoint(models.Model):
     city = models.ForeignKey("City", on_delete=models.DO_NOTHING)
     estimated_datetime_arrival = models.DateTimeField()
     node_number = models.IntegerField(editable=True, null=True)
+    # url = models.CharField(max_length=5000, default=None, editable=True, null=True)
 
 
 class Period(models.Model):

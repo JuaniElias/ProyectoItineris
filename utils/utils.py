@@ -91,37 +91,68 @@ def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
     return best_consequent
 
 
-def get_distance_matrix(locations: list, gmaps):
+def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps):
     """
 
     """
     rows_matrix = []
-
-    for item in locations:
+    ids_to_pickup = [traveler.id for traveler in traveler_to_pickup]
+    ids_to_drop = [traveler.id for traveler in traveler_to_drop]
+    start_id = 'start'
+    end_id = 'end' if end is not None else None
+    ids_list = ids_to_pickup + ids_to_drop + [start_id] + [end_id] if end is not None else []
+    
+    locations = ([traveler.geocode_origin for traveler in traveler_to_pickup] 
+                 + [traveler.geocode_destination for traveler in traveler_to_drop] 
+                 + [start] 
+                 + [end] if end is not None else []
+                 )
+    
+    for traveler in traveler_to_pickup:
         # se hacen llamados individuales para no sobrepasar el límite de la API
-        result = gmaps.distance_matrix(mode='driving', origins=item, destinations=locations, region='AR',
+        result = gmaps.distance_matrix(mode='driving', origins=traveler.geocode_origin, destinations=locations, region='AR',
                                        units='metric')
-        rows_matrix.append(result)
+        rows_matrix.append((traveler.id, result))
+    
+    for traveler in traveler_to_drop:
+        # se hacen llamados individuales para no sobrepasar el límite de la API
+        result = gmaps.distance_matrix(mode='driving', origins=traveler.geocode_destination, destinations=locations, region='AR',
+                                       units='metric')
+        rows_matrix.append((traveler.id, result))
+    
+    first_place = gmaps.distance_matrix(mode='driving', origins=start, destinations=locations, region='AR',
+                                       units='metric')
+    rows_matrix.append((start_id, first_place))
+    
+    if end is not None:
+        last_place = gmaps.distance_matrix(mode='driving', origins=end, destinations=locations, region='AR',
+                                       units='metric')
+        rows_matrix.append((end_id, last_place))
 
     raw_data = []
-    for result in rows_matrix:
+    for row in rows_matrix:
+        result = row[1]
+        id_origin = row[0]
+        id_dest = 0
         for i, origin in enumerate(result['origin_addresses']):
             for j, destination in enumerate(result['destination_addresses']):
                 data = {
                     'origin': origin,
+                    'id_origin': id_origin,
                     'destination': destination,
+                    'id_destination': ids_list[id_dest],
                     'distance': result['rows'][i]['elements'][j]['distance']['value'],
                     'duration': result['rows'][i]['elements'][j]['duration']['value'],
                     'status': result['rows'][i]['elements'][j]['status']
                 }
                 # Agregar el diccionario a la lista
                 raw_data.append(data)
+                id_dest += 1
 
     df = pd.json_normalize(raw_data)
-    df.origin = pd.Categorical(df.origin, categories=df.origin.unique(), ordered=True)
     # ACA DEBERÍAMOS CHEQUEAR QUE TODOS LOS VALORES DEL DF TENGAN EL STATUS = 'OK'
 
-    return df.pivot_table(index='destination', columns='origin', values='duration').reset_index()
+    return df.pivot_table(index='id_destination', columns='id_origin', values='duration').reset_index()
 
 
 def get_url_route(best_route: list):
@@ -134,82 +165,106 @@ def get_url_route(best_route: list):
     return f'https://www.google.com/maps/dir/{url_waypoints}'
 
 
-def calculate_full_route(travel_id):
+# Función para calcular la distancia total de una ruta
+def calculate_distance(route, distance_matrix):
+    distancia_total = 0
+    for i in range(len(route) - 1):
+        distancia_total += distance_matrix.iloc[route[i], route[i + 1]]
+    return distancia_total
+
+# Función para realizar el algoritmo de Branch and Bound
+def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix):
+    # Si no quedan nodos por visitar, calculamos la distancia total y retornamos la ruta
+    if not pending_nodes:
+        complete_route = current_route + [0]  # Volvemos al nodo inicial
+        total_distance = calculate_distance(complete_route, distance_matrix)
+        return complete_route, total_distance
+    
+    best_route = None
+    best_distance = float('inf')
+
+    # Exploramos las ramas posibles (visitando los nodos pendientes)
+    for next_node in pending_nodes:
+        if next_node in nodes_to_pickup and travelers < max_capacity:  # Recoger pasajero
+            new_route = current_route + [next_node]
+            new_pending_nodes = pending_nodes.copy()
+            new_pending_nodes.remove(next_node)
+            route, distance = branch_and_bound(new_route, travelers + 1, new_pending_nodes,
+                                               max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix)
+            if distance < best_distance:
+                best_route = route
+                best_distance = distance
+        elif next_node in nodes_to_drop and travelers > 0:  # Dejar pasajero
+            new_route = current_route + [next_node]
+            new_pending_nodes = pending_nodes.copy()
+            new_pending_nodes.remove(next_node)
+            route, distance = branch_and_bound(new_route, travelers - 1, new_pending_nodes, 
+                                               max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix)
+            if distance < best_distance:
+                best_route = route
+                best_distance = distance
+
+    return best_route, best_distance
+
+def calculate_waypoint_route(travel, segments, waypoint):
     load_dotenv()
     gmaps = googlemaps.Client(key=os.getenv('GOOGLE_API_KEY'))
-    # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    start_point = travel.address + ' ' + str(travel.city_origin)
-    # esta lista debería venir de una query a la base de datos trayendo todos los destinos para un viaje
-    pickup_addresses = [start_point]
-    drop_off_addresses = []
+    
+    traveler_to_pickup = segments.traveler_set.filter(waypoint_origin=waypoint, payment_status='Confirmado')
+    traveler_to_drop = segments.traveler_set.filter(waypoint_destination=waypoint, payment_status='Confirmado')
+    
+    previous_destination = segments.traveler_set.filter(waypoint_destination__node_number=waypoint.node_number - 1).first()
+    start = travel.geolocation if not previous_destination else previous_destination.geocode_destination
+    next_destination = segments.traveler_set.filter(waypoint_destination__node_number=waypoint.node_number + 1).first()
+    end = None if not next_destination else next_destination.geocode_destination
 
-    travelers = Traveler.objects.filter(travel_id=travel_id)
-
-    for traveler in travelers:
-        address_ori = f'{traveler.address_origin}, {traveler.segment.waypoint_origin.city}'
-        pickup_addresses.append(address_ori)
-        address_dest = f'{traveler.address_destination}, {traveler.segment.waypoint_destination.city}'
-        drop_off_addresses.append(address_dest)
-
-    distance_matrix_pickup = get_distance_matrix(pickup_addresses, gmaps)
-    start_point = distance_matrix_pickup.columns.to_list()[1]
-
-    # Remove the start point as a posible destination because it is, indeed, the start point
-    distance_matrix_pickup = distance_matrix_pickup[distance_matrix_pickup['destination'] != start_point]
-
-    best_route_pickup = get_best_route(start_point, distance_matrix_pickup)
-
-    drop_off_start = best_route_pickup[-1]
-    drop_off_addresses = [drop_off_start] + drop_off_addresses
-
-    distance_matrix_drop_off = get_distance_matrix(drop_off_addresses, gmaps)
-    drop_off_start = distance_matrix_drop_off.columns.to_list()[1]
-
-    # Remove the start point as a possible destination because it is, indeed, the start point
-    distance_matrix_drop_off = distance_matrix_drop_off[distance_matrix_drop_off['destination'] != drop_off_start]
-
-    best_route_drop_off = get_best_route(drop_off_start, distance_matrix_drop_off)
-
-    final_route = best_route_pickup[:-1] + best_route_drop_off
-    url = get_url_route(final_route)
-
+    distance_matrix = get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps)
+    
     # Inicialización
-    ubicacion_inicial = 0
-    ruta_inicial = [ubicacion_inicial]
-    mejor_ruta = []
-    mejor_distancia = float('inf')
-    # Supongamos que tienes un DataFrame con las distancias entre nodos
-    # M nodos de recolección y Z nodos de entrega
-    distancias_df = pd.DataFrame({
-        0: [0, 10, 15, 20, 10, 25, 30],
-        1: [10, 0, 35, 25, 30, 15, 20],
-        2: [15, 35, 0, 30, 20, 25, 10],
-        3: [20, 25, 30, 0, 10, 15, 35],
-        4: [10, 30, 20, 10, 0, 40, 25],
-        5: [25, 15, 25, 15, 40, 0, 10],
-        6: [30, 20, 10, 35, 25, 10, 0]
-    })
+    start_point = 'start'
+    first_route = [start_point]
 
-    nodos_recoleccion = [1, 3, 5]  # Nodos donde se recogen pasajeros
-    nodos_entrega = [2, 4, 6]  # Nodos donde se dejan pasajeros
-    capacidad_maxima = 4  # Capacidad máxima del vehículo
-    pasajeros_iniciales = 2  # Pasajeros iniciales en el auto (N)
+    nodes_to_pickup = [traveler.id for traveler in traveler_to_pickup]
+    nodes_to_drop = [traveler.id for traveler in traveler_to_drop]
+    max_capacity = travel.vehicle.capacity
+    travelers_on_board = 0 if not previous_destination else previous_destination.seats_occupied
 
     # Nodos que deben ser visitados
-    nodos_pendientes = nodos_recoleccion + nodos_entrega
+    pending_nodes = nodes_to_pickup + nodes_to_drop
 
     # Llamada al algoritmo
-    mejor_distancia = branch_and_bound(
-        ubicacion_inicial, ruta_inicial, capacidad_maxima, pasajeros_iniciales, nodos_pendientes, mejor_ruta,
-        mejor_distancia
+    best_route, best_distance = branch_and_bound(
+        first_route, travelers_on_board, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix
     )
+    
+    best_route = best_route if end is None else best_route[:-1]
+    best_route = best_route if not previous_destination else best_route[1:]
+    
+    geocode_route = []
+    for node in best_route:
+        if node in nodes_to_pickup:
+            geocode_route.append(traveler_to_pickup.get(id=node).geocode_origin)
+        elif node in nodes_to_drop:
+            geocode_route.append(traveler_to_drop.get(id=node).geocode_destination)
+        elif node == 'start':
+            geocode_route.append(start)
+    
+    return geocode_route
 
-    # Resultado final
-    print("La mejor ruta es:", mejor_ruta)
-    print("Con una distancia total de:", mejor_distancia)
-
-    travel.url = url
+def calculate_full_route(travel_id):
+    # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    segments = travel.segment_set.all()
+    waypoints = travel.waypoint_set.all().order_by('node_number')
+    
+    complete_route = []
+    for waypoint in waypoints:
+        best_route = calculate_waypoint_route(travel, segments, waypoint)
+        complete_route += best_route
+        # waypoint.url = get_url_route(best_route)
+        # waypoint.save()
+    
+    travel.url = get_url_route(complete_route)
     travel.save()
 
 
@@ -247,45 +302,3 @@ def search_segments(city_origin, passengers):
     ).order_by('waypoint_origin__estimated_datetime_arrival')
 
     return [segment for segment in segments if segment.seats_available() >= passengers]
-
-# For future development
-'''# Función para calcular la distancia total de una ruta
-def calcular_distancia(ruta, distancias_df):
-    distancia_total = 0
-    for i in range(len(ruta) - 1):
-        distancia_total += distancias_df.iloc[ruta[i], ruta[i + 1]]
-    return distancia_total
-
-# Función para realizar el algoritmo de Branch and Bound
-def branch_and_bound(ubicacion_actual, ruta_actual, capacidad_actual, pasajeros, nodos_pendientes, mejor_ruta,
-                     mejor_distancia, nodo_final):
-    # Si no quedan nodos por visitar, terminamos el recorrido
-    if not nodos_pendientes:
-        distancia = calcular_distancia(ruta_actual + [nodo_final], distancias_df)  # Vuelve al nodo inicial
-        if distancia < mejor_distancia:
-            mejor_ruta[:] = ruta_actual + [0]  # Actualiza la mejor ruta
-            mejor_distancia = distancia
-        return mejor_distancia
-
-    # Exploramos las ramas posibles (visitando los nodos pendientes)
-    for siguiente_nodo in nodos_pendientes:
-        if siguiente_nodo in nodos_recoleccion and pasajeros < capacidad_maxima:  # Recoger pasajero
-            nueva_ruta = ruta_actual + [siguiente_nodo]
-            nueva_capacidad = capacidad_actual - 1
-            nueva_lista_pendiente = nodos_pendientes.copy()
-            nueva_lista_pendiente.remove(siguiente_nodo)
-            mejor_distancia = branch_and_bound(
-                siguiente_nodo, nueva_ruta, nueva_capacidad, pasajeros + 1, nueva_lista_pendiente, mejor_ruta,
-                mejor_distancia, nodo_final
-            )
-        elif siguiente_nodo in nodos_entrega and pasajeros > 0:  # Dejar pasajero
-            nueva_ruta = ruta_actual + [siguiente_nodo]
-            nueva_capacidad = capacidad_actual + 1
-            nueva_lista_pendiente = nodos_pendientes.copy()
-            nueva_lista_pendiente.remove(siguiente_nodo)
-            mejor_distancia = branch_and_bound(
-                siguiente_nodo, nueva_ruta, nueva_capacidad, pasajeros - 1, nueva_lista_pendiente, mejor_ruta,
-                mejor_distancia, nodo_final
-            )
-
-    return mejor_distancia'''
