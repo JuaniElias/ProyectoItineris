@@ -42,8 +42,8 @@
             var lat = place.geometry.location.lat();
             var lng = place.geometry.location.lng();
 
-            // Guardar las coordenadas en el campo oculto 'geolocation'
-            document.getElementById('id_geolocation').value = lat + "," + lng;
+            // Guardar las coordenadas en el campo oculto 'geocode'
+            document.getElementById('id_geocode').value = lat + "," + lng;
         });
     }
     google.maps.event.addDomListener(window, 'load', initialize);

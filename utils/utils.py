@@ -207,14 +207,13 @@ def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, node
     return best_route, best_distance
 
 def calculate_waypoint_route(travel, segments, waypoint):
-    load_dotenv()
-    gmaps = googlemaps.Client(key=os.getenv('GOOGLE_API_KEY'))
+    gmaps = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
     
     traveler_to_pickup = segments.traveler_set.filter(waypoint_origin=waypoint, payment_status='Confirmado')
     traveler_to_drop = segments.traveler_set.filter(waypoint_destination=waypoint, payment_status='Confirmado')
     
     previous_destination = segments.traveler_set.filter(waypoint_destination__node_number=waypoint.node_number - 1).first()
-    start = travel.geolocation if not previous_destination else previous_destination.geocode_destination
+    start = travel.geocode if not previous_destination else previous_destination.geocode_destination
     next_destination = segments.traveler_set.filter(waypoint_destination__node_number=waypoint.node_number + 1).first()
     end = None if not next_destination else next_destination.geocode_destination
 

@@ -57,29 +57,55 @@
     <script>
         function initializeAutocompleteForFormset() {
             // Obtener todos los campos de autocompletado
-            var autocompletes = document.getElementsByClassName('autocomplete');
-            
-            for (var i = 0; i < autocompletes.length; i++) {
-                var input = autocompletes[i];
-                var autocomplete = new google.maps.places.Autocomplete(input, {
+            var autocompletes_origin = document.getElementsByClassName('autocomplete_origin');
+            var autocompletes_destination = document.getElementsByClassName('autocomplete_destination');
+
+            for (var j = 0; j < autocompletes_origin.length; j++) {
+                var input_origin = autocompletes_origin[j];
+                var autocomplete_origin = new google.maps.places.Autocomplete(input_origin, {
                     types: ['address'],
                     componentRestrictions: { country: 'ar' }  // Restricción para Argentina
                 });
     
                 // Hacer que cada autocompletado actualice su campo geolocation correspondiente
-                autocomplete.addListener('place_changed', (function(i) {
+                autocomplete_origin.addListener('place_changed', (function(j) {
                     return function () {
-                        var place = autocomplete.getPlace();
-                        if (!place.geometry) {
-                            console.log("No details available for input: '" + place.name + "'");
+                        var place_origin = autocomplete_origin.getPlace();
+                        if (!place_origin.geometry) {
+                            console.log("No details available for input: '" + place_origin.name + "'");
                             return;
                         }
     
-                        var lat = place.geometry.location.lat();
-                        var lng = place.geometry.location.lng();
+                        var lat_origin = place_origin.geometry.location.lat();
+                        var lng_origin = place_origin.geometry.location.lng();
     
                         // Obtener el campo geolocation asociado al campo de dirección
-                        document.getElementById('id_form-' + i + '-geolocation').value = lat + "," + lng;
+                        document.getElementById('id_form-' + j + '-geocode_origin').value = lat_origin + "," + lng_origin;
+                    };
+                })(i));
+            }
+
+            for (var i = 0; i < autocompletes_destination.length; i++) {
+                var input_dest = autocompletes_destination[i];
+                var autocomplete_dest = new google.maps.places.Autocomplete(input_dest, {
+                    types: ['address'],
+                    componentRestrictions: { country: 'ar' }  // Restricción para Argentina
+                });
+
+                // Hacer que cada autocompletado actualice su campo geolocation correspondiente
+                autocomplete_dest.addListener('place_changed', (function(i) {
+                    return function () {
+                        var place_dest = autocomplete_dest.getPlace();
+                        if (!place_dest.geometry) {
+                            console.log("No details available for input: '" + place_dest.name + "'");
+                            return;
+                        }
+
+                        var lat_dest = place_dest.geometry.location.lat();
+                        var lng_dest = place_dest.geometry.location.lng();
+
+                        // Obtener el campo geolocation asociado al campo de dirección
+                        document.getElementById('id_form-' + i + '-geocode_destination').value = lat_dest + "," + lng_dest;
                     };
                 })(i));
             }

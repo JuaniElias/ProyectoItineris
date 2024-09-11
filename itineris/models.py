@@ -22,7 +22,7 @@ class Travel(models.Model):
     driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING)
     vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
     address = models.CharField(max_length=200, null=True)
-    geolocation = models.CharField(max_length=100, null=True)
+    geocode = models.CharField(max_length=100, null=True)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
     payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)

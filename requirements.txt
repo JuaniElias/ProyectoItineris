@@ -13,3 +13,4 @@ sqlparse==0.4.4
 tzdata==2024.1
 mercadopago==2.2.1
 django-mathfilters==1.0.0
+python-dotenv==1.0.1

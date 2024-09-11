@@ -95,7 +95,7 @@ def create_travel(request):
                                                    driver=form.cleaned_data['driver'],
                                                    vehicle=form.cleaned_data['vehicle'],
                                                    address=form.cleaned_data['address'],
-                                                   geolocation=form.cleaned_data['geolocation'])
+                                                   geocode=form.cleaned_data['geocode'])
 
                 if toggle_checkbox and period_form.is_valid():
                     period = period_form.save()
@@ -245,7 +245,7 @@ def end_travel_creation(request):
                 driver=travel.driver,
                 vehicle=travel.vehicle,
                 address=travel.address,
-                geolocation=travel.geolocation,
+                geocode=travel.geocode,
                 period=travel.period,
                 status=travel.status,
             )
@@ -308,7 +308,6 @@ def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
-    # TODO: Validar que esto funque / mirar models
     total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
     gross_revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
 
@@ -723,7 +722,7 @@ def update_travel(request, travel_id):
                             travel.driver = updated_travel.driver
                             travel.vehicle = updated_travel.vehicle
                             travel.address = updated_travel.address
-                            travel.geolocation = updated_travel.geolocation
+                            travel.geocode = updated_travel.geocode
                             travel.save()
 
                             # TODO: try this instead

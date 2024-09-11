@@ -49,7 +49,7 @@ class CreateTravel(forms.Form):
         'id': 'autocomplete',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
-    geolocation = forms.CharField(max_length=100, required=False)
+    geocode = forms.CharField(max_length=100, required=False)
     driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
     vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
 
@@ -66,7 +66,7 @@ class CreateTravel(forms.Form):
                                                                                         status='Disponible',
                                                                                         active=1))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
-        self.fields['geolocation'].widget = forms.HiddenInput()
+        self.fields['geocode'].widget = forms.HiddenInput()
 
 
 class CreateWaypoint(forms.ModelForm):
@@ -248,15 +248,15 @@ class CreateTraveler(forms.ModelForm):
     email = forms.EmailField(label='Email', max_length=100, required=True)
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
     address_origin= forms.CharField(max_length=200, widget=forms.TextInput(attrs={
-        'class': 'autocomplete',  # ID necesario para el autocompletado
+        'class': 'autocomplete_origin',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
-    geolocation_origin = forms.CharField(max_length=100, required=False)
+    geocode_origin = forms.CharField(max_length=100, required=False)
     address_destination = forms.CharField(max_length=200, widget=forms.TextInput(attrs={
-        'class': 'autocomplete',  # ID necesario para el autocompletado
+        'class': 'autocomplete_destination',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
-    geolocation_destination = forms.CharField(max_length=100, required=False)
+    geocode_destination = forms.CharField(max_length=100, required=False)
 
     class Meta:
         model = Traveler
@@ -264,7 +264,7 @@ class CreateTraveler(forms.ModelForm):
                   'dni_type', 'dni', 'date_of_birth',
                   'sex', 'nationality', 'email', 'phone',
                   'address_origin', 'address_destination',
-                  'geolocation_origin', 'geolocation_destination')
+                  'geocode_origin', 'geocode_destination')
 
     def __init__(self, *args, **kwargs):
         super(CreateTraveler, self).__init__(*args, **kwargs)
@@ -278,8 +278,8 @@ class CreateTraveler(forms.ModelForm):
         self.fields['nationality'].widget.attrs['style'] = 'width: 220px;'
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
-        self.fields['geolocation_origin'].widget = forms.HiddenInput()
-        self.fields['geolocation_destination'].widget = forms.HiddenInput()
+        self.fields['geocode_origin'].widget = forms.HiddenInput()
+        self.fields['geocode_destination'].widget = forms.HiddenInput()
 
 
 class UpdateTraveler(forms.ModelForm):
@@ -288,22 +288,22 @@ class UpdateTraveler(forms.ModelForm):
         'id': 'autocomplete',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
-    geolocation_origin = forms.CharField(max_length=100, required=False)
+    geocode_origin = forms.CharField(max_length=100, required=False)
     address_destination = forms.CharField(max_length=200, widget=forms.TextInput(attrs={
         'id': 'autocomplete',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
-    geolocation_destination = forms.CharField(max_length=100, required=False)
+    geocode_destination = forms.CharField(max_length=100, required=False)
 
     class Meta:
         model = Traveler
-        fields = ('phone', 'address_origin', 'geolocation_origin', 'address_destination', 'geolocation_destination')
+        fields = ('phone', 'address_origin', 'geocode_origin', 'address_destination', 'geocode_destination')
 
     def __init__(self, *args, **kwargs):
         super(UpdateTraveler, self).__init__(*args, **kwargs)
         self.fields['phone'].widget.attrs['class'] = 'form-control'
-        self.fields['geolocation_origin'].widget = forms.HiddenInput()
-        self.fields['geolocation_destination'].widget = forms.HiddenInput()
+        self.fields['geocode_origin'].widget = forms.HiddenInput()
+        self.fields['geocode_destination'].widget = forms.HiddenInput()
 
 
 
@@ -314,11 +314,11 @@ class UpdateTravel(forms.ModelForm):
         'id': 'autocomplete',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
-    geolocation = forms.CharField(max_length=100, required=False)
+    geocode = forms.CharField(max_length=100, required=False)
 
     class Meta:
         model = Travel
-        fields = ('driver', 'vehicle', 'address', 'geolocation')
+        fields = ('driver', 'vehicle', 'address', 'geocode')
 
     def __init__(self, travel_id, *args, **kwargs):
         super(UpdateTravel, self).__init__(*args, **kwargs)
@@ -338,4 +338,4 @@ class UpdateTravel(forms.ModelForm):
                                                                                         capacity__gte=min_capacity,
                                                                                         ))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'
-        self.fields['geolocation'].widget = forms.HiddenInput()
+        self.fields['geocode'].widget = forms.HiddenInput()
