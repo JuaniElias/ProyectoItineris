@@ -56,7 +56,7 @@ class Segment(models.Model):
             self.duration = self.waypoint_destination.estimated_datetime_arrival - self.waypoint_origin.estimated_datetime_arrival
         super().save(*args, **kwargs)
 
-
+    @property
     def seats_available(self):
         # Obtener todos los segmentos asociados al mismo Travel
         travel_segments = Segment.objects.filter(travel=self.travel)
@@ -93,6 +93,27 @@ class Waypoint(models.Model):
     estimated_datetime_arrival = models.DateTimeField()
     node_number = models.IntegerField(editable=True, null=True)
     # url = models.CharField(max_length=5000, default=None, editable=True, null=True)
+
+    @property
+    def seats_available(self):
+
+        if self.node_number == 0:
+            return 0
+        else:
+            # Se buscan todos los segmentos que terminen en el nodo o que comiencen antes del nodo y terminen después de él.
+            valid_segments = Segment.objects.filter(travel=self.travel,
+                                                    waypoint_origin__node_number__lt=self.node_number,
+                                                    waypoint_destination__node_number__gte=self.node_number
+                                                    )
+
+            # node 2 --> (0, 2) (0, 3) (1, 2) (1, 3)
+            # (0, 1) (0, 2) (0, 3)
+            # (1, 2) (1, 3)
+            # (2, 3)
+
+            total_seats = valid_segments.aggregate(total=Sum('seats_occupied'))['total'] or 0
+
+            return total_seats
 
 
 class Period(models.Model):

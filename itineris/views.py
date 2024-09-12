@@ -350,6 +350,15 @@ def delete_driver(request, driver_id):
         driver.save()
     return redirect('your_drivers')
 
+def edit_driver(request, driver_id):
+    driver = get_object_or_404(Driver, driver_id=driver_id)
+    if request.method == "POST":
+        form = CreateDriver(request.POST, instance=driver)
+        if form.is_valid():
+            form.save()
+            return redirect('your_drivers')
+    else:
+        return None
 
 def your_travels(request):
     travels = Travel.objects.all().filter(company=request.user.id, status='Agendado')

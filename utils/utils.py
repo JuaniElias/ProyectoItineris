@@ -10,7 +10,7 @@ from urllib.parse import quote
 from datetime import date
 from django.shortcuts import get_object_or_404
 
-from itineris.models import Travel, Segment, Traveler
+from itineris.models import Travel, Segment, Traveler, Waypoint
 
 import base64
 
@@ -51,16 +51,9 @@ def decrypt_number(encoded_str, key):
     return int(decrypted_str)
 
 
+# Algoritmo viejo
+"""
 def get_next_destination(origin: str, distance_matrix: pd.DataFrame):
-    """
-    This function returns the best consequent given an starting point. It selects the destination with the minimum distance/time
-    and then remove that location so the value is not duplicated.
-
-    :param origin: is the starting point from where we are going to look for the next destination.
-
-    :param distance_matrix:  is a squared matrix with the distance/time between different locations. Column names have the Origin,
-    while rows have the destinations. This parameter is then returned without the destination selected.
-    """
     id_min = distance_matrix[distance_matrix[origin] > 0][origin].idxmin()
     destination = distance_matrix.loc[id_min, 'destination']
     distance_matrix = distance_matrix[distance_matrix['destination'] != destination]
@@ -69,15 +62,6 @@ def get_next_destination(origin: str, distance_matrix: pd.DataFrame):
 
 
 def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
-    """
-    This function returns the best route based on a starting point, which is on the distance matrix provided.
-    In order to return a route it uses a heuristic method.
-
-    :param start_point: is the starting point of the travel, where the travel begin
-
-    :param distance_matrix: is a squared matrix with the distance/time between different locations. Column names have the Origin,
-    while rows have the destinations.
-    """
     best_consequent = [start_point]
     locations = distance_matrix.iloc[:, 1:].columns.to_list()
     locations = [x for x in locations if x != start_point]
@@ -87,43 +71,120 @@ def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
         destination, distance_matrix = get_next_destination(origin, distance_matrix)
         best_consequent.append(destination)
 
-    return best_consequent
+    return best_consequent"""
+
+
+# GET ROUTE
+def calculate_full_route(travel_id):
+    # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
+    travel = get_object_or_404(Travel, travel_id=travel_id)
+    segments = Segment.objects.filter(travel=travel, seats_occupied__gt=0)
+
+    waypoint_origin_ids = [s.waypoint_origin.id for s in segments]
+    waypoint_destination_ids = [s.waypoint_destination.id for s in segments]
+
+    waypoint_ids = set(waypoint_origin_ids + waypoint_destination_ids)
+
+    waypoints = list(Waypoint.objects.filter(id__in=waypoint_ids).order_by('node_number'))
+
+    complete_route = []
+    for i, waypoint in enumerate(waypoints):
+        start = travel.geocode if len(complete_route) == 0 else complete_route[-1]
+        travelers_on_board = waypoint.seats_available
+
+        if i + 1 < len(waypoints):
+            next_segment = segments.filter(waypoint_destination=waypoints[i + 1])
+            t = Traveler.objects.filter(segment__in=next_segment, payment_status='Confirmado').first()
+            end = t.geocode_destination
+        else:
+            end = None
+
+        best_route = calculate_waypoint_route(travel, segments, waypoint, start, end, travelers_on_board)
+        complete_route += best_route
+        # waypoint.url = get_url_route(best_route)
+        # waypoint.save()
+
+    travel.url = get_url_route(complete_route)
+    travel.save()
+
+
+def calculate_waypoint_route(travel, segments, waypoint, start, end, travelers_on_board):
+    gmaps = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
+
+    # Traer todos los travelers de cada segmento cuyo origen es waypoint
+    segments_waypoint_origin = segments.filter(waypoint_origin=waypoint)
+    traveler_to_pickup = Traveler.objects.filter(segment__in=segments_waypoint_origin, payment_status='Confirmado')
+
+    # Traer todos los travelers de cada segmento cuyo destino es waypoint
+    segments_waypoint_destination = segments.filter(waypoint_destination=waypoint)
+    traveler_to_drop = Traveler.objects.filter(segment__in=segments_waypoint_destination, payment_status='Confirmado')
+
+    distance_matrix = get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps)
+
+    # Inicialización
+    first_route = ['start']
+
+    nodes_to_pickup = [traveler.id for traveler in traveler_to_pickup]
+    nodes_to_drop = [traveler.id for traveler in traveler_to_drop]
+    max_capacity = travel.vehicle.capacity
+
+    # Nodos que deben ser visitados
+    pending_nodes = nodes_to_pickup + nodes_to_drop
+
+    # Llamada al algoritmo
+    best_route, best_distance = branch_and_bound(
+        first_route, travelers_on_board, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix
+    )
+
+    best_route = best_route if end is None else best_route[:-1]
+    best_route = best_route if waypoint.node_number == 0 else best_route[1:]
+
+    geocode_route = []
+    for node in best_route:
+        if node in nodes_to_pickup:
+            geocode_route.append(traveler_to_pickup.get(id=node).geocode_origin)
+        elif node in nodes_to_drop:
+            geocode_route.append(traveler_to_drop.get(id=node).geocode_destination)
+        elif node == 'start':
+            geocode_route.append(start)
+
+    return geocode_route
 
 
 def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps):
     rows_matrix = []
-    
+
     # Creo listas con los IDs de los travelers para buscar y para dejar
     ids_to_pickup = [traveler.id for traveler in traveler_to_pickup]
     ids_to_drop = [traveler.id for traveler in traveler_to_drop]
-    
+
     start_id = 'start'
     end_id = 'end' if end is not None else None
 
-    ids_list = ids_to_pickup + ids_to_drop + [start_id] + [end_id] if end is not None else []
-    
-    locations = ([traveler.geocode_origin for traveler in traveler_to_pickup] 
-                 + [traveler.geocode_destination for traveler in traveler_to_drop] 
-                 + [start] 
-                 + [end] if end is not None else []
+    ids_list = ids_to_pickup + ids_to_drop + [start_id] + ([end_id] if end is not None else [])
+
+    locations = ([traveler.geocode_origin for traveler in traveler_to_pickup]
+                 + [traveler.geocode_destination for traveler in traveler_to_drop]
+                 + [start]
+                 + ([end] if end is not None else [])
                  )
-    
+
     for traveler in traveler_to_pickup:
         # se hacen llamados individuales para no sobrepasar el límite de la API
         result = gmaps.distance_matrix(mode='driving', origins=traveler.geocode_origin, destinations=locations, region='AR',
                                        units='metric')
         rows_matrix.append((traveler.id, result))
-    
+
     for traveler in traveler_to_drop:
         # se hacen llamados individuales para no sobrepasar el límite de la API
         result = gmaps.distance_matrix(mode='driving', origins=traveler.geocode_destination, destinations=locations, region='AR',
                                        units='metric')
         rows_matrix.append((traveler.id, result))
-    
+
     first_place = gmaps.distance_matrix(mode='driving', origins=start, destinations=locations, region='AR',
                                        units='metric')
     rows_matrix.append((start_id, first_place))
-    
+
     if end is not None:
         last_place = gmaps.distance_matrix(mode='driving', origins=end, destinations=locations, region='AR',
                                        units='metric')
@@ -155,31 +216,13 @@ def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps)
     return df.pivot_table(index='id_destination', columns='id_origin', values='duration')
 
 
-def get_url_route(best_route: list):
-    """
-    This function returns the URL to the route generated.
-    :param best_route: is a list with all the locations in order to generate the route.
-    """
-    url_waypoints = "/".join(quote(wp, safe='') for wp in best_route)
-
-    return f'https://www.google.com/maps/dir/{url_waypoints}'
-
-
-# Función para calcular la distancia total de una ruta
-def calculate_distance(route, distance_matrix):
-    distancia_total = 0
-    for i in range(len(route) - 1):
-        distancia_total += distance_matrix.loc[route[i], route[i + 1]]
-    return distancia_total
-
-# Función para realizar el algoritmo de Branch and Bound
 def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix):
     # Si no quedan nodos por visitar, calculamos la distancia total y retornamos la ruta
     if not pending_nodes:
-        complete_route = current_route + ['end'] # Volvemos al nodo inicial
+        complete_route = current_route + (['end'] if 'end' in distance_matrix.columns else []) # Ponemos el final
         total_distance = calculate_distance(complete_route, distance_matrix)
         return complete_route, total_distance
-    
+
     best_route = None
     best_distance = float('inf')
 
@@ -198,7 +241,7 @@ def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, node
             new_route = current_route + [next_node]
             new_pending_nodes = pending_nodes.copy()
             new_pending_nodes.remove(next_node)
-            route, distance = branch_and_bound(new_route, travelers - 1, new_pending_nodes, 
+            route, distance = branch_and_bound(new_route, travelers - 1, new_pending_nodes,
                                                max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix)
             if distance < best_distance:
                 best_route = route
@@ -206,85 +249,21 @@ def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, node
 
     return best_route, best_distance
 
-def calculate_waypoint_route(travel, segments, waypoint):
-    gmaps = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
 
-    # Traer todos los travelers de cada segmento cuyo origen es waypoint
-    segments_waypoint_origin = segments.filter(waypoint_origin=waypoint)
-    traveler_to_pickup = Traveler.objects.filter(segment__in=segments_waypoint_origin, payment_status='Confirmado')
-
-    # Traer todos los travelers de cada segmento cuyo destino es waypoint
-    segments_waypoint_destination = segments.filter(waypoint_destination=waypoint)
-    traveler_to_drop = Traveler.objects.filter(segment__in=segments_waypoint_destination, payment_status='Confirmado')
-
-    # si waypoint.node_number = 1 hay que tomar con waypoint_origin__node_number
-    previous_segment = segments.filter(waypoint_destination__node_number=waypoint.node_number - 1)
-
-    if previous_segment:
-        t = Traveler.objects.filter(segment__in=previous_segment, payment_status='Confirmado').first()
-        start = t.geocode_destination
-    else:
-        start = travel.geocode
-    
-    next_segment = segments.filter(waypoint_destination__node_number=waypoint.node_number + 1)
-    
-    if next_segment:
-        t = Traveler.objects.filter( segment__in=next_segment, payment_status='Confirmado').first()
-        end = t.geocode_destination
-    else:
-        end = None
-
-    distance_matrix = get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps)
-    
-    # Inicialización
-    start_point = 'start'
-    first_route = [start_point]
-
-    nodes_to_pickup = [traveler.id for traveler in traveler_to_pickup]
-    nodes_to_drop = [traveler.id for traveler in traveler_to_drop]
-    max_capacity = travel.vehicle.capacity
-    travelers_on_board = 0 if not previous_segment else previous_segment.seats_occupied
-
-    # Nodos que deben ser visitados
-    pending_nodes = nodes_to_pickup + nodes_to_drop
-
-    # Llamada al algoritmo
-    # TODO: chequear que pasa cuando llega al waypoint.node_number 0 = 1, retorna nulo.
-    best_route, best_distance = branch_and_bound(
-        first_route, travelers_on_board, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix
-    )
-    
-    best_route = best_route if end is None else best_route[:-1]
-    best_route = best_route if not previous_segment else best_route[1:]
-    
-    geocode_route = []
-    for node in best_route:
-        if node in nodes_to_pickup:
-            geocode_route.append(traveler_to_pickup.get(id=node).geocode_origin)
-        elif node in nodes_to_drop:
-            geocode_route.append(traveler_to_drop.get(id=node).geocode_destination)
-        elif node == 'start':
-            geocode_route.append(start)
-    
-    return geocode_route
-
-def calculate_full_route(travel_id):
-    # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-    segments = travel.segment_set.all()
-    waypoints = travel.waypoint_set.all().order_by('node_number')
-    
-    complete_route = []
-    for waypoint in waypoints:
-        best_route = calculate_waypoint_route(travel, segments, waypoint)
-        complete_route += best_route
-        # waypoint.url = get_url_route(best_route)
-        # waypoint.save()
-    
-    travel.url = get_url_route(complete_route)
-    travel.save()
+def calculate_distance(route, distance_matrix):
+    distancia_total = 0
+    for i in range(len(route) - 1):
+        distancia_total += distance_matrix.loc[route[i], route[i + 1]]
+    return distancia_total
 
 
+def get_url_route(best_route: list):
+    url_waypoints = "/".join(quote(wp, safe='') for wp in best_route)
+
+    return f'https://www.google.com/maps/dir/{url_waypoints}'
+
+
+# Segments
 def create_segments(travel, waypoints, segments=None):
     list_of_segments = list(itertools.combinations(waypoints, 2))
 
@@ -318,4 +297,4 @@ def search_segments(city_origin, passengers):
         travel__status='Agendado'
     ).order_by('waypoint_origin__estimated_datetime_arrival')
 
-    return [segment for segment in segments if segment.seats_available() >= passengers]
+    return [segment for segment in segments if segment.seats_available >= passengers]

@@ -31,10 +31,28 @@
                                 <td>{{ driver.email }}</td>
                                 <td>{{ driver.phone_number }}</td>
                                 <td>
-                                    <button id="btn-more-info" class="btn">
-                                        <i  class="bi bi-card-checklist" ></i>
+                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#editModal{{ driver.driver_id }}">
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
+                                <!-- Modal for Editing Driver -->
+                                <div class="modal fade" id="editModal{{ driver.driver_id }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editModalLabel">Edit Driver</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="post" action="{% url 'edit_driver' driver.driver_id %}">
+                                                    {% csrf_token %}
+                                                    {{ form.as_p }}
+                                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <td> 
                                     <a href="{% url 'delete_driver' driver.driver_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?')">
                                         <i class="btn bi bi-trash3"></i>
@@ -65,18 +83,6 @@
                     </div>
                   </div>
                 </div>
-
-                <dialog class="travel-modal" id="delete-modal">
-                    <h3>Conductor</h3>
-                    <p>Apellido:</p>
-                    <p>Nombre:</p>
-                    <p>DNI:</p>
-                    <h3>¿Está seguro que quieres eliminar a este conductor?</h3>
-                    <div class="row-modal">
-                        <button type="submit" class="modal-btn" id="btn-close-del-modal">SALIR</button>
-                        <button type="submit" class="modal-btn" id="btn-confirm-delete">SI, ELIMINAR</button>
-                    </div>
-                </dialog>
             </div>
         </div>
     </section>
