@@ -31,9 +31,6 @@
                     </div>
 
                     {% if waypoints.2 > 0 %}
-                        <form action="{% url 'generate_route'  travel.travel_id %}" method="get">
-                            <button type="submit" class="btn btn-primary mb-2">Generar mapa de ruta</button>
-                        </form>
                         <a href="{{ travel.url }}">Ruta</a>
                     {% endif %}
                     {% if travel.status == 'Agendado' %}

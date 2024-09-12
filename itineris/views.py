@@ -1,4 +1,5 @@
 import csv
+import io
 from datetime import datetime, date
 
 import mercadopago
@@ -323,15 +324,24 @@ def your_drivers(request):
     drivers = Driver.objects.filter(company_id=request.user.id, active=True)
 
     if request.method == "POST":
-        form = CreateDriver(request.POST)
-        if form.is_valid():
-            if company.is_verified:
-                new_driver = form.save(commit=False)
-                new_driver.company_id = request.user.id
-                new_driver.save()
+        # If driver_id is passed, handle edit
+        driver_id = request.POST.get("driver_id")
+        if driver_id:
+            driver = get_object_or_404(Driver, pk=driver_id)
+            form = CreateDriver(request.POST, instance=driver)
+            if form.is_valid():
+                form.save()
                 return redirect('your_drivers')
-            else:
-                messages.success(request, 'No se puede cargar el conductor, la compañía no está verificada.')
+        else:
+            form = CreateDriver(request.POST)
+            if form.is_valid():
+                if company.is_verified:
+                    new_driver = form.save(commit=False)
+                    new_driver.company_id = request.user.id
+                    new_driver.save()
+                    return redirect('your_drivers')
+                else:
+                    messages.success(request, 'No se puede cargar el conductor, la compañía no está verificada.')
     else:
         form = CreateDriver()
 
@@ -430,12 +440,15 @@ def mark_travel_ended(request, travel_id):
 
 
 def start_trip(request, travel_id):
+    calculate_full_route(travel_id)
+
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travel.status = 'En proceso'
     travel.save()
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
-    driver_message = (f"Lista de pasajeros para el viaje: <br>"
+    driver_message = (f"<h2>Ingrese al siguiente <a href={travel.url}>LINK</a> para ver la ruta de viaje.</h2><br>"
+                      f"<h3>Lista de pasajeros para el viaje: <br>"
                       f"<table><thead>"
                       f"<tr><th>Trayecto</th>"
                       f"<th>Nombre</th>"
@@ -443,7 +456,7 @@ def start_trip(request, travel_id):
                       f"<th>DNI</th>"
                       f"<th>Teléfono</th>"
                       f"<th>Dirección Origen</th>"
-                      f"<th>Dirección Destino</th></tr>")
+                      f"<th>Dirección Destino</th></tr></h3>")
 
     for traveler in travelers:
         to_email = traveler.email
@@ -471,7 +484,6 @@ def start_trip(request, travel_id):
             messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
 
     # Envía mail al driver
-    # TODO: ver si anda. mail de driver
     driver_email = travel.driver.email
     driver_subject = f'Itineris | Viaje confirmado!'
     driver_message += f"</tbody></table>"
@@ -481,11 +493,6 @@ def start_trip(request, travel_id):
     except Exception as e:
         messages.error(request, f'Error al enviar el correo de verificación al driver: {str(e)}')
 
-    return travel_detail(request, travel_id)
-
-
-def generate_route(request, travel_id):
-    calculate_full_route(travel_id)
     return travel_detail(request, travel_id)
 
 
@@ -833,8 +840,9 @@ def export_travelers_to_csv(request, travel_id):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{city_origin}_a_{city_destination}_{date_}.csv"'
 
-    # Crear un escritor de CSV
-    writer = csv.writer(response)
+    # Crear un escritor de CSV con encoding utf-8
+    csv_buffer = io.StringIO()
+    writer = csv.writer(csv_buffer, quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
 
     # Escribir el encabezado del CSV
     writer.writerow(
@@ -842,7 +850,7 @@ def export_travelers_to_csv(request, travel_id):
             , 'nacionalidad', 'tripulante', 'ocupa_butaca'])
 
     # Obtener los datos de la base de datos y escribirlos en el archivo CSV
-    segments = travel.segment_set
+    segments = Segment.objects.filter(travel=travel)
     travelers = Traveler.objects.all().filter(segment__in=segments)
     for traveler in travelers:
         writer.writerow([
@@ -857,5 +865,9 @@ def export_travelers_to_csv(request, travel_id):
             0,
             1,
         ])
+
+    response.write('\ufeff')  # Agregar BOM
+    response.write(csv_buffer.getvalue())
+    csv_buffer.close()
 
     return response

@@ -29,7 +29,6 @@ urlpatterns = [
     path("checkout", views.checkout, name="checkout"),
     path("travel_history", views.travel_history, name="travel_history"),
     path("payment_success", views.payment_success, name="payment_success"),
-    path("generate_route/<str:travel_id>/", views.generate_route, name="generate_route"),
     path("feedback/<str:encrypted_traveler_id>/", views.feedback, name="feedback"),
     path("update_feedback/", views.update_feedback, name="update_feedback"),
     path("update_traveler/<str:encrypted_traveler_id>/", views.update_traveler, name="update_traveler"),
