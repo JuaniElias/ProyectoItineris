@@ -534,6 +534,8 @@ def show_travelers(request):
                 traveler.save()
                 t.append(traveler.id)
             request.session['travelers'] = t
+            segment.seats_occupied += len(t)
+            segment.save()
             return redirect('checkout')
         else:
             print("Formset is not valid: ", formset.errors)
@@ -545,11 +547,11 @@ def show_travelers(request):
 
 
 def checkout(request):
-    t = request.session.get('travelers')
+    session_travelers = request.session.get('travelers')
     # request.session['travelers'] = []  # Limpia los travelers de la session cuando entra a checkout y no está muy bien
-    if not t:
+    if not session_travelers:
         return HttpResponseBadRequest("No se han creado viajeros.")
-    travelers = Traveler.objects.filter(id__in=t)
+    travelers = Traveler.objects.filter(id__in=session_travelers)
 
     checkout_url = request.build_absolute_uri(reverse('checkout'))
     payment_success_url = request.build_absolute_uri(reverse('payment_success'))
@@ -581,15 +583,16 @@ def checkout(request):
 
 @csrf_exempt
 def payment_success(request):
-    payment_status = request.GET.get("payment_status", None)
+    payment_status = request.GET.get("status", None)
+    print(payment_status)
     if payment_status == 'approved':
         payment_id = request.GET.get("payment_id", None)
-
+        print(payment_id)
         sdk = mercadopago.SDK("APP_USR-4911057100331416-060418-a5d1090130a913b3533f686a2c7f5c20-1831872037")
         payment_info = sdk.payment().get(payment_id)
-
+        print(payment_info)
         status = payment_info["response"]["status"]
-
+        print(status)
         # Por las dudas chequeamos que el pago fue aprobado nuevamente
         if status == 'approved':
             traveler_ids = request.session.get('travelers')
@@ -598,21 +601,28 @@ def payment_success(request):
                 traveler.payment_status = 'Confirmado'
                 encrypted_traveler_id = encrypt_number(traveler.id, key=encryptedkey)
 
+                # test = request.build_absolute_uri(reverse('update_traveler')) + encrypted_traveler_id + "/"
+
+                relative_url = reverse('update_traveler', kwargs={'encrypted_traveler_id': encrypted_traveler_id})
+                # Generar la URL absoluta utilizando 'request.build_absolute_uri'
+                absolute_url = request.build_absolute_uri(relative_url)
+
                 to_email = traveler.email
                 subject = f'Pasaje Itineris - {traveler.segment.waypoint_origin.city} a {traveler.segment.waypoint_destination.city}'
-                message = (f'¡Te brindamos los datos de tu pasaje!<br>'
-                           f'Información de tu pasaje:\n'
+                message = (f'<h1>¡Te brindamos los datos de tu pasaje!</h1><br>'
+                           f'<h3>Información de tu pasaje:<br>'
                            f'Origen: {traveler.address_origin}<br>'
                            f'Destino: {traveler.address_destination}<br>'
                            f'Fecha y hora de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
                            f'Fecha y hora estimada de llegada: {traveler.segment.waypoint_destination.estimated_datetime_arrival}<br>'
-                           f'Empresa: {traveler.segment.travel.company.company_name}<br>'
-                           f'El vehículo que te pasa a buscar: {traveler.segment.travel.vehicle}<br>'
+                           f'Empresa: {traveler.segment.travel.company.company_name}<br><br>'
+                           
+                           f'Vehículo: {traveler.segment.travel.vehicle}<br>'
                            f'Chofer: {traveler.segment.travel.driver}<br>'
-                           f'Tarifa: {traveler.segment.fee}<br><br>'
+                           f'Tarifa: ${traveler.segment.fee}<br><br>'
 
-                           f'Si querés editar tus datos antes de viajar podes ingresar al siguiente '
-                           f'<a href="localhost:8000/update_traveler/{encrypted_traveler_id}/">link</a>.'
+                           f'Si querés editar tus datos antes de viajar podés ingresar al siguiente '
+                           f'<a href="{absolute_url}">link</a>.</h3>'
                            )
                 try:
                     send_email(to_email, subject, message, file=None, html=True)
@@ -648,12 +658,12 @@ def update_traveler(request, encrypted_traveler_id):
     # Chequea si puede cancelar el viaje el pasajero antes de 48 horas
     can_cancel = True
     # Dos días antes se puede cancelar el viaje
-    date_to_check = traveler.travel.datetime_departure - pd.Timedelta(days=2)
+    date_to_check = traveler.segment.waypoint_origin.estimated_datetime_arrival - pd.Timedelta(days=2)
 
     if datetime.now(pytz.utc) <= date_to_check:
         can_cancel = False
     # Solo permitir editar los datos antes de que haya comenzado el viaje.
-    if traveler.travel.status == "Agendado":
+    if traveler.segment.travel.status == "Agendado":
         if request.method == 'POST':
             form = UpdateTraveler(request.POST, instance=traveler)
             if form.is_valid():

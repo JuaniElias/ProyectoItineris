@@ -9,9 +9,8 @@ import pandas as pd
 from urllib.parse import quote
 from datetime import date
 from django.shortcuts import get_object_or_404
-from dotenv import load_dotenv
 
-from itineris.models import Traveler, Travel, Segment
+from itineris.models import Travel, Segment
 
 import base64
 
@@ -92,9 +91,6 @@ def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
 
 
 def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps):
-    """
-
-    """
     rows_matrix = []
     ids_to_pickup = [traveler.id for traveler in traveler_to_pickup]
     ids_to_drop = [traveler.id for traveler in traveler_to_drop]

@@ -82,7 +82,7 @@ class Segment(models.Model):
 
     @property
     def revenue(self):
-        travelers = self.traveler_set
+        travelers = self.traveler_set.filter(payment_status='Confirmado')
         revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
         return revenue
 
@@ -182,10 +182,6 @@ class Traveler(models.Model):
                 self.dni_description = None
 
         self.paid_amount = self.segment.fee
-        # TODO: YYyyy mirá loco
-        if self.payment_status == 'Confirmado':
-            self.segment.seats_occupied += 1
-            self.segment.save()
 
         super().save(*args, **kwargs)
 

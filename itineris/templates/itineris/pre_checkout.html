@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-7">
+            <div class="col-5">
                 <h3 class="text-center"> Completa los datos de los pasajeros </h3>
                 <form class="d-flex flex-column align-items-center" action="{% url 'show_travelers' %}" method=POST>
                     {{ formset.management_form }}
@@ -82,7 +82,7 @@
                         // Obtener el campo geolocation asociado al campo de dirección
                         document.getElementById('id_form-' + j + '-geocode_origin').value = lat_origin + "," + lng_origin;
                     };
-                })(i));
+                })(j));
             }
 
             for (var i = 0; i < autocompletes_destination.length; i++) {
