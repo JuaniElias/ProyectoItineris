@@ -10,7 +10,7 @@ from urllib.parse import quote
 from datetime import date
 from django.shortcuts import get_object_or_404
 
-from itineris.models import Travel, Segment
+from itineris.models import Travel, Segment, Traveler
 
 import base64
 
@@ -92,10 +92,14 @@ def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
 
 def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps):
     rows_matrix = []
+    
+    # Creo listas con los IDs de los travelers para buscar y para dejar
     ids_to_pickup = [traveler.id for traveler in traveler_to_pickup]
     ids_to_drop = [traveler.id for traveler in traveler_to_drop]
+    
     start_id = 'start'
     end_id = 'end' if end is not None else None
+
     ids_list = ids_to_pickup + ids_to_drop + [start_id] + [end_id] if end is not None else []
     
     locations = ([traveler.geocode_origin for traveler in traveler_to_pickup] 
@@ -148,7 +152,7 @@ def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps)
     df = pd.json_normalize(raw_data)
     # ACA DEBERÍAMOS CHEQUEAR QUE TODOS LOS VALORES DEL DF TENGAN EL STATUS = 'OK'
 
-    return df.pivot_table(index='id_destination', columns='id_origin', values='duration').reset_index()
+    return df.pivot_table(index='id_destination', columns='id_origin', values='duration')
 
 
 def get_url_route(best_route: list):
@@ -165,14 +169,14 @@ def get_url_route(best_route: list):
 def calculate_distance(route, distance_matrix):
     distancia_total = 0
     for i in range(len(route) - 1):
-        distancia_total += distance_matrix.iloc[route[i], route[i + 1]]
+        distancia_total += distance_matrix.loc[route[i], route[i + 1]]
     return distancia_total
 
 # Función para realizar el algoritmo de Branch and Bound
 def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix):
     # Si no quedan nodos por visitar, calculamos la distancia total y retornamos la ruta
     if not pending_nodes:
-        complete_route = current_route + [0]  # Volvemos al nodo inicial
+        complete_route = current_route + ['end'] # Volvemos al nodo inicial
         total_distance = calculate_distance(complete_route, distance_matrix)
         return complete_route, total_distance
     
@@ -204,14 +208,31 @@ def branch_and_bound(current_route, travelers, pending_nodes, max_capacity, node
 
 def calculate_waypoint_route(travel, segments, waypoint):
     gmaps = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
+
+    # Traer todos los travelers de cada segmento cuyo origen es waypoint
+    segments_waypoint_origin = segments.filter(waypoint_origin=waypoint)
+    traveler_to_pickup = Traveler.objects.filter(segment__in=segments_waypoint_origin, payment_status='Confirmado')
+
+    # Traer todos los travelers de cada segmento cuyo destino es waypoint
+    segments_waypoint_destination = segments.filter(waypoint_destination=waypoint)
+    traveler_to_drop = Traveler.objects.filter(segment__in=segments_waypoint_destination, payment_status='Confirmado')
+
+    # si waypoint.node_number = 1 hay que tomar con waypoint_origin__node_number
+    previous_segment = segments.filter(waypoint_destination__node_number=waypoint.node_number - 1)
+
+    if previous_segment:
+        t = Traveler.objects.filter(segment__in=previous_segment, payment_status='Confirmado').first()
+        start = t.geocode_destination
+    else:
+        start = travel.geocode
     
-    traveler_to_pickup = segments.traveler_set.filter(waypoint_origin=waypoint, payment_status='Confirmado')
-    traveler_to_drop = segments.traveler_set.filter(waypoint_destination=waypoint, payment_status='Confirmado')
+    next_segment = segments.filter(waypoint_destination__node_number=waypoint.node_number + 1)
     
-    previous_destination = segments.traveler_set.filter(waypoint_destination__node_number=waypoint.node_number - 1).first()
-    start = travel.geocode if not previous_destination else previous_destination.geocode_destination
-    next_destination = segments.traveler_set.filter(waypoint_destination__node_number=waypoint.node_number + 1).first()
-    end = None if not next_destination else next_destination.geocode_destination
+    if next_segment:
+        t = Traveler.objects.filter( segment__in=next_segment, payment_status='Confirmado').first()
+        end = t.geocode_destination
+    else:
+        end = None
 
     distance_matrix = get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps)
     
@@ -222,18 +243,19 @@ def calculate_waypoint_route(travel, segments, waypoint):
     nodes_to_pickup = [traveler.id for traveler in traveler_to_pickup]
     nodes_to_drop = [traveler.id for traveler in traveler_to_drop]
     max_capacity = travel.vehicle.capacity
-    travelers_on_board = 0 if not previous_destination else previous_destination.seats_occupied
+    travelers_on_board = 0 if not previous_segment else previous_segment.seats_occupied
 
     # Nodos que deben ser visitados
     pending_nodes = nodes_to_pickup + nodes_to_drop
 
     # Llamada al algoritmo
+    # TODO: chequear que pasa cuando llega al waypoint.node_number 0 = 1, retorna nulo.
     best_route, best_distance = branch_and_bound(
         first_route, travelers_on_board, pending_nodes, max_capacity, nodes_to_pickup, nodes_to_drop, distance_matrix
     )
     
     best_route = best_route if end is None else best_route[:-1]
-    best_route = best_route if not previous_destination else best_route[1:]
+    best_route = best_route if not previous_segment else best_route[1:]
     
     geocode_route = []
     for node in best_route:
