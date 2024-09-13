@@ -20,6 +20,7 @@ urlpatterns = [
     path("pre_checkout/<str:segment_id>/", views.pre_checkout, name="pre_checkout"),
     path("your_drivers", views.your_drivers, name="your_drivers"),
     path("delete_driver/<str:driver_id>/", views.delete_driver, name="delete_driver"),
+    path("edit_driver/<str:driver_id>/", views.edit_driver, name="edit_driver"),
     path("your_travels", views.your_travels, name="your_travels"),
     path("travel_detail/<str:travel_id>/", views.travel_detail, name="travel_detail"),
     path("mark_travel_ended/<str:travel_id>/", views.mark_travel_ended, name="mark_travel_ended"),
@@ -35,6 +36,6 @@ urlpatterns = [
     path("cancel_traveler_ticket/<str:encrypted_traveler_id>/", views.cancel_traveler_ticket,
          name="cancel_traveler_ticket"),
     path("update_travel/<str:travel_id>/", views.update_travel, name="update_travel"),
-    path("cancel_travel/<str:travel_id>/", views.cancel_travel, name="cancel_travel"),
+    path("cancel_travel_handler/<str:travel_id>/", views.cancel_travel_handler, name="cancel_travel_handler"),
     path("export_travelers_to_csv/<str:travel_id>/", views.export_travelers_to_csv, name="export_travelers_to_csv"),
 ]

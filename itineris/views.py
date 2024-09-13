@@ -18,7 +18,7 @@ from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTrav
     UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
 from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number, create_segments, \
-    search_segments
+    search_segments, cancel_travel
 
 
 def index(request):
@@ -708,9 +708,10 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
     return redirect('index')
 
 
-# TODO: Arreglar HTML porque se ve para la tula.
+
 def update_travel(request, travel_id):
     travel = Travel.objects.get(travel_id=travel_id)
+
     original_travel = Travel.objects.get(travel_id=travel_id)
 
     can_cancel = True
@@ -719,6 +720,29 @@ def update_travel(request, travel_id):
 
     if datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')) >= date_to_check:
         can_cancel = False
+    action = request.POST.get('action')
+    if action == 'cancel':
+        if travel.company.id == request.user.id:
+            if request.POST.get('radio_period') == 'following':
+                travels = Travel.objects.filter(period=travel.period)
+
+                future_travels = [
+                    t for t in travels
+                    if
+                    t.origin.estimated_datetime_arrival >= travel.origin.estimated_datetime_arrival
+                ]
+                print(future_travels)
+                for t in future_travels:
+                    cancel_travel(t)
+
+            else:
+                cancel_travel(travel)
+
+            messages.success(request, "Tu viaje fue cancelado exitosamente.")
+        else:
+            return "No tienes acceso para borrar este viaje"
+
+        return redirect('your_travels')
 
     if travel.status == "Agendado":
         if request.method == 'POST':
@@ -802,34 +826,12 @@ def update_travel(request, travel_id):
         'waypoints': (travel.origin, travel.destination)})
 
 
-def cancel_travel(request, travel_id):
+
+
+def cancel_travel_handler(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-    if travel.company.id == request.user.id:
-        travel.status = 'Cancelado'
-        travel.save()
 
-        travelers = Traveler.objects.filter(travel_id=travel_id, payment_status='Confirmado')
 
-        for traveler in travelers:
-            to_email = traveler.email
-            subject = f'Itineris | Viaje cancelado.'
-            message = (f'La empresa {travel.company.company_name} ha cancelado su viaje de '
-                       f'{traveler.segment.waypoint_origin.city} a {traveler.segment.waypoint_destination.city}<br>'
-                       f'Día de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
-                       f'En los próximos días verás reflejado la devolución de tu dinero.<br>'
-                       f'Lamentamos las molestias.<br>'
-                       f'Podes contactarte con nosotros con el siguiente mail: <a>itineris.pf@gmail.com</a>'
-                       )
-            try:
-                send_email(to_email, subject, message, file=None, html=True)
-            except Exception as e:
-                messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
-
-        messages.success(request, "Tu viaje fue cancelado exitosamente.")
-    else:
-        return "No tienes acceso para borrar este viaje"
-
-    return redirect('your_travels')
 
 
 def export_travelers_to_csv(request, travel_id):

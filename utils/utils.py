@@ -298,3 +298,24 @@ def search_segments(city_origin, passengers):
     ).order_by('waypoint_origin__estimated_datetime_arrival')
 
     return [segment for segment in segments if segment.seats_available >= passengers]
+
+def cancel_travel(travel):
+    travel.status = 'Cancelado'
+    travel.save()
+
+    travelers = Traveler.objects.filter(segment__travel=travel, payment_status='Confirmado')
+
+    for traveler in travelers:
+        to_email = traveler.email
+        subject = f'Itineris | Viaje cancelado.'
+        message = (f'La empresa {travel.company.company_name} ha cancelado su viaje de '
+                   f'{traveler.segment.waypoint_origin.city} a {traveler.segment.waypoint_destination.city}<br>'
+                   f'Día de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
+                   f'En los próximos días verás reflejado la devolución de tu dinero.<br>'
+                   f'Lamentamos las molestias.<br>'
+                   f'Podes contactarte con nosotros con el siguiente mail: <a>itineris.pf@gmail.com</a>'
+                   )
+        try:
+            send_email(to_email, subject, message, file=None, html=True)
+        except Exception as e:
+            raise f'Error al enviar el correo de verificación: {str(e)}'
