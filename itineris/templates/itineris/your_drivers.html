@@ -31,31 +31,13 @@
                                 <td>{{ driver.email }}</td>
                                 <td>{{ driver.phone_number }}</td>
                                 <td>
-                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#editModal{{ driver.driver_id }}">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                                    <a class="btn" href="{% url "update_driver" driver.driver_id %}">
+                                        <i class="bi bi-pencil-square text-success"></i>
+                                    </a>
                                 </td>
-                                <!-- Modal for Editing Driver -->
-                                <div class="modal fade" id="editModal{{ driver.driver_id }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editModalLabel">Edit Driver</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form method="post" action="{% url 'edit_driver' driver.driver_id %}">
-                                                    {% csrf_token %}
-                                                    {{ form.as_p }}
-                                                    <button type="submit" class="btn btn-primary">Save changes</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 <td> 
                                     <a href="{% url 'delete_driver' driver.driver_id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?')">
-                                        <i class="btn bi bi-trash3"></i>
+                                        <i class="btn bi bi-trash3 text-danger"></i>
                                     </a>
                                 </td>
                             {% endfor %}
