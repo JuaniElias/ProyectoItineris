@@ -29,15 +29,13 @@
                             <p><b>Ingresos brutos:</b> ${{ waypoints.3 }}</p>
                         </div>
                     </div>
-
-                    {% if waypoints.2 > 0 %}
-                        <a href="{{ travel.url }}">Ruta</a>
-                    {% endif %}
+                
                     {% if travel.status == 'Agendado' %}
                         <form action="{% url 'start_trip'  travel.travel_id %}" method="get">
                             <button type="submit" class="btn btn-primary mb-2">Dar inicio al viaje</button>
                         </form>
                     {% elif travel.status == 'En proceso' %}
+                        <a href="{{ travel.url }}">Ruta</a>
                         <form action="{% url 'mark_travel_ended'  travel.travel_id %}" method="get">
                             <button type="submit" class="btn btn-primary mb-2">Marcar viaje como completado</button>
                         </form>
