@@ -27,6 +27,7 @@ urlpatterns = [
     path("start_trip/<str:travel_id>/", views.start_trip, name="start_trip"),
     path("your_vehicles", views.your_vehicles, name="your_vehicles"),
     path("delete_vehicle/<str:plate_number>/", views.delete_vehicle, name="delete_vehicle"),
+    path("update_vehicle/<str:plate_number>/", views.update_vehicle, name="update_vehicle"),
     path("checkout", views.checkout, name="checkout"),
     path("travel_history", views.travel_history, name="travel_history"),
     path("payment_success", views.payment_success, name="payment_success"),

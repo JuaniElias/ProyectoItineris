@@ -37,6 +37,11 @@
                                     </button>
                                 </td>
                                 <td>
+                                    <a class="btn" href="{% url "update_vehicle" vehicle.plate_number %}">
+                                        <i class="bi bi-pencil-square text-success"></i>
+                                    </a>
+                                </td>
+                                <td>
                                     <a href="{% url 'delete_vehicle' vehicle.plate_number %}"
                                        onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?')">
                                         <i class="btn bi bi-trash3"></i>

@@ -1,0 +1,17 @@
+{% extends 'itineris/base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-3 mx-auto mt-3">
+            <div class="card m-4 p-3">
+                <h2>Edita tu vehiculo:</h2> <h3 class="text-muted">{{ vehicle }}</h3>
+                <form action="{% url 'update_vehicle' vehicle.plate_number %}" method=POST>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <br>
+                    <button type="submit" class="btn btn-success me-auto p-2 fs-4 mb-2">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

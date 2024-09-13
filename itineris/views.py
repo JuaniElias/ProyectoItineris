@@ -363,7 +363,6 @@ def delete_driver(request, driver_id):
 def update_driver(request, driver_id):
     driver = get_object_or_404(Driver, driver_id=driver_id)
 
-    # Solo permitir editar los datos antes de que haya comenzado el viaje.
     if request.method == 'POST':
         form = CreateDriver(request.POST, instance=driver)
         if form.is_valid():
@@ -372,7 +371,6 @@ def update_driver(request, driver_id):
             return redirect('your_drivers')
     else:
         form = CreateDriver(instance=driver)
-    # Viajes ya finalizados, en proceso o cancelados.
 
     return render(request, "itineris/update_driver.html", {'form': form, 'driver': driver})
 
@@ -534,6 +532,20 @@ def delete_vehicle(request, plate_number):
         vehicle.active = False
         vehicle.save()
     return redirect('your_vehicles')
+
+def update_vehicle(request, plate_number):
+    vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
+
+    if request.method == 'POST':
+        form = CreateVehicle(request.POST, instance=vehicle)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "El vehículo se editó correctamente.")
+            return redirect('your_vehicles')
+    else:
+        form = CreateVehicle(instance=vehicle)
+
+    return render(request, "itineris/update_vehicle.html", {'form': form, 'vehicle': vehicle})
 
 
 def pre_checkout(request, segment_id):
