@@ -537,13 +537,14 @@ def update_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
 
     if request.method == 'POST':
-        form = CreateVehicle(request.POST, instance=vehicle)
+        form = CreateVehicle(request.POST, instance=vehicle, disable_plate=True)
+        form.fields['plate_number'].widget.attrs['disabled'] = 'disabled'
         if form.is_valid():
             form.save()
             messages.success(request, "El vehículo se editó correctamente.")
             return redirect('your_vehicles')
     else:
-        form = CreateVehicle(instance=vehicle)
+        form = CreateVehicle(instance=vehicle, disable_plate=True)
 
     return render(request, "itineris/update_vehicle.html", {'form': form, 'vehicle': vehicle})
 

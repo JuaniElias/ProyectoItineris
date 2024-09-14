@@ -157,13 +157,17 @@ class CreateVehicle(forms.ModelForm):
         model = Vehicle
         fields = ('plate_number', 'brand', 'car_model', 'capacity', 'color',)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, disable_plate=False, **kwargs):
         super(CreateVehicle, self).__init__(*args, **kwargs)
         self.fields['plate_number'].widget.attrs['class'] = 'form-control'
         self.fields['brand'].widget.attrs['class'] = 'form-control'
         self.fields['car_model'].widget.attrs['class'] = 'form-control'
         self.fields['capacity'].widget.attrs['class'] = 'form-control'
         self.fields['color'].widget.attrs['class'] = 'form-control'
+
+        if disable_plate:
+            self.fields['plate_number'].disabled = True
+            self.fields['plate_number'].widget.attrs['title'] = 'No se puede modificar la patente. Agrega otro vehiculo de ser necesario.'
 
 
 class CreateDriver(forms.ModelForm):
