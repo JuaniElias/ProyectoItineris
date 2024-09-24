@@ -17,4 +17,21 @@
         </div>
     </div>
    </div>
+    <script>
+    function getCurrentDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const datetime_departure = document.querySelector('#id_datetime_departure');
+        
+        datetime_departure.setAttribute('min', getCurrentDate());
+    });
+    
+        
+    </script>
 {% endblock %}
