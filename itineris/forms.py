@@ -199,13 +199,13 @@ class SearchTravel(forms.Form):
         (5, 5),
     ]
 
-    city_origin = forms.ModelChoiceField(queryset=City.objects.all(),
+    city_origin = forms.ModelChoiceField(queryset=City.objects.all().order_by('city_name'),
                                          label='Ciudad de salida',
                                          widget=s2forms.ModelSelect2Widget(
                                              model=City, search_fields=['city_name__icontains'],
                                          )
                                          )
-    city_destination = forms.ModelChoiceField(queryset=City.objects.all(),
+    city_destination = forms.ModelChoiceField(queryset=City.objects.all().order_by('city_name'),
                                               label='Ciudad de destino',
                                               widget=s2forms.ModelSelect2Widget(
                                                   model=City, search_fields=['city_name__icontains'],
