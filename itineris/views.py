@@ -1,6 +1,7 @@
 import csv
 import io
 from datetime import datetime, date
+from struct import pack_into
 
 import mercadopago
 import pandas as pd
@@ -892,3 +893,7 @@ def export_travelers_to_csv(request, travel_id):
     csv_buffer.close()
 
     return response
+
+def export_travel_history(request):
+    print(request.POST.get("min"))
+    return redirect(travel_history)

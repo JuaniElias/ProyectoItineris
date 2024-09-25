@@ -30,6 +30,7 @@ urlpatterns = [
     path("update_vehicle/<str:plate_number>/", views.update_vehicle, name="update_vehicle"),
     path("checkout", views.checkout, name="checkout"),
     path("travel_history", views.travel_history, name="travel_history"),
+    path("export_travel_history", views.export_travel_history, name="export_travel_history"),
     path("payment_success", views.payment_success, name="payment_success"),
     path("feedback/<str:encrypted_traveler_id>/", views.feedback, name="feedback"),
     path("update_feedback/", views.update_feedback, name="update_feedback"),
