@@ -251,12 +251,12 @@ class CreateTraveler(forms.ModelForm):
                                          )
     email = forms.EmailField(label='Email', max_length=100, required=True)
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
-    address_origin= forms.CharField(max_length=200, widget=forms.TextInput(attrs={
+    address_origin= forms.CharField(label='Dirección de salida', max_length=200, widget=forms.TextInput(attrs={
         'class': 'autocomplete_origin',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
     geocode_origin = forms.CharField(max_length=100, required=False)
-    address_destination = forms.CharField(max_length=200, widget=forms.TextInput(attrs={
+    address_destination = forms.CharField(label='Dirección de llegada', max_length=200, widget=forms.TextInput(attrs={
         'class': 'autocomplete_destination',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
