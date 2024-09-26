@@ -1,7 +1,6 @@
 import csv
 import io
-from datetime import datetime, date
-from struct import pack_into
+from datetime import datetime
 
 import mercadopago
 import pandas as pd
@@ -15,12 +14,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from itineris.forms import CreateVehicle, CreateDriver, CreateTravel, SearchTravel, CreateTraveler, PeriodTravel, \
-    UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet
+from itineris.forms import (CreateVehicle, CreateDriver, CreateTravel, SearchTravel, CreateTraveler, PeriodTravel,
+                            UpdateTraveler, UpdateTravel, CreateWaypoint, EditSegmentFormSet)
 from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment, Waypoint
-from utils.utils import send_email, calculate_full_route, decrypt_number, encryptedkey, encrypt_number, create_segments, \
-    search_segments, cancel_travel
-
+from utils.utils import (send_email, decrypt_number, encryptedkey, encrypt_number, create_segments, search_segments,
+                         cancel_travel)
+from utils.maps import calculate_full_route
 
 def index(request):
     request.session.clear()
