@@ -34,10 +34,10 @@
                             <div class="col-md-2">
                                 <label>
                                     Conductor
-                                    <select id="driverFilter" class="form-control">
+                                    <select id="driverFilter" name="driverFilter" class="form-control">
                                         <option value="Todos">Todos</option>
                                         {% for driver in drivers %}
-                                            <option value="{{ driver.id }}">{{ driver }}</option>
+                                            <option value="{{ driver.driver_id }}">{{ driver }}</option>
                                         {% endfor %}
                                     </select>
                                 </label>
@@ -45,10 +45,10 @@
                             <div class="col-md-2">
                                 <label>
                                     Vehículo
-                                    <select id="vehicleFilter" class="form-control">
+                                    <select id="vehicleFilter" name="vehicleFilter" class="form-control">
                                         <option value="Todos">Todos</option>
                                         {% for vehicle in vehicles %}
-                                            <option value="{{ vehicle.id }}">{{ vehicle.plate_number }}</option>
+                                            <option value="{{ vehicle.plate_number }}">{{ vehicle.plate_number }}</option>
                                         {% endfor %}
                                     </select>
                                 </label>
@@ -56,7 +56,7 @@
                             <div class="col-md-2">
                                 <label>
                                     Estado
-                                    <select id="statusFilter" class="form-control">
+                                    <select id="statusFilter" name="statusFilter" class="form-control">
                                         <option value="Todos">Todos</option>
                                         <option value="Completado">Completado</option>
                                         <option value="Agendado">Agendado</option>

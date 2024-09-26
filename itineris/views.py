@@ -1,4 +1,5 @@
 import csv
+import datetime
 import io
 from datetime import datetime
 
@@ -20,6 +21,8 @@ from itineris.models import Company, Vehicle, Driver, Travel, Traveler, Segment,
 from utils.utils import (send_email, decrypt_number, encryptedkey, encrypt_number, create_segments, search_segments,
                          cancel_travel)
 from utils.maps import calculate_full_route
+from django.db.models import Q
+
 
 def index(request):
     request.session.clear()
@@ -360,6 +363,7 @@ def delete_driver(request, driver_id):
         driver.save()
     return redirect('your_drivers')
 
+
 def update_driver(request, driver_id):
     driver = get_object_or_404(Driver, driver_id=driver_id)
 
@@ -373,6 +377,7 @@ def update_driver(request, driver_id):
         form = CreateDriver(instance=driver)
 
     return render(request, "itineris/update_driver.html", {'form': form, 'driver': driver})
+
 
 def your_travels(request):
     travels = Travel.objects.all().filter(company=request.user.id, status='Agendado')
@@ -532,6 +537,7 @@ def delete_vehicle(request, plate_number):
         vehicle.active = False
         vehicle.save()
     return redirect('your_vehicles')
+
 
 def update_vehicle(request, plate_number):
     vehicle = get_object_or_404(Vehicle, plate_number=plate_number)
@@ -727,7 +733,6 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
     return redirect('index')
 
 
-
 def update_travel(request, travel_id):
     travel = Travel.objects.get(travel_id=travel_id)
 
@@ -845,12 +850,8 @@ def update_travel(request, travel_id):
         'waypoints': (travel.origin, travel.destination)})
 
 
-
-
 def cancel_travel_handler(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
-
-
 
 
 def export_travelers_to_csv(request, travel_id):
@@ -893,6 +894,92 @@ def export_travelers_to_csv(request, travel_id):
 
     return response
 
+
 def export_travel_history(request):
-    print(request.POST.get("min"))
-    return redirect(travel_history)
+    company_id = request.user.id
+
+    # Construir la consulta base
+    filters = Q(travel__company_id=company_id)
+
+    # Obtener y procesar min_date si está presente
+    min_date = request.POST.get("min").strip()  # Elimina espacios en blanco
+    if min_date:
+        date_obj = datetime.strptime(min_date, "%d/%m/%Y")
+        min_date_aware = timezone.make_aware(date_obj)
+        filters &= Q(waypoint_origin__estimated_datetime_arrival__gte=min_date_aware)
+
+    # Obtener y procesar max_date si está presente
+    max_date = request.POST.get("max").strip()
+    if max_date:
+        date_obj = datetime.strptime(max_date, "%d/%m/%Y")
+        max_date_aware = timezone.make_aware(date_obj)
+        filters &= Q(waypoint_destination__estimated_datetime_arrival__lte=max_date_aware)
+
+    # Procesar driver_id si no es "Todos"
+    driver_id = request.POST.get("driverFilter").strip()
+    if driver_id != "Todos":
+        filters &= Q(travel__driver_id=driver_id)
+
+    # Procesar vehicle si no es "Todos"
+    vehicle = request.POST.get("vehicleFilter").strip()
+    if vehicle != "Todos":
+        filters &= Q(travel__vehicle__plate_number=vehicle)
+
+    # Procesar status si no es "Todos"
+    status = request.POST.get("statusFilter").strip()
+    if status != "Todos":
+        filters &= Q(travel__status=status)
+
+    # Aplicar los filtros dinámicamente a la consulta de Segment
+    segments = Segment.objects.filter(filters)
+
+    travelers = Traveler.objects.all().filter(segment__in=segments)
+
+    response = HttpResponse(content_type='text/csv')
+    # TODO: Cambiar nombre del archivo
+    response['Content-Disposition'] = f'attachment; filename="Reporte.csv"'
+    csv_buffer = io.StringIO()
+    writer = csv.writer(csv_buffer, quoting=csv.QUOTE_MINIMAL, lineterminator='\n', delimiter=';')
+
+    # TODO: Rellenar con los encabezados que queremos mostrar.. se me ocurrieron esas
+    #  asegurarse de que estén en orden con los de abajo
+    writer.writerow(
+        ['Viaje', 'Segmento', 'Salida', 'Llegada', 'Conductor', 'Vehiculo', 'Estado',
+         'Nombre', 'Apellido', 'Tipo DNI', 'Descripción DNI', 'DNI', 'Email', 'Sexo', 'Fecha de Nacimiento',
+         'Menor', 'Nacionalidad', 'Teléfono', 'Dirección Origen', 'GEO Origen', 'Dirección Destino', 'GEO Destino', 'Monto',
+         'Estado de Pago', 'Feedback'])
+
+    for traveler in travelers:
+        writer.writerow([
+            traveler.segment.travel.travel_id,
+            traveler.segment,
+            traveler.segment.waypoint_origin.estimated_datetime_arrival,
+            traveler.segment.waypoint_destination.estimated_datetime_arrival,
+            traveler.segment.travel.driver,
+            traveler.segment.travel.vehicle,
+            traveler.segment.travel.status,
+            traveler.first_name,
+            traveler.last_name,
+            traveler.dni_type,
+            traveler.dni_description,
+            traveler.dni,
+            traveler.email,
+            traveler.sex,
+            traveler.date_of_birth,
+            traveler.minor,
+            traveler.nationality,
+            traveler.phone,
+            traveler.address_origin,
+            traveler.geocode_origin,
+            traveler.address_destination,
+            traveler.geocode_destination,
+            traveler.paid_amount,
+            traveler.payment_status,
+            traveler.feedback,
+        ])
+
+    response.write('\ufeff')  # Agregar BOM
+    response.write(csv_buffer.getvalue())
+    csv_buffer.close()
+
+    return response

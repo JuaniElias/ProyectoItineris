@@ -46,6 +46,7 @@ def decrypt_number(encoded_str, key):
 
     return int(decrypted_str)
 
+
 # Segments
 def create_segments(travel, waypoints, segments=None):
     list_of_segments = list(itertools.combinations(waypoints, 2))
@@ -81,6 +82,7 @@ def search_segments(city_origin, passengers):
     ).order_by('waypoint_origin__estimated_datetime_arrival')
 
     return [segment for segment in segments if segment.seats_available >= passengers]
+
 
 def cancel_travel(travel):
     travel.status = 'Cancelado'
