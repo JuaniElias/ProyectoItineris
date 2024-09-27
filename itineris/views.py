@@ -939,14 +939,14 @@ def export_travel_history(request):
     # TODO: Cambiar nombre del archivo
     response['Content-Disposition'] = f'attachment; filename="Reporte.csv"'
     csv_buffer = io.StringIO()
-    writer = csv.writer(csv_buffer, quoting=csv.QUOTE_MINIMAL, lineterminator='\n', delimiter=';')
+    writer = csv.writer(csv_buffer, quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
 
     # TODO: Rellenar con los encabezados que queremos mostrar.. se me ocurrieron esas
     #  asegurarse de que estén en orden con los de abajo
     writer.writerow(
         ['Viaje', 'Segmento', 'Salida', 'Llegada', 'Conductor', 'Vehiculo', 'Estado',
-         'Nombre', 'Apellido', 'Tipo DNI', 'Descripción DNI', 'DNI', 'Email', 'Sexo', 'Fecha de Nacimiento',
-         'Menor', 'Nacionalidad', 'Teléfono', 'Dirección Origen', 'GEO Origen', 'Dirección Destino', 'GEO Destino', 'Monto',
+         'Nombre', 'Apellido', 'Tipo DNI', 'DNI', 'Email', 'Sexo', 'Fecha de Nacimiento',
+         'Menor', 'Nacionalidad', 'Teléfono', 'Dirección Origen', 'Dirección Destino', 'Monto',
          'Estado de Pago', 'Feedback'])
 
     for traveler in travelers:
@@ -961,7 +961,6 @@ def export_travel_history(request):
             traveler.first_name,
             traveler.last_name,
             traveler.dni_type,
-            traveler.dni_description,
             traveler.dni,
             traveler.email,
             traveler.sex,
@@ -970,9 +969,7 @@ def export_travel_history(request):
             traveler.nationality,
             traveler.phone,
             traveler.address_origin,
-            traveler.geocode_origin,
             traveler.address_destination,
-            traveler.geocode_destination,
             traveler.paid_amount,
             traveler.payment_status,
             traveler.feedback,
