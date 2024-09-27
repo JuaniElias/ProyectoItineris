@@ -1,10 +1,12 @@
 import csv
 import datetime
 import io
+from io import BytesIO
 from datetime import datetime
 
 import mercadopago
 import pandas as pd
+import xlsxwriter
 import pytz
 from django.contrib import messages
 from django.db.models import Sum
@@ -898,85 +900,133 @@ def export_travelers_to_csv(request, travel_id):
 def export_travel_history(request):
     company_id = request.user.id
 
-    # Construir la consulta base
     filters = Q(travel__company_id=company_id)
 
-    # Obtener y procesar min_date si está presente
     min_date = request.POST.get("min").strip()  # Elimina espacios en blanco
     if min_date:
         date_obj = datetime.strptime(min_date, "%d/%m/%Y")
         min_date_aware = timezone.make_aware(date_obj)
         filters &= Q(waypoint_origin__estimated_datetime_arrival__gte=min_date_aware)
 
-    # Obtener y procesar max_date si está presente
     max_date = request.POST.get("max").strip()
     if max_date:
         date_obj = datetime.strptime(max_date, "%d/%m/%Y")
         max_date_aware = timezone.make_aware(date_obj)
         filters &= Q(waypoint_destination__estimated_datetime_arrival__lte=max_date_aware)
 
-    # Procesar driver_id si no es "Todos"
     driver_id = request.POST.get("driverFilter").strip()
     if driver_id != "Todos":
         filters &= Q(travel__driver_id=driver_id)
+        driver = get_object_or_404(Driver, id=driver_id)
+        driver_name = str(driver)
+    else:
+        driver_name = 'Todos'
 
-    # Procesar vehicle si no es "Todos"
     vehicle = request.POST.get("vehicleFilter").strip()
     if vehicle != "Todos":
         filters &= Q(travel__vehicle__plate_number=vehicle)
 
-    # Procesar status si no es "Todos"
     status = request.POST.get("statusFilter").strip()
     if status != "Todos":
         filters &= Q(travel__status=status)
 
-    # Aplicar los filtros dinámicamente a la consulta de Segment
     segments = Segment.objects.filter(filters)
 
     travelers = Traveler.objects.all().filter(segment__in=segments)
 
-    response = HttpResponse(content_type='text/csv')
-    # TODO: Cambiar nombre del archivo
-    response['Content-Disposition'] = f'attachment; filename="Reporte.csv"'
-    csv_buffer = io.StringIO()
-    writer = csv.writer(csv_buffer, quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="Reporte.xlsx"'
 
-    # TODO: Rellenar con los encabezados que queremos mostrar.. se me ocurrieron esas
-    #  asegurarse de que estén en orden con los de abajo
-    writer.writerow(
-        ['Viaje', 'Segmento', 'Salida', 'Llegada', 'Conductor', 'Vehiculo', 'Estado',
-         'Nombre', 'Apellido', 'Tipo DNI', 'DNI', 'Email', 'Sexo', 'Fecha de Nacimiento',
-         'Menor', 'Nacionalidad', 'Teléfono', 'Dirección Origen', 'Dirección Destino', 'Monto',
-         'Estado de Pago', 'Feedback'])
+    excel_buffer = BytesIO()
 
-    for traveler in travelers:
-        writer.writerow([
+    workbook = xlsxwriter.Workbook(excel_buffer, {'in_memory': True, 'remove_timezone': True})
+
+    sheet_travelers_data = workbook.add_worksheet('Pasajeros')
+    headers = [
+        'Viaje', 'Segmento', 'Salida', 'Llegada', 'Conductor', 'Vehiculo', 'Estado',
+        'Nombre', 'Apellido', 'Tipo DNI', 'DNI', 'Email', 'Sexo', 'Fecha de Nacimiento',
+        'Menor', 'Nacionalidad', 'Teléfono', 'Dirección Origen', 'Dirección Destino', 'Monto',
+        'Estado de Pago', 'Feedback'
+    ]
+
+    for col_num, header in enumerate(headers):
+        sheet_travelers_data.write(0, col_num, header)
+
+    for row_num, traveler in enumerate(travelers, start=1):
+        data = [
             traveler.segment.travel.travel_id,
-            traveler.segment,
-            traveler.segment.waypoint_origin.estimated_datetime_arrival,
-            traveler.segment.waypoint_destination.estimated_datetime_arrival,
-            traveler.segment.travel.driver,
-            traveler.segment.travel.vehicle,
+            str(traveler.segment),
+            str(traveler.segment.waypoint_origin.estimated_datetime_arrival)[:-9],
+            str(traveler.segment.waypoint_destination.estimated_datetime_arrival)[:-9],
+            str(traveler.segment.travel.driver),
+            str(traveler.segment.travel.vehicle),
             traveler.segment.travel.status,
             traveler.first_name,
             traveler.last_name,
             traveler.dni_type,
-            traveler.dni,
+            str(traveler.dni),
             traveler.email,
             traveler.sex,
-            traveler.date_of_birth,
+            str(traveler.date_of_birth),
             traveler.minor,
-            traveler.nationality,
-            traveler.phone,
+            str(traveler.nationality),
+            str(traveler.phone),
             traveler.address_origin,
             traveler.address_destination,
             traveler.paid_amount,
             traveler.payment_status,
             traveler.feedback,
-        ])
+        ]
+        for col_num, cell_value in enumerate(data):
+            sheet_travelers_data.write(row_num, col_num, cell_value)
 
-    response.write('\ufeff')  # Agregar BOM
-    response.write(csv_buffer.getvalue())
-    csv_buffer.close()
+    sheet_travels_data = workbook.add_worksheet('Viajes')
+    travels = Travel.objects.filter(travel_id__in=segments.values_list('travel', flat=True).distinct())
+
+    headers = [
+        'Viaje', 'Origen', 'Destino', 'Salida', 'Llegada', 'Pasajeros', 'Conductor', 'Vehiculo', 'Estado',
+        'Recaudado', 'Estado de Pago'
+    ]
+    for col_num, header in enumerate(headers):
+        sheet_travels_data.write(0, col_num, header)
+
+    for row_num, travel in enumerate(travels, start=1):
+        segments_ = Segment.objects.all().filter(travel=travel)
+        data = [
+            travel.travel_id,
+            str(travel.origin.city),
+            str(travel.destination.city),
+            str(travel.origin.estimated_datetime_arrival)[:-9],
+            str(travel.destination.estimated_datetime_arrival)[:-9],
+            travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0,
+            str(travel.driver),
+            str(travel.vehicle),
+            travel.status,
+            (Traveler.objects.all().filter(segment__in=segments_, payment_status='Confirmado').aggregate(total=Sum('paid_amount')))['total'] or 0,
+            travel.payment_status,
+        ]
+        for col_num, cell_value in enumerate(data):
+            sheet_travels_data.write(row_num, col_num, cell_value)
+
+
+    if not min_date:
+        min_date = 'NaN'
+    if not max_date:
+        max_date = 'NaN'
+
+    sheet_filters = workbook.add_worksheet('Filtros')
+    sheet_filters.write(0, 7, 'La información descargada fue usando los siguientes filtros')
+    headers = ['Fecha desde', 'Fecha hasta', 'Conductor', 'Vehiculo', 'Estado']
+
+    for col_num, header in enumerate(headers):
+        sheet_filters.write(0, col_num, header)
+
+    data = [min_date, max_date, driver_name, vehicle, status]
+    for col_num, data in enumerate(data):
+        sheet_filters.write(1, col_num, data)
+
+    workbook.close()
+    response.write(excel_buffer.getvalue())
+    excel_buffer.close()
 
     return response
