@@ -7,30 +7,6 @@ from django.shortcuts import get_object_or_404
 
 from itineris.models import Travel, Segment, Traveler, Waypoint
 
-
-# Algoritmo viejo
-"""
-def get_next_destination(origin: str, distance_matrix: pd.DataFrame):
-    id_min = distance_matrix[distance_matrix[origin] > 0][origin].idxmin()
-    destination = distance_matrix.loc[id_min, 'destination']
-    distance_matrix = distance_matrix[distance_matrix['destination'] != destination]
-
-    return destination, distance_matrix
-
-
-def get_best_route(start_point: str, distance_matrix: pd.DataFrame):
-    best_consequent = [start_point]
-    locations = distance_matrix.iloc[:, 1:].columns.to_list()
-    locations = [x for x in locations if x != start_point]
-
-    for i in range(1, len(locations) + 1):
-        origin = best_consequent[i - 1]
-        destination, distance_matrix = get_next_destination(origin, distance_matrix)
-        best_consequent.append(destination)
-
-    return best_consequent"""
-
-
 def calculate_full_route(travel_id):
     # el start point debería estar indicado por la empresa, sería el punto de acceso a la ciudad final.
     travel = get_object_or_404(Travel, travel_id=travel_id)
@@ -44,6 +20,7 @@ def calculate_full_route(travel_id):
     waypoints = list(Waypoint.objects.filter(id__in=waypoint_ids).order_by('node_number'))
 
     complete_route = []
+    waypoint_codes = []
     for i, waypoint in enumerate(waypoints):
         start = travel.geocode if len(complete_route) == 0 else complete_route[-1]
         travelers_on_board = waypoint.seats_available
@@ -57,8 +34,19 @@ def calculate_full_route(travel_id):
 
         best_route = calculate_waypoint_route(travel, segments, waypoint, start, end, travelers_on_board)
         complete_route += best_route
-        # waypoint.url = get_url_route(best_route)
-        # waypoint.save()
+        waypoint_codes.append(best_route)
+
+    fixed_orders = []
+    for j, waypoint in enumerate(waypoint_codes):
+        if j + 1 < len(waypoint_codes):
+            waypoint += [waypoint_codes[j+1][0]]
+
+        fixed_orders.append(waypoint)
+
+    for i, waypoint in enumerate(waypoints):
+        waypoint.url = get_url_route(fixed_orders[i])
+        waypoint.save()
+
 
     travel.url = get_url_route(complete_route)
     travel.save()
@@ -110,7 +98,7 @@ def calculate_waypoint_route(travel, segments, waypoint, start, end, travelers_o
 def get_distance_matrix(start, end, traveler_to_pickup, traveler_to_drop, gmaps):
     rows_matrix = []
 
-    # Creo listas con los IDs de los travelers para buscar y para dejar
+    # Creo listas con los ID de los travelers para buscar y para dejar
     ids_to_pickup = [traveler.id for traveler in traveler_to_pickup]
     ids_to_drop = [traveler.id for traveler in traveler_to_drop]
 

@@ -92,11 +92,10 @@ class Waypoint(models.Model):
     city = models.ForeignKey("City", on_delete=models.DO_NOTHING)
     estimated_datetime_arrival = models.DateTimeField()
     node_number = models.IntegerField(editable=True, null=True)
-    # url = models.CharField(max_length=5000, default=None, editable=True, null=True)
+    url = models.CharField(max_length=5000, default=None, editable=True, null=True)
 
     @property
     def seats_available(self):
-
         if self.node_number == 0:
             return 0
         else:
@@ -111,6 +110,33 @@ class Waypoint(models.Model):
             # (1, 2) (1, 3)
             # (2, 3)
 
+            total_seats = valid_segments.aggregate(total=Sum('seats_occupied'))['total'] or 0
+
+            return total_seats
+
+    @property
+    def travelers_to_pick_up(self):
+        last_waypoint = Waypoint.objects.filter(travel=self.travel).order_by('node_number').last()
+
+        if self.node_number == last_waypoint.node_number:
+            return '-'
+        else:
+            valid_segments = Segment.objects.filter(travel=self.travel,
+                                                    waypoint_origin__node_number=self.node_number,
+                                                    )
+
+            total_seats = valid_segments.aggregate(total=Sum('seats_occupied'))['total'] or 0
+
+            return total_seats
+
+    @property
+    def travelers_to_drop_off(self):
+        if self.node_number == 0:
+            return '-'
+        else:
+            valid_segments = Segment.objects.filter(travel=self.travel,
+                                                    waypoint_destination__node_number=self.node_number
+                                                    )
             total_seats = valid_segments.aggregate(total=Sum('seats_occupied'))['total'] or 0
 
             return total_seats

@@ -314,13 +314,17 @@ def travel_detail(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
+    waypoints = Waypoint.objects.filter(travel_id=travel_id).order_by('node_number')
+
     total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
     gross_revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
 
     segments = Segment.objects.all().filter(travel_id=travel_id)
-    waypoints = (travel.origin, travel.destination, total_passengers, gross_revenue)
+    travel_data = (travel.origin, travel.destination, total_passengers, gross_revenue)
+
     return render(request, "itineris/travel_detail.html",
-                  {'travelers': travelers, 'waypoints': waypoints, 'travel': travel, 'segments': segments})
+                  {'travelers': travelers, 'travel_data': travel_data, 'travel': travel, 'segments': segments,
+                   'waypoints': waypoints})
 
 
 def your_drivers(request):
@@ -387,10 +391,7 @@ def your_travels(request):
     for travel in travels:
         total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
 
-        fee = Segment.objects.all().filter(waypoint_origin=travel.origin,
-                                           waypoint_destination=travel.destination).values('fee')[0]['fee']
-
-        wp.append((travel.origin, travel.destination, total_passengers, fee))
+        wp.append((travel.origin, travel.destination, total_passengers))
 
     wp.sort(key=lambda x: x[0].estimated_datetime_arrival)
 
@@ -490,7 +491,8 @@ def start_trip(request, travel_id):
                            f"<td>{traveler.segment.waypoint_origin.city.city_name
                            } - {traveler.segment.waypoint_destination.city.city_name}</td></tr>")
         try:
-            send_email(to_email, subject, message, file=None, html=True)
+            pass
+            #send_email(to_email, subject, message, file=None, html=True)
         except Exception as e:
             messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
 

@@ -14,7 +14,6 @@
                             <th class="date"        >Fecha y Hora salida</th>
                             <th class="origin"      >Se anuncia a</th>
                             <th class="capacity"    >Pasajeros</th>
-                            <th class="fee"         >Tarifa</th>
                             <th class="more-info"   ></th>
                             <th class="update"      ></th>
                         </tr>
@@ -25,7 +24,6 @@
                                 <td>{{ waypoint.0.estimated_datetime_arrival|date:"Y-m-d H:i" }}</td>
                                 <td>{{ waypoint.0.city }} - {{ waypoint.1.city }}</td>
                                 <td>{{ waypoint.2 }}</td>
-                                <td>${{ waypoint.3 }}</td>
                                 <td>
                                     <a href="{% url 'travel_detail' waypoint.0.travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
                                         <i class="bi bi-info-circle"></i>
