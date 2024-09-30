@@ -13,11 +13,12 @@ class RegistrationFormCompany(UserCreationForm):
     company_name = forms.CharField(label='Nombre de empresa', max_length=100)
     phone = forms.CharField(label='Teléfono')
     address = forms.CharField(label='Dirección')
+    cbu = forms.CharField(label='CBU', max_length=22, validators=[dni_validator])
     license = forms.FileField(label='Adjunte Licencia CNRT')
 
     class Meta:
         model = Company
-        fields = ('username', 'email', 'password1', 'password2', 'company_name', 'phone', 'address', 'license',)
+        fields = ('username', 'email', 'password1', 'password2', 'company_name', 'phone', 'address', 'cbu', 'license',)
 
     def __init__(self, *args, **kwargs):
         super(RegistrationFormCompany, self).__init__(*args, **kwargs)
@@ -28,4 +29,5 @@ class RegistrationFormCompany(UserCreationForm):
         self.fields['company_name'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['address'].widget.attrs['class'] = 'form-control'
+        self.fields['cbu'].widget.attrs['class'] = 'form-control'
         self.fields['license'].widget.attrs['class'] = 'form-control'

@@ -29,6 +29,7 @@ class Travel(models.Model):
     status = models.CharField(max_length=50,
                               default="Borrador")  # En Proceso | Agendado | Finalizado | Cancelado | Borrador
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
+    cbu = models.CharField(max_length=22)
 
     @property
     def origin(self):
