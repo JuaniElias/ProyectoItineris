@@ -74,7 +74,9 @@
                                     <th>Llegada estimada</th>
                                     <th>Pasajeros que suben</th>
                                     <th>Pasajeros que bajan</th>
+                                    {% if waypoint.url %}
                                     <th>Ruta</th>
+                                    {% endif %} 
                                 </tr>
 
                                 </thead>
@@ -85,7 +87,9 @@
                                         <td>{{ waypoint.estimated_datetime_arrival }}</td>
                                         <td>{{ waypoint.travelers_to_pick_up }}</td>
                                         <td>{{ waypoint.travelers_to_drop_off }}</td>
+                                        {% if waypoint.url %}
                                         <td><a href="{{ waypoint.url }}">URL</a></td>
+                                        {% endif %} 
                                     </tr>
                                 {% endfor %}
                                 </tbody>
