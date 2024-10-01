@@ -459,7 +459,15 @@ def start_trip(request, travel_id):
     travel.save()
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
-    driver_message = (f"<h2>Ingrese al siguiente <a href={travel.url}>LINK</a> para ver la ruta de viaje.</h2><br>"
+    if travelers.count() > 12:
+        driver_message = f"<h2>Ingrese al siguiente <a href={travel.url}>LINK</a> para ver la ruta de viaje.</h2><br>"
+    else:
+        waypoints = Waypoint.objects.filter(travel_id=travel_id).order_by('node_number')
+        driver_message = f"<h2>Ingrese a los siguientes links para ver la ruta del viaje.</h2><br>"
+        for wp in waypoints:
+            driver_message += f"Ruta para {wp.city} <a href={wp.url}>LINK</a> <br>"
+
+    driver_message += (
                       f"<h3>Lista de pasajeros para el viaje: <br>"
                       f"<table><thead>"
                       f"<tr><th>Trayecto</th>"
@@ -492,7 +500,7 @@ def start_trip(request, travel_id):
                            } - {traveler.segment.waypoint_destination.city.city_name}</td></tr>")
         try:
             pass
-            #send_email(to_email, subject, message, file=None, html=True)
+            send_email(to_email, subject, message, file=None, html=True)
         except Exception as e:
             messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
 
