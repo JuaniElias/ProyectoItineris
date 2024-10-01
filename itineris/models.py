@@ -1,4 +1,5 @@
 import pandas as pd
+from Scripts.pywin32_postinstall import verbose
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import date
@@ -9,27 +10,63 @@ from django.db.models import Sum
 # Create your models here.
 
 class Company(AbstractUser):
-    company_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=30)
-    address = models.CharField(max_length=100)
-    license = models.FileField(upload_to='licenses')
-    is_verified = models.BooleanField(default=False)
+    company_name = models.CharField(max_length=100, verbose_name='Compañía')
+    phone = models.CharField(max_length=30, verbose_name='Teléfono')
+    address = models.CharField(max_length=100, verbose_name='Teléfono')
+    license = models.FileField(upload_to='licenses', verbose_name='Licencia')
+    is_verified = models.BooleanField(default=False, verbose_name='Verificado')
+
+    username = models.CharField(max_length=150, unique=True, verbose_name="CUIT")
+
+    class Meta:
+        verbose_name = "Listado de empresas"
+        verbose_name_plural = "Listado de empresas"
+
+    def __str__(self):
+        return str(self.company_name) + ' (' + str(self.username) + ')'
 
 
 class Travel(models.Model):
-    travel_id = models.AutoField(primary_key=True)
-    company = models.ForeignKey("Company", on_delete=models.DO_NOTHING)
+    STATUS_CHOICES = [
+        ('Borrador', 'Borrador'),
+        ('En Proceso', 'En Proceso'),
+        ('Agendado', 'Agendado'),
+        ('Finalizado', 'Finalizado'),
+        ('Cancelado', 'Cancelado'),
+        ('Pagado', 'Pagado'),
+    ]
+    PAYMENT_STATUS_CHOICES = [
+        ('Pendiente', 'Pendiente'),
+        ('Pago', 'Pago')
+    ]
+
+    travel_id = models.AutoField(primary_key=True, verbose_name='ID')
+    company = models.ForeignKey("Company", on_delete=models.DO_NOTHING, verbose_name='Compañía')
     driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING)
     vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
     address = models.CharField(max_length=200, null=True)
     geocode = models.CharField(max_length=100, null=True)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
-    payment_status = models.CharField(max_length=20, default="Pendiente")  # Pendiente | Pago
+    payment_status = models.CharField(max_length=20, default="Pendiente",choices=PAYMENT_STATUS_CHOICES, verbose_name='Estado de pago')
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
-    status = models.CharField(max_length=50,
-                              default="Borrador")  # En Proceso | Agendado | Finalizado | Cancelado | Borrador
-    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True)
+    status = models.CharField(max_length=50, default="Borrador", choices=STATUS_CHOICES)
+    real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True, verbose_name='Fecha de llegada')
     cbu = models.CharField(max_length=22)
+
+    class Meta:
+        verbose_name = "Viaje a pagar"
+        verbose_name_plural = "Viajes a pagar"
+
+    @property
+    def gross_revenue(self):
+        gross_rev = (Traveler.objects.filter(segment__travel=self.travel_id,
+                                             payment_status='Confirmado')
+                     .aggregate(total=Sum('paid_amount'))
+                     ['total'] or 0
+                     )
+        return '$' + str(gross_rev)
+
+    gross_revenue.fget.short_description = "Total a pagar"
 
     @property
     def origin(self):
@@ -199,8 +236,8 @@ class City(models.Model):
 
 class Traveler(models.Model):
     segment = models.ForeignKey("Segment", on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, verbose_name='Nombre')
+    last_name = models.CharField(max_length=50, verbose_name='Apellido')
     dni_type = models.CharField(max_length=9)
     dni_description = models.CharField(max_length=9, default=None, null=True)
     dni = models.CharField(max_length=8)
@@ -209,15 +246,20 @@ class Traveler(models.Model):
     date_of_birth = models.DateField()
     minor = models.BooleanField()
     nationality = models.ForeignKey("Nationality", on_delete=models.DO_NOTHING)
-    phone = models.CharField(max_length=30)
+    phone = models.CharField(max_length=30, verbose_name='Teléfono')
     address_origin = models.CharField(max_length=200, null=True)
     geocode_origin = models.CharField(max_length=100, null=True)
     address_destination = models.CharField(max_length=200, null=True)
     geocode_destination = models.CharField(max_length=100, null=True)
     feedback = models.TextField(max_length=200, null=True, default='-')
     payment_status = models.CharField(max_length=50,
-                                      default="En Proceso")  # En Proceso | Confirmado | Cancelado
-    paid_amount = models.IntegerField()
+                                      default="En Proceso", verbose_name='Estado de pago')  # En Proceso | Confirmado | Cancelado
+    paid_amount = models.IntegerField(verbose_name='Total pagado')
+    refunded = models.BooleanField(default=False, verbose_name='Devolución')
+
+    class Meta:
+        verbose_name = "Pasajero pendiente de devolución"
+        verbose_name_plural = "Pasajeros pendientes de devolución"
 
     def save(self, *args, **kwargs):
         if not self.pk:

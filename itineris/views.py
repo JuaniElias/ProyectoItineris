@@ -317,10 +317,10 @@ def travel_detail(request, travel_id):
     waypoints = Waypoint.objects.filter(travel_id=travel_id).order_by('node_number')
 
     total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
-    gross_revenue = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
+    ingresos_brutos = travelers.aggregate(total=Sum('paid_amount'))['total'] or 0
 
     segments = Segment.objects.all().filter(travel_id=travel_id)
-    travel_data = (travel.origin, travel.destination, total_passengers, gross_revenue)
+    travel_data = (travel.origin, travel.destination, total_passengers, ingresos_brutos)
 
     return render(request, "itineris/travel_detail.html",
                   {'travelers': travelers, 'travel_data': travel_data, 'travel': travel, 'segments': segments,
@@ -732,6 +732,19 @@ def cancel_traveler_ticket(request, encrypted_traveler_id):
     traveler = get_object_or_404(Traveler, id=traveler_id)
     traveler.payment_status = 'Cancelado'
     traveler.save()
+    subject = 'Cancelación de tu viaje'
+    message = (
+        f'Has cancelado tu viaje desde {traveler.segment.waypoint_origin.city
+        } a {traveler.segment.waypoint_destination.city} '
+        f'para la fecha {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
+        f'Te solicitamos que por favor que respondas a este email con tu CBU o alias de tu cuenta bancaria '
+        f'para que podamos gestionar la devolución del pasaje.<br>'
+        f'Saludos!'
+    )
+    try:
+        send_email(traveler.email, subject, message, file=None, html=True)
+    except Exception as e:
+        messages.error(request, f'Error al enviar el correo de verificación: {str(e)}')
     messages.success(request, "Tu viaje fue cancelado exitosamente.")
 
     return redirect('index')
