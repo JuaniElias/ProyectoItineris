@@ -45,13 +45,13 @@ class CreateTravel(forms.Form):
     datetime_arrival = forms.DateTimeField(label='Fecha y hora estimada de llegada',
                                            widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
                                            required=True)
-    address = forms.CharField(max_length=200, widget=forms.TextInput(attrs={
+    address = forms.CharField(label='Dirección de salida', max_length=200, widget=forms.TextInput(attrs={
         'id': 'autocomplete',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
     geocode = forms.CharField(max_length=100, required=False)
-    driver = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.none(), required=True)
-    vehicle = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.none(), required=True)
+    driver = forms.ModelChoiceField(queryset=Driver.objects.none(), required=True)
+    vehicle = forms.ModelChoiceField(queryset=Vehicle.objects.none(), required=True)
 
     def __init__(self, company_id, *args, **kwargs):
         super(CreateTravel, self).__init__(*args, **kwargs)
@@ -59,10 +59,10 @@ class CreateTravel(forms.Form):
         self.fields['city_destination'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_departure'].widget.attrs['class'] = 'form-control'
         self.fields['datetime_arrival'].widget.attrs['class'] = 'form-control'
-        self.fields['driver'] = forms.ModelChoiceField(queryset=Driver.objects.filter(company_id=company_id,
+        self.fields['driver'] = forms.ModelChoiceField(label='Conductor', queryset=Driver.objects.filter(company_id=company_id,
                                                                                       active=1))
         self.fields['driver'].widget.attrs['class'] = 'form-control'
-        self.fields['vehicle'] = forms.ModelChoiceField(queryset=Vehicle.objects.filter(company_id=company_id,
+        self.fields['vehicle'] = forms.ModelChoiceField(label='Vehículo', queryset=Vehicle.objects.filter(company_id=company_id,
                                                                                         status='Disponible',
                                                                                         active=1))
         self.fields['vehicle'].widget.attrs['class'] = 'form-control'

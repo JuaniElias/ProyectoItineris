@@ -42,8 +42,8 @@ class Travel(models.Model):
 
     travel_id = models.AutoField(primary_key=True, verbose_name='ID')
     company = models.ForeignKey("Company", on_delete=models.DO_NOTHING, verbose_name='Compañía')
-    driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING)
-    vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING)
+    driver = models.ForeignKey("Driver", on_delete=models.DO_NOTHING, verbose_name='Conductor')
+    vehicle = models.ForeignKey("Vehicle", on_delete=models.DO_NOTHING, verbose_name='Vehiculo')
     address = models.CharField(max_length=200, null=True)
     geocode = models.CharField(max_length=100, null=True)
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
