@@ -13,11 +13,12 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            if user.is_superuser:
+                return redirect('/admin/')
             return redirect('your_travels')
         else:
             messages.success(request, 'Hubo un error al iniciar el usuario, intente otra vez.')
             return redirect('login')
-
     else:
         return render(request, 'authenticate/login.html')
 
