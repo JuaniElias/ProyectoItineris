@@ -25,6 +25,11 @@ class CompanyAdmin(UserAdmin):
             return format_html('<a href="{}">Ver Licencia</a>', obj.license.url)
         return "No disponible"
 
+    def get_queryset(self, request):
+        # Filtrar los viajes que están pendientes de pago y finalizados
+        queryset = super().get_queryset(request)
+        return queryset.filter(is_superuser=0)
+
     view_license.short_description = "Licencia"
 
 admin.site.register(Company, CompanyAdmin)
