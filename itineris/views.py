@@ -881,10 +881,6 @@ def update_travel(request, travel_id):
         'waypoints': (travel.origin, travel.destination)})
 
 
-def cancel_travel_handler(request, travel_id):
-    travel = get_object_or_404(Travel, travel_id=travel_id)
-
-
 def export_travelers_to_csv(request, travel_id):
     travel = get_object_or_404(Travel, travel_id=travel_id)
     date_ = travel.origin.estimated_datetime_arrival.strftime("%Y-%m-%d")

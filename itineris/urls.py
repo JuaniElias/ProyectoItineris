@@ -38,6 +38,5 @@ urlpatterns = [
     path("cancel_traveler_ticket/<str:encrypted_traveler_id>/", views.cancel_traveler_ticket,
          name="cancel_traveler_ticket"),
     path("update_travel/<str:travel_id>/", views.update_travel, name="update_travel"),
-    path("cancel_travel_handler/<str:travel_id>/", views.cancel_travel_handler, name="cancel_travel_handler"),
     path("export_travelers_to_csv/<str:travel_id>/", views.export_travelers_to_csv, name="export_travelers_to_csv"),
 ]
