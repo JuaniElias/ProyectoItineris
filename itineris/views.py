@@ -716,8 +716,9 @@ def update_traveler(request, encrypted_traveler_id):
     can_cancel = True
     # Dos días antes se puede cancelar el viaje
     date_to_check = traveler.segment.waypoint_origin.estimated_datetime_arrival - pd.Timedelta(days=2)
+    date_today = datetime.now(pytz.utc)
 
-    if datetime.now(pytz.utc) <= date_to_check:
+    if date_today > date_to_check:
         can_cancel = False
     # Solo permitir editar los datos antes de que haya comenzado el viaje.
     if traveler.segment.travel.status == "Agendado":
