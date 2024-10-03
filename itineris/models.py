@@ -15,6 +15,7 @@ class Company(AbstractUser):
     address = models.CharField(max_length=100, verbose_name='Teléfono')
     license = models.FileField(upload_to='licenses', verbose_name='Licencia')
     is_verified = models.BooleanField(default=False, verbose_name='Verificado')
+    cbu = models.CharField(max_length=22)
 
     username = models.CharField(max_length=150, unique=True, verbose_name="CUIT")
 
@@ -49,9 +50,8 @@ class Travel(models.Model):
     url = models.CharField(max_length=5000, default=None, editable=True, null=True)
     payment_status = models.CharField(max_length=20, default="Pendiente",choices=PAYMENT_STATUS_CHOICES, verbose_name='Estado de pago')
     period = models.ForeignKey("Period", on_delete=models.DO_NOTHING, default=None, null=True, editable=True)
-    status = models.CharField(max_length=50, default="Borrador", choices=STATUS_CHOICES)
+    status = models.CharField(max_length=50, default="Borrador", choices=STATUS_CHOICES, verbose_name='Estado del viaje')
     real_datetime_arrival = models.DateTimeField(default=None, null=True, editable=True, verbose_name='Fecha de llegada')
-    cbu = models.CharField(max_length=22)
 
     class Meta:
         verbose_name = "Viaje a pagar"
@@ -76,6 +76,10 @@ class Travel(models.Model):
     def destination(self):
         return self.waypoint_set.all().order_by('node_number').last()
 
+    @property
+    def payment_info(self):
+        return self.company.cbu
+    payment_info.fget.short_description = "CBU"
 
 class Segment(models.Model):
     travel = models.ForeignKey("Travel", on_delete=models.DO_NOTHING)

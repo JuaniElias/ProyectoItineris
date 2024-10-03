@@ -30,18 +30,18 @@ class CompanyAdmin(UserAdmin):
 admin.site.register(Company, CompanyAdmin)
 
 class TravelAdmin(admin.ModelAdmin):
-    list_display = ('travel_id', 'company', 'payment_status', 'status', 'real_datetime_arrival', 'cbu' ,'gross_revenue')
+    list_display = ('travel_id', 'company', 'payment_status', 'status', 'real_datetime_arrival', 'payment_info', 'gross_revenue')
     list_filter = ('company', 'payment_status', 'status')
 
     readonly_fields = ('travel_id', 'company', 'driver', 'vehicle', 'address', 'geocode', 'status'
-                       , 'real_datetime_arrival', 'cbu' ,'gross_revenue', 'url', 'period')
+                       , 'real_datetime_arrival' ,'gross_revenue', 'url', 'period')
 
     fieldsets = (
         ('Información del viaje', {
             'fields': ('travel_id', 'company', 'status',)
         }),
         ('Información de pagos', {
-            'fields': ('cbu',  'payment_status',)
+            'fields': ('payment_status',)
         }),
     )
 

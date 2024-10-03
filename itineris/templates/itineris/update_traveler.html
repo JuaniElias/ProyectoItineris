@@ -10,12 +10,12 @@
                     <p>Nombre: {{ traveler.last_name }}, {{ traveler.first_name }} </p>
                     <p>DNI: {{ traveler.dni }}</p>
                     <p>Email: {{ traveler.email }}</p>
-                    <p>Ciudad de salida: {{ traveler.travel.city_origin }}</p>
-                    <p>Ciudad de destino: {{ traveler.travel.city_destination }}</p>
+                    <p>Ciudad de salida: {{ traveler.segment.waypoint_origin.city }}</p>
+                    <p>Ciudad de destino: {{ traveler.segment.waypoint_destination.city }}</p>
 
                     {{ form.as_table }}
                     <br>
-                    <button type="submit" class="btn btn-primary p-2 fs-3 mb-2">Guardar</button>
+                    <button type="submit" class="btn btn-success p-2 fs-4 mt-2">Guardar</button>
                 </form>
                 {% if can_cancel %}
                     <a class="btn btn-danger" href="{% url 'cancel_traveler_ticket' encrypted_traveler_id %}"

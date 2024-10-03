@@ -127,7 +127,7 @@ class EditSegment(forms.ModelForm):
 EditSegmentFormSet = modelformset_factory(Segment, form=EditSegment, extra=0)
 
 class PeriodTravel(forms.ModelForm):
-    weekdays = forms.ModelMultipleChoiceField(queryset=Weekday.objects.all(),
+    weekdays = forms.ModelMultipleChoiceField(label="Dia de la semana", queryset=Weekday.objects.all(),
                                               widget=s2forms.ModelSelect2MultipleWidget(
                                                   model=Weekday, search_fields=['weekday__icontains'],
                                                   attrs={'data-minimum-input-length': 0}),
@@ -288,12 +288,12 @@ class CreateTraveler(forms.ModelForm):
 
 class UpdateTraveler(forms.ModelForm):
     phone = forms.CharField(label='Teléfono', max_length=30, required=True)
-    address_origin = forms.CharField(max_length=200, widget=forms.TextInput(attrs={
+    address_origin = forms.CharField(label="Dirección de salida", max_length=200, widget=forms.TextInput(attrs={
         'id': 'autocomplete_origin',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))
     geocode_origin = forms.CharField(max_length=100, required=False)
-    address_destination = forms.CharField(max_length=200, widget=forms.TextInput(attrs={
+    address_destination = forms.CharField(label="Dirección de llegada", max_length=200, widget=forms.TextInput(attrs={
         'id': 'autocomplete_destination',  # ID necesario para el autocompletado
         'placeholder': 'Ingresa una dirección',
     }))

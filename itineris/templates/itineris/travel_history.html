@@ -53,7 +53,7 @@
                                     </select>
                                 </label>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <label>
                                     Estado
                                     <select id="statusFilter" name="statusFilter" class="form-control">
@@ -61,6 +61,16 @@
                                         <option value="Completado">Completado</option>
                                         <option value="Agendado">Agendado</option>
                                         <option value="Cancelado">Cancelado</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="col-md-1">
+                                <label>
+                                    Pago
+                                    <select id="paymentFilter" name="paymentFilter" class="form-control">
+                                        <option value="Todos">Todos</option>
+                                        <option value="Completado">Pendiente</option>
+                                        <option value="Agendado">Pago</option>
                                     </select>
                                 </label>
                             </div>
@@ -114,6 +124,7 @@
         const driverFilter = document.querySelector('#driverFilter');
         const vehicleFilter = document.querySelector('#vehicleFilter');
         const statusFilter = document.querySelector('#statusFilter');
+        const paymentFilter = document.querySelector('#paymentFilter');
 
         const table = new DataTable('#travel-history-table', {
             moment: {
@@ -131,14 +142,17 @@
             let driver_selected = driverFilter.options[driverFilter.selectedIndex].text;
             let vehicle_selected = vehicleFilter.options[vehicleFilter.selectedIndex].text;
             let status_selected = statusFilter.options[statusFilter.selectedIndex].text;
+            let payment_selected = paymentFilter.options[paymentFilter.selectedIndex].text;
 
             let driver = data[3] || "Todos";
             let vehicle = data[4] || "Todos";
             let status = data[5] || "Todos";
+            let payment = data[7] || "Todos";
 
             return (driver_selected === "Todos" || driver_selected === driver) &&
                 (vehicle_selected === "Todos" || vehicle_selected === vehicle) &&
-                (status_selected === "Todos" || status_selected === status);
+                (status_selected === "Todos" || status_selected === status) &&
+                (payment_selected === "Todos" || payment_selected === payment);
         });
 
         // Changes to the inputs will trigger a redraw to update the table
@@ -149,6 +163,9 @@
             table.draw();
         });
         statusFilter.addEventListener('change', function () {
+            table.draw();
+        });
+        paymentFilter.addEventListener('change', function () {
             table.draw();
         });
 

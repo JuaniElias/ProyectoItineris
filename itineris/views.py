@@ -427,9 +427,15 @@ def mark_travel_ended(request, travel_id):
     travel.real_datetime_arrival = datetime.now()
     travel.status = 'Finalizado'
     travel.save()
-    travelers = Traveler.objects.filter(segment_id=travel_id, payment_status='Confirmado')
+    travelers = Traveler.objects.filter(segment__travel_id=travel_id, payment_status='Confirmado')
+
 
     for traveler in travelers:
+        encrypted_traveler_id = encrypt_number(traveler.id, key=encryptedkey)
+        relative_url = reverse('feedback', kwargs={'encrypted_traveler_id': encrypted_traveler_id})
+        # Generar la URL absoluta utilizando 'request.build_absolute_uri'
+        absolute_url = request.build_absolute_uri(relative_url)
+
         to_email = traveler.email
         subject = f'Itineris | Viaje finalizado!'
         message = (f'¡Gracias por elegirnos!<br>'
@@ -441,7 +447,7 @@ def mark_travel_ended(request, travel_id):
                    f'Empresa: {traveler.segment.travel.company.company_name}<br>'
                    f'Vehículo: {traveler.segment.travel.vehicle}<br>'
                    f'Chofer: {traveler.segment.travel.driver}<br> <br> <br>'
-                   f'Si quieres dejar una reseña de viaje puedes hacerlo <a href="localhost:8000">aquí</a>.'
+                   f'Si quieres dejar una reseña de viaje puedes hacerlo <a href="{absolute_url}">aquí</a>.'
                    )
         try:
             send_email(to_email, subject, message, file=None, html=True)
