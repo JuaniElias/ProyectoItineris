@@ -593,8 +593,6 @@ def show_travelers(request):
                 traveler.save()
                 t.append(traveler.id)
             request.session['travelers'] = t
-            segment.seats_occupied += len(t)
-            segment.save()
             return redirect('checkout')
         else:
             print("Formset is not valid: ", formset.errors)

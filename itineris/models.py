@@ -279,6 +279,13 @@ class Traveler(models.Model):
 
         super().save(*args, **kwargs)
 
+        self.update_seats_occupied()
+
+    def update_seats_occupied(self):
+        confirmed_travelers = Traveler.objects.filter(segment=self.segment, payment_status='Confirmado').count()
+        self.segment.seats_occupied = confirmed_travelers
+        self.segment.save()
+
 
 class Province(models.Model):
     province_id = models.AutoField(primary_key=True),
