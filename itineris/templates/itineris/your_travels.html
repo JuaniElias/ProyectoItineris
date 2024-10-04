@@ -11,11 +11,13 @@
                 <table id="your-travels-table" class="content-table">
                     <thead>
                         <tr>
-                            <th class="date"        >Fecha y Hora salida</th>
-                            <th class="origin"      >Se anuncia a</th>
-                            <th class="capacity"    >Pasajeros</th>
-                            <th class="more-info"   ></th>
-                            <th class="update"      ></th>
+                            <th class="date" style="width: 25%;">Fecha y Hora salida</th>
+                            <th class="origin" style="width: 35%;">Se anuncia a</th>
+                            <th class="capacity" style="width: 15%; text-align: center;">Pasajeros</th>
+                            <th class="more-info"></th>
+                            <th class="update"></th>
+                            <th class="status"></th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -23,7 +25,7 @@
                             <tr>
                                 <td>{{ waypoint.0.estimated_datetime_arrival|date:"Y-m-d H:i" }}</td>
                                 <td>{{ waypoint.0.city }} - {{ waypoint.1.city }}</td>
-                                <td>{{ waypoint.2 }}</td>
+                                <td style="text-align: center;">{{ waypoint.2 }}</td>
                                 <td>
                                     <a href="{% url 'travel_detail' waypoint.0.travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
                                         <i class="bi bi-info-circle"></i>
@@ -34,6 +36,13 @@
                                         <i class="bi bi-pencil-square text-grey"></i>
                                     </a>
                                 </td>
+                                <td>
+                                    {% if waypoint.3 %}
+                                        <i class="bi bi-clock" ></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
                             {% endfor %}
                     </tbody>
                 </table>

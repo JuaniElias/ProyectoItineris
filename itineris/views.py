@@ -387,15 +387,18 @@ def update_driver(request, driver_id):
 
 def your_travels(request):
     travels = Travel.objects.all().filter(company=request.user.id, status='Agendado')
+    date_today = datetime.now(pytz.utc)
     wp = []
     for travel in travels:
         total_passengers = travel.segment_set.aggregate(total=Sum('seats_occupied'))['total'] or 0
-
-        wp.append((travel.origin, travel.destination, total_passengers))
+        if travel.origin.estimated_datetime_arrival <= date_today:
+            delay = True
+        else:
+            delay = False
+        wp.append((travel.origin, travel.destination, total_passengers, delay))
 
     wp.sort(key=lambda x: x[0].estimated_datetime_arrival)
-
-    return render(request, "itineris/your_travels.html", {'travels': wp, })
+    return render(request, "itineris/your_travels.html",{'travels': wp,})
 
 
 def travel_history(request):
