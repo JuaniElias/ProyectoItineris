@@ -3,6 +3,11 @@
 
 <title>Pago confirmado</title>
 {% block content %}
+<script type="text/javascript">
+    setTimeout(function() {
+        window.location.href = "{% url 'index' %}";
+    }, 5000);  // Redirige después de 5 segundos (5000 ms)
+</script>
 <div class="container-fluid vh-100 pt-4" style="background-color: #fdf8e2; margin-top: -24px;">
     <div class="row">
         <div class="col text-center">
