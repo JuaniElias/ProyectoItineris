@@ -14,9 +14,9 @@
                             <th class="date" style="width: 25%;">Fecha y Hora salida</th>
                             <th class="origin" style="width: 35%;">Se anuncia a</th>
                             <th class="capacity" style="width: 15%; text-align: center;">Pasajeros</th>
-                            <th class="more-info"></th>
-                            <th class="update"></th>
-                            <th class="status"></th>
+                            <th class="more-info" style="text-align: center;">Más Info</th>
+                            <th class="update" style="text-align: center;">Editar</th>
+                            <th class="status" style="text-align: center;">Retraso</th>
 
                         </tr>
                     </thead>
@@ -26,19 +26,19 @@
                                 <td>{{ waypoint.0.estimated_datetime_arrival|date:"Y-m-d H:i" }}</td>
                                 <td>{{ waypoint.0.city }} - {{ waypoint.1.city }}</td>
                                 <td style="text-align: center;">{{ waypoint.2 }}</td>
-                                <td>
+                                <td style="text-align: center;">
                                     <a href="{% url 'travel_detail' waypoint.0.travel.travel_id %}" class="btn" data-toggle="modal" data-target="#travelModal">
                                         <i class="bi bi-info-circle"></i>
                                     </a>
                                 </td>
-                                <td>
+                                <td style="text-align: center;">
                                     <a href="{% url 'update_travel' waypoint.0.travel.travel_id %}">
                                         <i class="bi bi-pencil-square text-grey"></i>
                                     </a>
                                 </td>
-                                <td>
+                                <td style="text-align: center;">
                                     {% if waypoint.3 %}
-                                        <i class="bi bi-clock" ></i>
+                                        <i class="bi bi-clock text-danger"></i>
                                     {% endif %}
                                 </td>
                             </tr>
