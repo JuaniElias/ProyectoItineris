@@ -30,12 +30,7 @@
                                 <td>{{ vehicle.brand }}</td>
                                 <td>{{ vehicle.car_model }}</td>
                                 <td>{{ vehicle.capacity }}</td>
-                                <td>{{ vehicle.status }}</td>
-                                <td>
-                                    <button class="btn" data-bs-toggle="modal" data-bs-target="#travelsVehicle">
-                                        <i class="bi bi-card-checklist"></i>
-                                    </button>
-                                </td>
+                                <td >{{ vehicle.status }}</td>
                                 <td>
                                     <a class="btn" href="{% url "update_vehicle" vehicle.plate_number %}">
                                         <i class="bi bi-pencil-square text-success"></i>
@@ -74,24 +69,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Info Vehicle Modal -->
-                <div class="modal fade" id="travelsVehicle" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Viajes del vehículo</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="{% url 'your_vehicles' %}" method=POST>
-                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
             </div>
         </div>
     </section>
