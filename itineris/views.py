@@ -468,24 +468,28 @@ def start_trip(request, travel_id):
     travel.save()
     travelers = Traveler.objects.filter(segment__travel=travel_id, payment_status='Confirmado')
 
-    if travelers.count() > 12:
+    if travelers.count() < 12:
         driver_message = f"<h2>Ingrese al siguiente <a href={travel.url}>LINK</a> para ver la ruta de viaje.</h2><br>"
     else:
         waypoints = Waypoint.objects.filter(travel_id=travel_id).order_by('node_number')
         driver_message = f"<h2>Ingrese a los siguientes links para ver la ruta del viaje.</h2><br>"
         for wp in waypoints:
-            driver_message += f"Ruta para {wp.city} <a href={wp.url}>LINK</a> <br>"
+            if wp.url is not None:
+                driver_message += f"Ruta para {wp.city} <a href={wp.url}>LINK</a> <br>"
 
     driver_message += (
-                      f"<h3>Lista de pasajeros para el viaje: <br>"
-                      f"<table><thead>"
-                      f"<tr><th>Trayecto</th>"
+                      f"<h3>Lista de pasajeros para el viaje: </h3><br>"
+                      f"<table>"
+                      f"<thead>"
+                      f"<tr>"
+                      f"<th>Trayecto</th>"
                       f"<th>Nombre</th>"
                       f"<th>Apellido</th>"
                       f"<th>DNI</th>"
                       f"<th>Teléfono</th>"
                       f"<th>Dirección Origen</th>"
-                      f"<th>Dirección Destino</th></tr></h3>")
+                      f"<th>Dirección Destino</th>"
+                      f"</tr></thead>")
 
     for traveler in travelers:
         to_email = traveler.email
@@ -499,14 +503,16 @@ def start_trip(request, travel_id):
             f'Recuerda chequear que el vehículo sea el correcto. Te brindamos la ruta que el conductor estará '
             f'siguiendo <a href="{travel.url}">aquí</a>'
             )
-        driver_message += (f"<tr><td>{traveler.first_name}</td>"
+        driver_message += (f"<tbody>"
+                           f"<tr><td>{traveler.segment.waypoint_origin.city.city_name
+                           } - {traveler.segment.waypoint_destination.city.city_name}</td>"
+                           f"<td>{traveler.first_name}</td>"
                            f"<td>{traveler.last_name}</td>"
                            f"<td>{traveler.dni}</td>"
                            f"<td>{traveler.phone}</td>"
                            f"<td>{traveler.address_origin}</td>"
                            f"<td>{traveler.address_destination}</td>"
-                           f"<td>{traveler.segment.waypoint_origin.city.city_name
-                           } - {traveler.segment.waypoint_destination.city.city_name}</td></tr>")
+                           f"</tr>")
         try:
             pass
             send_email(to_email, subject, message, file=None, html=True)
@@ -673,8 +679,8 @@ def payment_success(request):
                            f'<h3>Información de tu pasaje:<br>'
                            f'Origen: {traveler.address_origin}<br>'
                            f'Destino: {traveler.address_destination}<br>'
-                           f'Fecha y hora de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival}<br>'
-                           f'Fecha y hora estimada de llegada: {traveler.segment.waypoint_destination.estimated_datetime_arrival}<br>'
+                           f'Fecha y hora de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival[:-9]}<br>'
+                           f'Fecha y hora estimada de llegada: {traveler.segment.waypoint_destination.estimated_datetime_arrival[:-9]}<br>'
                            f'Empresa: {traveler.segment.travel.company.company_name}<br><br>'
                            
                            f'Vehículo: {traveler.segment.travel.vehicle}<br>'
