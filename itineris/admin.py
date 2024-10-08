@@ -53,7 +53,12 @@ class TravelAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         # Filtrar los viajes que están pendientes de pago y finalizados
         queryset = super().get_queryset(request)
-        return queryset.filter(payment_status='Pendiente', status='Finalizado')
+        all_travels = queryset.filter(payment_status='Pendiente', status='Finalizado')
+        non_zero_travels = []
+        for travel in all_travels:
+            if travel.gross_revenue > 0:
+                non_zero_travels.append(travel.travel_id)
+        return queryset.filter(travel_id__in=non_zero_travels)
 
 admin.site.register(Travel, TravelAdmin)
 

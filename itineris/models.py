@@ -64,7 +64,7 @@ class Travel(models.Model):
                      .aggregate(total=Sum('paid_amount'))
                      ['total'] or 0
                      )
-        return '$' + str(gross_rev)
+        return gross_rev
 
     gross_revenue.fget.short_description = "Total a pagar"
 

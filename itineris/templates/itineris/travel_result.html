@@ -9,7 +9,7 @@
             {% for segment in segments %}
                 <div class="card text-center mb-4">
                     <div class="card-header">
-                        <p>{{ segment.travel.company.company_name }}</p>
+                        <h3 class="fw-bold">{{ segment.travel.company.company_name }}</h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -17,7 +17,7 @@
     
                             </div>
                             <div class="col-md-2">
-                                <p>{{ segment.waypoint_origin.city }}</p>
+                                <p class="fw-bold">{{ segment.waypoint_origin.city }}</p>
                                 <p>{{ segment.waypoint_origin.estimated_datetime_arrival }}</p>
                             </div>
                             <div class="col-md-2">
@@ -25,7 +25,7 @@
                                 <p>{{ segment.duration }}</p>
                             </div>
                             <div class="col-md-2">
-                                <p>{{ segment.waypoint_destination.city }}</p>
+                                <p class="fw-bold">{{ segment.waypoint_destination.city }}</p>
                                 <p>{{ segment.waypoint_destination.estimated_datetime_arrival }}</p>
                             </div>
                             <div class="col-md-3">
