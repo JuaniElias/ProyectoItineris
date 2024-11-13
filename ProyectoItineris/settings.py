@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'ProyectoItineris.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'itinerisDB',
+        'NAME': os.path.join(BASE_DIR, 'itinerisDB'),
     }
 }
 
