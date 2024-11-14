@@ -15,6 +15,8 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    # Configura los argumentos para iniciar el servidor en localhost:8000
+    sys.argv = ['manage.py', 'runserver', 'localhost:8000', '--noreload']
     execute_from_command_line(sys.argv)
 
 
