@@ -500,6 +500,7 @@ def start_trip(request, travel_id):
             f'Este es su número de teléfono en caso de que lo necesites! {travel.driver.phone_number} <br>'
             f'Empresa: {travel.company.company_name}<br>'
             f'Vehículo: {travel.vehicle}<br>'
+            f'Color del vehículo: {travel.vehicle.color}<br>'
             f'Recuerda chequear que el vehículo sea el correcto. Te brindamos la ruta que el conductor estará '
             f'siguiendo <a href="{travel.url}">aquí</a>'
             )
@@ -950,7 +951,7 @@ def export_travel_history(request):
     driver_id = request.POST.get("driverFilter").strip()
     if driver_id != "Todos":
         filters &= Q(travel__driver_id=driver_id)
-        driver = get_object_or_404(Driver, id=driver_id)
+        driver = get_object_or_404(Driver, driver_id=driver_id)
         driver_name = str(driver)
     else:
         driver_name = 'Todos'
