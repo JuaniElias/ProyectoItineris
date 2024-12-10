@@ -679,8 +679,8 @@ def payment_success(request):
                            f'<h3>Información de tu pasaje:<br>'
                            f'Origen: {traveler.address_origin}<br>'
                            f'Destino: {traveler.address_destination}<br>'
-                           f'Fecha y hora de salida: {traveler.segment.waypoint_origin.estimated_datetime_arrival[:-9]}<br>'
-                           f'Fecha y hora estimada de llegada: {traveler.segment.waypoint_destination.estimated_datetime_arrival[:-9]}<br>'
+                           f'Fecha y hora de salida: {str(traveler.segment.waypoint_origin.estimated_datetime_arrival)[:-9]}<br>'
+                           f'Fecha y hora estimada de llegada: {str(traveler.segment.waypoint_destination.estimated_datetime_arrival)[:-9]}<br>'
                            f'Empresa: {traveler.segment.travel.company.company_name}<br><br>'
                            
                            f'Vehículo: {traveler.segment.travel.vehicle}<br>'
