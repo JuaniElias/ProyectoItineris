@@ -44,7 +44,7 @@
                                                 completado
                                             </button>
                                         </form>
-                                        <form action="{{ travel.url }}" method="get">
+                                        <form action="{{ travel.url }}" target="_blank" method="get">
                                             <button type="submit" class="btn btn-info mb-2">Ver ruta completa
                                             </button>
                                         </form>
@@ -88,7 +88,7 @@
                                         <td>{{ waypoint.travelers_to_pick_up }}</td>
                                         <td>{{ waypoint.travelers_to_drop_off }}</td>
                                         {% if waypoint.url %}
-                                        <td><a href="{{ waypoint.url }}">URL</a></td>
+                                        <td><a href="{{ waypoint.url }} " target="_blank">URL</a></td>
                                         {% endif %} 
                                     </tr>
                                 {% endfor %}
